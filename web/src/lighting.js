@@ -18,7 +18,28 @@ const D2R = Math.PI / 180;
 export async function loadSky( url, { rotation = 0 } = {} ) {
 
 	const loader = new HDRLoader().setDataType( THREE.FloatType );
-	const tex = await loader.loadAsync( url );
+	let tex;
+	if ( url.endsWith( '.txt' ) ) {
+
+		// Artifact versiyasi: .hdr fayl base64 matn sifatida yetkaziladi
+		const b64 = ( await ( await fetch( url ) ).text() ).trim();
+		const bin = atob( b64 );
+		const bytes = new Uint8Array( bin.length );
+		for ( let i = 0; i < bin.length; i ++ ) bytes[ i ] = bin.charCodeAt( i );
+		const d = loader.parse( bytes.buffer );
+		tex = new THREE.DataTexture( d.data, d.width, d.height, THREE.RGBAFormat, d.type );
+		tex.colorSpace = THREE.LinearSRGBColorSpace;
+		tex.minFilter = tex.magFilter = THREE.LinearFilter;
+		tex.generateMipmaps = false;
+		tex.flipY = true;
+		tex.needsUpdate = true;
+
+	} else {
+
+		tex = await loader.loadAsync( url );
+
+	}
+
 	tex.mapping = THREE.EquirectangularReflectionMapping;
 	const { width: W, height: Hh, data } = tex.image;
 

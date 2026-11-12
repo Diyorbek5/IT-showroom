@@ -29,6 +29,16 @@ head = head.replace(title, '')
 out = title.strip() + '\n' + head.strip() + '\n' + body.strip() + '\n' + '\n'.join(s.strip() for s in scripts) + '\n'
 open(os.path.join(root, 'artifact.html'), 'w', encoding='utf-8').write(out)
 
+# .hdr artifact'da xizmat qilinmaydi — base64 matn sifatida beramiz
+import base64, glob
+hdr = os.path.join(root, 'hdri', 'park_parking_2k.hdr')
+open(hdr + '.txt', 'w').write(base64.b64encode(open(hdr, 'rb').read()).decode())
+os.remove(hdr)
+for js in glob.glob(os.path.join(root, 'assets', 'index-*.js')):
+    t = open(js, encoding='utf-8').read()
+    assert 'hdri/park_parking_2k.hdr' in t
+    open(js, 'w', encoding='utf-8').write(t.replace('hdri/park_parking_2k.hdr', 'hdri/park_parking_2k.hdr.txt'))
+
 files = []
 for d in ('assets', 'hdri', 'tex'):
     for f in sorted(os.listdir(os.path.join(root, d))):
