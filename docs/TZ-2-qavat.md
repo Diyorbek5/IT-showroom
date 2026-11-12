@@ -1,6 +1,6 @@
 # TZ — IT Showroom, 2-qavat (qoralama v0.1)
 
-> Holat: faqat o'lchamli reja (`reference/2-qavat/01-plan-olchamlar.jpg`) tahlil qilingan. Ichki rasmlar kutilmoqda.
+> Holat: reja va 5 ta ichki rasm (`02…06-interyer.jpg`) tahlil qilindi. Boshqa xonalarning rasmlari kutilmoqda, model hali boshlanmagan.
 > Koordinatalar 1-qavat bilan bir xil: X — chapdan o'ngga, Z — rejada yuqoridan pastga, (0,0) — chap-yuqori ichki burchak.
 > Masshtab: ~40.6 px = 1 m. 23.35, 16.00 va 17.01 o'lchamlari bir-biriga mos keladi.
 
@@ -38,11 +38,31 @@
 - 1-qavatdan kelgan zina chap blokning pastki devori yonida, x 3.9…6.3, z 7.55…8.75 oralig'ida chiqadi. Bu teshik 1-qavat modelida bor.
 - 1-qavatning o'ng devori (x = 7.30) 2-qavatda yo'q. Uning o'rnida ikkita erkin turgan ustun qoladi va katta ochiq zal hosil bo'ladi.
 
-## 5. Aniqlanishi kerak (ichki rasmlardan yoki sizdan)
+## 5. Ichki rasmlar tahlili (birinchi to'plam)
+| Element | Rasmda ko'ringani | Qaysi rasm |
+|---|---|---|
+| Pol | laminat, och kulrang-bej eman, uzun taxtalar (~1.2 × 0.2 m), yarim yaltiroq | hammasi |
+| Shift | **qora** bo'yalgan beton, ostidan chiqib turgan to'sinlar (balkalar) ham qora | 02, 03, 04, 05, 06 |
+| Yoritgichlar | kvadrat LED panellar (~0.3–0.4 m), to'r shaklida joylashgan; ba'zi zonalarda mayda yumaloq spotlar | 02, 03, 05, 06 |
+| Elektr kabellari | shift va devor bo'ylab ochiq qora kabellar, bir joyda devorda o'ralgan kabel | 04, 05, 06 |
+| Devorlar | oq, mat | hammasi |
+| Plintus | och yog'och rangida (laminatga mos), 1-qavatdagidek qora emas | 02, 03, 04 |
+| Ustunlar | oq, to'rtburchak, katta | 02, 03, 05, 06 |
+| Fasad oynalari | poldan shiftgacha, qora profil, gorizontal ko'ndalang profillar bor (pastda ~0.9 m va yuqorida); ba'zi tavaqalar ochiladi | 02, 04, 05, 06 |
+| Oyna tashqarisi | yashil to'r bilan o'ralgan qurilish maydoni, ko'p qavatli uylar, daraxtlar, ko'cha | 02, 04, 05 |
+| Zina teshigi | 1-qavatdagi bilan bir xil qora geometrik panjara | 02, 03, 05 |
+| Eshiklar | oq plastik eshik (to'q oyna paneli bilan), oq eshik, to'q rangli eshik | 02, 03 |
+| Radiatorlar | oq seksiyali, pol yaqinida | 03, 04 |
+| Gaz qozon | devorga osilgan oq qozon, quvurlari bilan | 02 |
+| To'siq devorlar | zal ichida alohida oq devor bloklari, ba'zi xonalar (eshikli) | 03 |
+| Kichik xona | tor xona, bir devori to'liq oyna, radiator, qora shift, ochiq simlar | 04 |
+
+## 6. Aniqlanishi kerak (ichki rasmlardan yoki sizdan)
 1. Shift balandligi qancha?
 2. Yuqori fasad (23.35 m) to'liq oynami?
 3. O'ng qanotning chap tomonidagi uch chiziqli devor (z 1…8.75 qismi) chap blok bilan o'ng qanotni ajratadimi (devor yoki oyna) yoki zal ochiqmi?
 4. O'ng qanotning o'ng va chap tashqi tomonlari oynami?
 5. Chizmaning chap-yuqorisidagi oq chiziq nima — soyabon yoki balkonmi?
 6. 2-qavatdan yuqoriga zina bormi? Hojatxona, xonalar va to'siqlar bormi?
-7. Pol, devor, shift, yoritgichlar va jihozlar — ichki rasmlardan olinadi.
+7. Har bir rasm rejaning qaysi qismidan va qaysi tomonga qarab olingan? Buni keyingi rasmlar bilan birga aniqlayman.
+8. Kichik xona (04-rasm) va eshikli xonalar (03-rasm) rejada qayerda? Rejada ichki devorlar chizilmagan.
