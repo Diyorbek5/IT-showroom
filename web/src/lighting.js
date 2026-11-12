@@ -102,23 +102,39 @@ export async function loadSky( url, { rotation = 0 } = {} ) {
 
 }
 
+// Oynadan ko'rinadigan fon: 2K JPEG (osmon = 1 birlikda, BG_SCALE ga bo'lingan) — 6.6 MB HDR o'rniga 0.5 MB
+export const BG_SCALE = 4.0;
+export async function loadBackground( url ) {
+
+	const t = await new THREE.TextureLoader().loadAsync( url );
+	t.mapping = THREE.EquirectangularReflectionMapping;
+	t.colorSpace = THREE.SRGBColorSpace;
+	t.generateMipmaps = true;
+	t.minFilter = THREE.LinearMipmapLinearFilter;
+	t.anisotropy = 4;
+	return t;
+
+}
+
 export function setupSky( scene, renderer, sky, params ) {
 
 	const rot = params.hdriRotation * D2R;
-	scene.background = sky.texture;
+	const bg = sky.bg || sky.texture;
+	const bgK = sky.bg ? BG_SCALE : 1;
+	scene.background = bg;
 	scene.backgroundRotation.set( 0, rot, 0 );
-	scene.backgroundIntensity = params.skyIntensity;
+	scene.backgroundIntensity = params.skyIntensity * bgK;
 
 	// Yerga proyeksiyalangan fon — oynadan tashqaridagi asfalt/daraxtlar to'g'ri masshtabda
 	const mkGround = ( h, cx, cz, name ) => {
 
-		const g = new GroundedSkybox( sky.texture, h, 70, 96 );
+		const g = new GroundedSkybox( bg, h, 70, 96 );
 		g.position.set( cx, h - 0.03, cz );
 		g.rotation.y = rot;
 		g.material.depthWrite = false;
 		g.renderOrder = - 10;
 		g.name = name;
-		g.material.color.setScalar( params.skyIntensity );
+		g.material.color.setScalar( params.skyIntensity * bgK );
 		scene.add( g );
 		return g;
 
@@ -170,7 +186,7 @@ export function createProbeGrid() {
 
 	// Probe markazlari ustunlar ichiga tushmasligi uchun hajm tanlandi (TZ ga qarang)
 	const gx0 = 0.3, gx1 = 7.3, gz0 = 0, gz1 = 8.75;
-	const grid = new LightProbeGridWebGL( gx1 - gx0, H, gz1 - gz0, 7, 3, 9 );
+	const grid = new LightProbeGridWebGL( gx1 - gx0, H, gz1 - gz0, 6, 2, 7 );
 	grid.position.set( ( gx0 + gx1 ) / 2, H / 2, ( gz0 + gz1 ) / 2 );
 	grid.name = 'probe-grid';
 
@@ -187,9 +203,9 @@ export function createProbeGrid() {
 
 	return [
 		grid,
-		mk( 0.3, 15.66, 0, 8.75, 10, 3, 6, 'probe-grid-2a' ),
-		mk( 15.66, 23.35, 0, 11.6, 5, 3, 8, 'probe-grid-2b' ),
-		mk( 16.0, 23.35, 11.72, 17.01, 5, 2, 3, 'probe-grid-2c' ),
+		mk( 0.3, 15.66, 0, 8.75, 8, 2, 5, 'probe-grid-2a' ),
+		mk( 15.66, 23.35, 0, 11.6, 4, 2, 6, 'probe-grid-2b' ),
+		mk( 16.0, 23.35, 11.72, 17.01, 4, 2, 2, 'probe-grid-2c' ),
 	];
 
 }
@@ -206,6 +222,38 @@ export function bakeGI( renderer, scene, grids, { bounces = 2, cubemapSize = 16 
 
 	for ( const g of grids ) g.bake( renderer, scene, { cubemapSize, near: 0.02, far: 80, bounces } );
 	scene.environment = env;
+
+}
+
+// Bosqichma-bosqich bake: har kadrda bir nechta probe — sahifa qotmaydi, progress ko'rsatiladi.
+export async function bakeGIProgressive( renderer, scene, grids, { bounces = 1, cubemapSize = 16, chunk = 12, onProgress, before, after } = {} ) {
+
+	for ( const g of grids ) if ( ! g.parent ) scene.add( g );
+	const total = grids.reduce( ( a, g ) => a + g.resolution.x * g.resolution.y * g.resolution.z, 0 ) * ( bounces + 1 );
+	let done = 0;
+	for ( let pass = 0; pass <= bounces; pass ++ ) {
+
+		for ( const g of grids ) {
+
+			const n = g.resolution.x * g.resolution.y * g.resolution.z;
+			for ( let start = 0; start < n; start += chunk ) {
+
+				const count = Math.min( chunk, n - start );
+				before && before();
+				const env = scene.environment;
+				scene.environment = null;
+				g.bake( renderer, scene, { cubemapSize, near: 0.02, far: 80, start, count, pass } );
+				scene.environment = env;
+				after && after();
+				done += count;
+				onProgress && onProgress( done / total );
+				await new Promise( ( r ) => requestAnimationFrame( r ) );
+
+			}
+
+		}
+
+	}
 
 }
 

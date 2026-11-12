@@ -41,7 +41,7 @@ export async function enterPathTracing( { renderer, scene, camera, mats, sky, sk
 	} );
 
 	scene.environment = sky.texture;
-	scene.background = sky.texture;
+	scene.background = sky.bg || sky.texture;
 	scene.environmentRotation.copy( scene.backgroundRotation );
 	scene.environmentIntensity = params.skyIntensity;
 

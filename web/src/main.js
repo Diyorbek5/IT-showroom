@@ -15,7 +15,7 @@ import { buildShell } from './building.js';
 import { buildStair } from './stair.js';
 import { buildFixtures, applyLightLevels } from './fixtures.js';
 import { FloorReflection } from './reflection.js';
-import { loadSky, setupSky, updateSun, createProbeGrid, bakeGI, captureRoomEnv } from './lighting.js';
+import { loadSky, loadBackground, setupSky, createProbeGrid, bakeGIProgressive, captureRoomEnv } from './lighting.js';
 import { WalkControls } from './walk.js';
 
 const BASE = import.meta.env.BASE_URL;
@@ -31,7 +31,7 @@ const params = {
 	sunScale: 0.5,
 	skyIntensity: 1,
 	exposure: 0.68,
-	exposure2: 1.0, // 2-qavat: qora shift, kamroq qaytgan yorug'lik — fotograflar kabi ekspozitsiya oshiriladi
+	exposure2: 1.15, // 2-qavat: qora shift, kamroq qaytgan yorug'lik — fotograflar kabi ekspozitsiya oshiriladi
 	panel: 0.9,
 	chandelier: 0.25,
 	chandelierEmissive: 7,
@@ -93,11 +93,11 @@ async function main() {
 	const shell = buildShell( mats );
 	const stair = buildStair( mats );
 	const fixtures = buildFixtures( mats, params );
-	applyLightLevels( fixtures.userData.lights, mats, params );
 	const lights = fixtures.userData.lights;
 	const m2 = createMaterials2( mats );
 	const floor2 = buildFloor2( mats, m2 );
 	lights.floor2 = floor2.userData.lights;
+	applyLightLevels( lights, mats, params );
 	scene.add( shell, stair, fixtures, floor2, floor2.userData.mass );
 	const ceilingGroup = shell.userData.ceiling;
 	const floor = shell.userData.floor;
@@ -105,12 +105,13 @@ async function main() {
 	// Shiftga tegishli ob'ektlar (tepadan ko'rinishda yashiriladi)
 	const overhead = [ ceilingGroup, ...fixtures.children.filter( ( o ) => /chandelier|panel/.test( o.name ) ), ...stair.children.filter( ( o ) => false ) ];
 
-	const reflection = new FloorReflection( floor, { resolution: 0.5 } );
+	const reflection = new FloorReflection( floor, { resolution: 0.35 } );
 
 	// ---------- Osmon / quyosh ----------
-	setLoad( 0.25, 'Ko\'cha HDRI yuklanmoqda (6.8 MB)…' );
+	setLoad( 0.25, 'Ko\'cha manzarasi yuklanmoqda…' );
 	console.log( 'model built' );
-	const sky = await loadSky( BASE + 'hdri/park_parking_2k.hdr' );
+	const [ sky, bgTex ] = await Promise.all( [ loadSky( BASE + 'hdri/park_parking_1k.hdr' ), loadBackground( BASE + 'hdri/park_parking_bg.jpg' ) ] );
+	sky.bg = bgTex;
 	// Barcha birliklarni osmon = 1 ga normallashtiramiz
 	{
 
@@ -135,23 +136,68 @@ async function main() {
 	const skyObjs = setupSky( scene, renderer, sky, params );
 	renderer.toneMappingExposure = params.exposure;
 
-	// ---------- GI bake ----------
-	setLoad( 0.55, 'Yorug\'lik hisoblanmoqda (GI)…' );
+	// GI va akslarni hisoblashda to'liq HDR osmon ishlatiladi (JPEG fonda quyosh atrofi kesilgan)
+	const bgIntensity = scene.backgroundIntensity;
+	function hdrBackground( on ) {
+
+		if ( scene.background && scene.background.isColor ) return;
+		scene.background = on ? sky.texture : sky.bg;
+		scene.backgroundIntensity = on ? params.skyIntensity : bgIntensity;
+
+	}
+
+	// ---------- GI bake (bosqichma-bosqich, sahifa qotmaydi) ----------
+	setLoad( 0.4, 'Yorug\'lik hisoblanmoqda…' );
 	await frame();
 	renderer.shadowMap.needsUpdate = true;
-	reflection.uniforms.reflStrength.value = 0;
 	const grids = createProbeGrid();
 	const t0 = performance.now();
-	if ( LOW ) skyObjs.sun.shadow.mapSize.set( 1024, 1024 );
-	bakeGI( renderer, scene, grids, LOW ? { bounces: 1, cubemapSize: 8 } : { bounces: 2, cubemapSize: 16 } );
+	if ( LOW ) skyObjs.sun.shadow.mapSize.set( 2048, 2048 );
+	const bakeOpts = {
+		bounces: LOW ? 1 : 2, cubemapSize: LOW ? 8 : 16, chunk: LOW ? 8 : 24,
+		// Panel chiroqlari (RectAreaLight) faqat GI hisoblanayotganda yoqiladi: ularning yorug'ligi
+		// probe'larga "pishiriladi", real vaqtda esa og'ir hisob qilinmaydi.
+		before: () => {
+
+			reflection.uniforms.reflStrength.value = 0;
+			hdrBackground( true );
+			params.areaLights = true;
+			applyLightLevels( lights, mats, params );
+
+		},
+		after: () => {
+
+			reflection.uniforms.reflStrength.value = 1;
+			hdrBackground( false );
+			params.areaLights = false;
+			applyLightLevels( lights, mats, params );
+
+		},
+	};
+	await bakeGIProgressive( renderer, scene, grids, { ...bakeOpts, onProgress: ( f ) => setLoad( 0.4 + f * 0.45, `Yorug'lik hisoblanmoqda… ${Math.round( f * 100 )}%` ) } );
 	console.log( 'bake done', Math.round( performance.now() - t0 ) );
-	setLoad( 0.8, 'Akslar tayyorlanmoqda…' );
+	setLoad( 0.88, 'Akslar tayyorlanmoqda…' );
 	await frame();
-	scene.environment = captureRoomEnv( renderer, scene, new THREE.Vector3( 3.6, 1.5, 5.0 ), LOW ? 64 : 256 );
+	reflection.uniforms.reflStrength.value = 0;
+	hdrBackground( true );
+	scene.environment = captureRoomEnv( renderer, scene, new THREE.Vector3( 3.6, 1.5, 5.0 ), LOW ? 64 : 128 );
 	scene.environmentRotation.set( 0, 0, 0 );
-	setEnvMap( m2, captureRoomEnv( renderer, scene, new THREE.Vector3( 11.0, Y2 + 1.7, 3.2 ), LOW ? 64 : 256 ) );
+	setEnvMap( m2, captureRoomEnv( renderer, scene, new THREE.Vector3( 11.0, Y2 + 1.7, 3.2 ), LOW ? 64 : 128 ) );
+	hdrBackground( false );
 	reflection.uniforms.reflStrength.value = 1;
 	console.log( 'GI bake ms', Math.round( performance.now() - t0 ) );
+
+	// Chiroqlar almashtirilganda GI fonda qayta hisoblanadi
+	let rebaking = false;
+	async function rebakeGI() {
+
+		if ( rebaking ) return;
+		rebaking = true;
+		await bakeGIProgressive( renderer, scene, grids, { ...bakeOpts, onProgress: () => invalidate() } );
+		rebaking = false;
+		invalidate();
+
+	}
 
 	// ---------- Post-processing ----------
 	const composer = new EffectComposer( renderer, new THREE.WebGLRenderTarget( innerWidth * dpr, innerHeight * dpr, { type: THREE.HalfFloatType } ) );
@@ -313,6 +359,8 @@ async function main() {
 		applyLightLevels( lights, mats, params );
 		pt.active && pt.tracer.updateLights();
 		pt.active && pt.tracer.updateMaterials();
+		invalidate();
+		if ( ! pt.active ) rebakeGI();
 
 	};
 
@@ -331,11 +379,15 @@ async function main() {
 			try {
 
 				const { enterPathTracing } = await import( './pathtrace.js' );
+				params.areaLights = true;
+				applyLightLevels( lights, mats, params );
 				pt.ctx = await enterPathTracing( { renderer, scene, camera, mats, sky, skyObjs, grids, params, existing: pt.tracer } );
 
 			} catch ( e ) {
 
 				console.error( e );
+				params.areaLights = false;
+				applyLightLevels( lights, mats, params );
 				pt.loading = false;
 				btn.disabled = false;
 				status( 'Foto sifat rejimi bu qurilmada ishlamadi' );
@@ -352,6 +404,9 @@ async function main() {
 		} else {
 
 			pt.ctx.exit();
+			params.areaLights = false;
+			applyLightLevels( lights, mats, params );
+			invalidate();
 			pt.active = false;
 			btn.setAttribute( 'aria-pressed', 'false' );
 			status( null );
@@ -370,19 +425,36 @@ async function main() {
 
 	}
 
-	// ---------- O'lcham ----------
+	// ---------- O'lcham va moslashuvchan sifat ----------
+	// scale — ekran o'lchamiga nisbatan render o'lchami. Sekin qurilmada avtomatik kamayadi.
+	let scale = 1;
 	function resize() {
 
 		const w = innerWidth, h = innerHeight;
+		const pr = dpr * scale;
 		camera.aspect = w / h;
 		camera.updateProjectionMatrix();
+		renderer.setPixelRatio( pr );
 		renderer.setSize( w, h );
+		composer.setPixelRatio( pr );
 		composer.setSize( w, h );
-		n8.setSize( w * dpr, h * dpr );
-		reflection.setSize( w * dpr, h * dpr );
+		n8.setSize( w * pr, h * pr );
+		reflection.setSize( w * pr, h * pr );
 		pt.active && pt.tracer.updateCamera();
+		invalidate();
 
 	}
+
+	// Faqat o'zgarish bo'lganda chizamiz (kamera, animatsiya, chiroq...). Tinch turganda GPU dam oladi.
+	let dirty = 3;
+	function invalidate( n = 2 ) {
+
+		dirty = Math.max( dirty, n );
+
+	}
+
+	orbit.addEventListener( 'change', () => invalidate() );
+	walk.plc.addEventListener( 'change', () => invalidate() );
 
 	addEventListener( 'resize', resize );
 	resize();
@@ -397,6 +469,34 @@ async function main() {
 	mapGround.receiveShadow = true;
 	mapGround.visible = false;
 	scene.add( mapGround );
+
+	// Kadr vaqtiga qarab render o'lchamini sozlash (uzluksiz harakat paytida)
+	const perf = { last: 0, acc: 0, n: 0, cool: 0 };
+	function adapt() {
+
+		const now = performance.now();
+		if ( perf.last ) {
+
+			perf.acc += now - perf.last; perf.n ++;
+
+		}
+
+		perf.last = now;
+		if ( perf.n < 20 || now < perf.cool || SHOT ) return;
+		const avg = perf.acc / perf.n;
+		perf.acc = 0; perf.n = 0;
+		let ns = scale;
+		if ( avg > 26 && scale > 0.5 ) ns = Math.max( 0.5, scale * 0.8 );
+		else if ( avg < 15 && scale < 1 ) ns = Math.min( 1, scale * 1.15 );
+		if ( ns !== scale ) {
+
+			scale = ns;
+			perf.cool = now + 1500;
+			resize();
+
+		}
+
+	}
 
 	// ---------- Kadr sikli ----------
 	const clock = new THREE.Clock();
@@ -414,8 +514,12 @@ async function main() {
 
 		}
 
-		if ( walk.active ) walk.update( dt );
-		else orbit.update();
+		if ( anim ) invalidate();
+		if ( walk.active ) {
+
+			if ( walk.update( dt ) ) invalidate();
+
+		} else if ( orbit.update() ) invalidate();
 
 		// Kamera qaysi qavat ichida? Tashqarida (tepadan) bo'lsa — kesim (maket) ko'rinishi
 		const cp = camera.position;
@@ -430,10 +534,22 @@ async function main() {
 		skyObjs.ground2.visible = ! outside && cp.y >= H + 0.1;
 		mapGround.visible = outside;
 		hemi.visible = outside;
-		scene.background = outside ? outsideBg : sky.texture;
+		scene.background = outside ? outsideBg : sky.bg;
 		reflection.enabled = cp.y < H;
+		if ( !! params.floor2Live !== in2 ) {
+
+			params.floor2Live = in2;
+			applyLightLevels( lights, mats, params );
+
+		}
 		const expT = ( cp.y > Y2 - 0.2 && ! cut1 ) ? params.exposure2 : params.exposure;
-		renderer.toneMappingExposure += ( expT - renderer.toneMappingExposure ) * ( SHOT ? 1 : Math.min( 1, dt * 4 ) );
+		const de = expT - renderer.toneMappingExposure;
+		if ( Math.abs( de ) > 0.002 ) {
+
+			renderer.toneMappingExposure += de * ( SHOT ? 1 : Math.min( 1, dt * 4 ) );
+			invalidate();
+
+		}
 
 		if ( pt.active ) {
 
@@ -448,13 +564,19 @@ async function main() {
 			pt.tracer.renderSample();
 			status( `Foto sifat · ${Math.floor( pt.tracer.samples )} namuna` );
 
-		} else {
+		} else if ( dirty > 0 || SHOT ) {
 
+			dirty --;
 			const f2 = floor2.visible;
 			floor2.visible = false;
 			reflection.update( renderer, scene, camera );
 			floor2.visible = f2;
 			composer.render( dt );
+			adapt();
+
+		} else {
+
+			perf.last = 0;
 
 		}
 
@@ -469,7 +591,7 @@ async function main() {
 	loader.style.opacity = '0';
 	setTimeout( () => loader.remove(), 700 );
 	window.__ready = true;
-	window.__app = { pt, bloom, n8, composer, renderFrames: ( n = 1 ) => {
+	window.__app = { invalidate, pt, bloom, n8, composer, renderFrames: ( n = 1 ) => {
 
 		for ( let i = 0; i < n; i ++ ) tick();
 		return renderer.domElement.toDataURL( 'image/png' );

@@ -146,32 +146,38 @@ export function buildFixtures( mats, params ) {
 
 }
 
-// Yoritgichlar yorqinligini HDRI birliklarida sozlash
+// Yoritgichlar yorqinligini HDRI birliklarida sozlash.
+// Real vaqtda RectAreaLight'lar o'chiq (juda og'ir) — panel yorug'ligi GI probe'lar orqali keladi;
+// ular faqat "Foto sifat" (path tracing) rejimida yoqiladi. Yorug'lik soni o'zgarmasligi uchun
+// chiroqlar visible bilan emas, intensity bilan o'chiriladi (shader qayta kompilyatsiya bo'lmaydi).
 export function applyLightLevels( lights, mats, p ) {
 
+	const on = p.lightsOn ? 1 : 0;
+	const area = !! p.areaLights;
 	for ( const l of lights.panels ) {
 
-		l.intensity = p.panel * ( p.lightsOn ? 1 : 0 );
-		l.visible = p.lightsOn;
+		l.intensity = p.panel * on;
+		l.visible = area;
 
 	}
 
 	for ( const l of lights.chandeliers ) {
 
-		l.intensity = p.chandelier * ( p.lightsOn ? 1 : 0 );
-		l.visible = p.lightsOn;
+		l.intensity = p.chandelier * on;
+		l.visible = true;
 
 	}
 
+	// 2-qavat panel guruhlari (6 ta katta yorug'lik) — kamera 2-qavatda bo'lganda real vaqtda ham yoqiladi
 	for ( const l of lights.floor2 || [] ) {
 
-		l.intensity = p.panel * l.userData.areaFactor;
-		l.visible = p.lightsOn;
+		l.intensity = p.panel * l.userData.areaFactor * on;
+		l.visible = area || !! p.floor2Live;
 
 	}
 
-	mats.ledCool.emissiveIntensity = p.lightsOn ? p.panelEmissive : 0;
-	mats.ledWarm.emissiveIntensity = p.lightsOn ? p.chandelierEmissive : 0;
+	mats.ledCool.emissiveIntensity = p.panelEmissive * on;
+	mats.ledWarm.emissiveIntensity = p.chandelierEmissive * on;
 
 }
 
