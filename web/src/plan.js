@@ -33,9 +33,10 @@ export const GLAZING = [
 	{ id: 'west-s', a: [GLASS_LINE, 8.75], b: [GLASS_LINE, 4.18], mullions: [0.8, 2.25, 3.4], transom: 2.45, doors: [{ t0: 0.8, t1: 2.25, h: 2.45 }] },
 ];
 
-// Zina: janubiy devor bo'ylab, g'arbdan sharqqa ko'tariladi
+// Zina: janubiy devor bo'ylab, SHARQDAN G'ARBGA ko'tariladi (2-qavat rasmlari: 2-qavatga g'arb uchida,
+// kichik xona ro'parasida chiqadi). x1 — pastki pog'ona (sharq), x0 — yuqori chiqish (g'arb).
 export const STAIR = {
-	x0: 2.37,
+	x0: 2.6,
 	x1: 6.3,
 	z0: 7.6,
 	z1: 8.75,
@@ -44,11 +45,11 @@ export const STAIR = {
 STAIR.rise = FF / STAIR.risers;
 STAIR.going = ( STAIR.x1 - STAIR.x0 ) / ( STAIR.risers - 1 );
 
-// Shiftdagi zina teshigi
-export const OPENING = { x0: 3.9, x1: 6.3, z0: 7.55, z1: 8.75 };
+// Shiftdagi (2-qavat polidagi) zina teshigi — yuqori uchi ustida
+export const OPENING = { x0: 2.6, x1: 4.9, z0: 7.55, z1: 8.75 };
 
-// Zina ostidagi xona (WC / omborxona) va eshik
-export const WC = { x0: 5.44, x1: 6.5, z0: 7.55, z1: 8.75, t: 0.1, door: { x0: 5.58, x1: 6.38, h: 2.05 } };
+// Zina yuqori uchi ostidagi kichik xona (omborxona) va eshik
+export const WC = { x0: 2.37, x1: 4.1, z0: 7.55, z1: 8.75, t: 0.1, door: { x0: 2.8, x1: 3.6, h: 2.05 } };
 
 // Qandillar
 export const CHANDELIERS = [
@@ -66,7 +67,7 @@ export const PANELS = [
 
 // Radiatorlar: markaz, devor normali yo'nalishi (xonaga), seksiyalar soni
 export const RADIATORS = [
-	{ x: 3.75, z: 8.75, nx: 0, nz: - 1, n: 10 },
+	{ x: 4.75, z: 8.75, nx: 0, nz: - 1, n: 10 },
 	{ x: 7.3, z: 2.2, nx: - 1, nz: 0, n: 10 },
 	{ x: 7.3, z: 5.05, nx: - 1, nz: 0, n: 8 },
 ];

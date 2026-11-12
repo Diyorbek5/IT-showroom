@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { OPENING } from './plan.js';
-import { Y2, H2, BEAM_D, ROOF_T, XJ, OUTLINE2, COLS2, GLAZING2, TRANSOMS2, PARTITIONS2, BEAMS2, PANELS2, SPOTS2, RADIATORS2 } from './plan2.js';
+import { Y2, H2, BEAM_D, ROOF_T, XJ, OUTLINE2, COLS2, GLAZING2, TRANSOMS2, PARTITIONS2, BEAMS2, PANELS2, SPOTS2, RADIATORS2, NOOK2 } from './plan2.js';
 import { Batch, box, worldUV } from './geo.js';
 import { buildGlazingRun } from './glazing.js';
 import { addRadiators } from './fixtures.js';
@@ -67,7 +67,22 @@ export function buildFloor2( mats, m2 ) {
 	};
 
 	band( - 0.3, 23.65, - 0.3, 0 );
-	band( - 0.3, 0, 0, 8.75 );
+	band( - 0.3, 0, 0, 1.9 );
+	w.add( W, box( - 0.3, 0, yb, yt, 1.9, 8.75 ) ); // g'arbiy devor (oynasiz qism)
+
+	// Tambur old devori: o'rtasida eshiksiz o'tish joyi
+	{
+
+		const n = NOOK2, t0 = n.x1 - 0.12;
+		w.add( W, box( t0, n.x1, Y2, TOP, n.z0, n.open[ 0 ] ) );
+		w.add( W, box( t0, n.x1, Y2 + DOOR_H + 0.15, TOP, n.open[ 0 ], n.open[ 1 ] ) );
+		w.add( W, box( t0, n.x1, Y2, TOP, n.open[ 1 ], n.z1 ) );
+		// o'tish joyi ramkasi
+		for ( const z of n.open ) w.add( m2.pvc, box( t0 - 0.01, n.x1 + 0.01, Y2, Y2 + DOOR_H + 0.15, z - 0.03, z + 0.03 ) );
+		w.add( m2.pvc, box( t0 - 0.01, n.x1 + 0.01, Y2 + DOOR_H + 0.12, Y2 + DOOR_H + 0.18, n.open[ 0 ], n.open[ 1 ] ) );
+
+	}
+
 	band( 15.7, 16.0, 9.93, 14.95 );
 	band( 16.4, 18.75, 17.01, 17.31 );
 	band( 20.65, 22.95, 17.01, 17.31 );
@@ -105,11 +120,13 @@ export function buildFloor2( mats, m2 ) {
 	const skz = ( z, x0, x1, side ) => w.add( S, box( x0, x1, Y2, Y2 + SK_H, z, z + side * SK_T ) );
 	skx( 23.35, 1.0, 3.57, - 1 ); skx( 23.35, 4.56, 9.0, - 1 ); skx( 23.35, 9.95, 11.6, - 1 );
 	skx( 23.35, 11.72, 14.95, - 1 ); skx( 23.35, 15.94, 16.45, - 1 );
-	skz( 8.75, 0.0, OPENING.x0 - 0.05, - 1 ); skz( 8.75, OPENING.x1, 15.375, - 1 );
+	skz( 8.75, 2.0, OPENING.x0, - 1 ); skz( 8.75, OPENING.x1 + 0.05, 15.375, - 1 );
+	skx( 0, 4.18, 5.6, 1 ); skx( 0.75, 3.8, 3.68, 1 );
+	skx( 2.0, 5.6, 8.75, 1 ); skz( 5.6, 0, 0.28, - 1 ); skz( 5.6, 1.22, 2.0, - 1 ); skx( 1.4, 1.9, 2.35, 1 ); skx( 1.4, 3.25, 3.8, 1 );
 	skx( 15.375, 4.56, 8.75, - 1 ); skx( 15.55, 4.56, 8.75, 1 );
 	skx( 16.0, 8.75, 8.94, 1 );
 	let sx = 16.0;
-	for ( const d of doors ) {
+	for ( const d of doors.filter( ( q ) => q.x0 > 15 ) ) {
 
 		skz( 11.6, sx, d.x0 - 0.07, - 1 ); skz( 11.72, sx, d.x0 - 0.07, 1 ); sx = d.x1 + 0.07;
 
@@ -135,8 +152,8 @@ export function buildFloor2( mats, m2 ) {
 
 	// ---------- Eshiklar ----------
 	for ( const d of doors ) addDoor( w, m2, d );
-	// chap blokdagi to'q rangli metall eshik (rasm 02)
-	addSurfaceDoor( w, m2, 1.15, 2.05, 8.75 );
+	// tambur ichidagi to'q rangli metall eshik (rasm 02, 12, 13) — g'arbiy devorda
+	addSurfaceDoorX( w, m2, 2.35, 3.25, 0 );
 
 	// Zina teshigi atrofidagi pol qirrasi va ostona chiziqlari
 	w.add( m2.threshold, box( XJ - 0.015, XJ + 0.015, Y2, Y2 + 0.004, 1.0, 3.57 ) );
@@ -144,7 +161,7 @@ export function buildFloor2( mats, m2 ) {
 
 	// ---------- Radiatorlar, gaz qozon, rozetkalar ----------
 	addRadiators( w, m2, RADIATORS2, Y2 );
-	addBoiler( w, m2, 23.35, 2.3 );
+	addBoiler( w, m2, 7.59, 1.0, 0 ); // rasm 12: qozon ustunning janubiy yuzasida
 	for ( const [ x, z, nx, nz ] of [ [ 23.35, 6.0, - 1, 0 ], [ 9.0, 8.75, 0, - 1 ], [ 15.375, 5.4, - 1, 0 ], [ 17.0, 11.72, 0, 1 ], [ 22.6, 11.72, 0, 1 ], [ 19.0, 11.6, 0, - 1 ] ] ) addSocket( w, m2, x, Y2 + 0.32, z, nx, nz );
 
 	root.add( w.build( { name: 'floor2-walls' } ) );
@@ -258,19 +275,19 @@ function addDoor( b, m2, d ) {
 
 }
 
-// Devor yuzasiga o'rnatilgan metall eshik (janubiy devor, shimolga qaragan)
-function addSurfaceDoor( b, m2, x0, x1, z ) {
+// Devor yuzasidagi metall eshik (x = const devor, sharqqa qaragan)
+function addSurfaceDoorX( b, m2, z0, z1, x ) {
 
-	b.add( m2.metalDoor, box( x0 - 0.05, x1 + 0.05, Y2, Y2 + DOOR_H + 0.05, z - 0.02, z ) );
-	b.add( m2.metalDoor, box( x0, x1, Y2 + 0.005, Y2 + DOOR_H, z - 0.045, z - 0.02 ) );
-	for ( let y = 0.3; y < DOOR_H - 0.1; y += 0.16 ) b.add( m2.blackMetal, box( x0 + 0.06, x1 - 0.06, Y2 + y, Y2 + y + 0.006, z - 0.047, z - 0.044 ) );
-	b.add( m2.chrome, box( x1 - 0.16, x1 - 0.04, Y2 + 1.0, Y2 + 1.02, z - 0.1, z - 0.08 ) );
+	b.add( m2.metalDoor, box( x, x + 0.02, Y2, Y2 + DOOR_H + 0.05, z0 - 0.05, z1 + 0.05 ) );
+	b.add( m2.metalDoor, box( x + 0.02, x + 0.045, Y2 + 0.005, Y2 + DOOR_H, z0, z1 ) );
+	for ( let y = 0.3; y < DOOR_H - 0.1; y += 0.16 ) b.add( m2.blackMetal, box( x + 0.044, x + 0.047, Y2 + y, Y2 + y + 0.006, z0 + 0.06, z1 - 0.06 ) );
+	b.add( m2.chrome, box( x + 0.08, x + 0.1, Y2 + 1.0, Y2 + 1.02, z1 - 0.16, z1 - 0.04 ) );
 
 }
 
-function addBoiler( b, m2, x, z ) {
+function addBoiler( b, m2, x, z, rotY = - Math.PI / 2 ) {
 
-	const m = new THREE.Matrix4().makeRotationY( - Math.PI / 2 ).setPosition( x, Y2, z );
+	const m = new THREE.Matrix4().makeRotationY( rotY ).setPosition( x, Y2, z );
 	b.add( m2.boiler, new RoundedBoxGeometry( 0.42, 0.72, 0.3, 3, 0.03 ).translate( 0, 1.75, 0.16 ), m );
 	b.add( m2.boilerGrey, box( - 0.17, 0.17, 1.4, 1.43, 0.04, 0.29 ), m );
 	b.add( m2.darkGlass, box( - 0.08, 0.08, 1.62, 1.68, 0.305, 0.312 ), m );

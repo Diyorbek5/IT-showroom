@@ -8,27 +8,28 @@ export function buildStair( mats ) {
 
 	const root = new THREE.Group();
 	root.name = 'stair';
-	const { x0, z0, z1, risers, rise: r, going: g } = STAIR;
+	const { x0, x1, z0, z1, risers, rise: r, going: g } = STAIR;
 	const steps = risers - 1;
 	const b = new Batch();
 
-	// Pog'onalar: oq suvoqli blok (pastki tomoni zinapoya shaklida), qora granit qoplama
+	// Pog'onalar (i = 0 — eng pastki, sharqda): oq suvoqli blok (pastki tomoni zinapoya shaklida),
+	// qora granit qoplama. Yurish yo'nalishi — g'arbga.
 	const underside = ( i ) => i * r - 0.18;
 	for ( let i = 0; i < steps; i ++ ) {
 
-		const sx = x0 + i * g;
+		const xe = x1 - i * g; // pog'onaning old (sharqiy) qirrasi
+		const xw = xe - g;
 		const top = ( i + 1 ) * r;
 		let bot = underside( i );
 		if ( bot < 0.15 ) bot = 0;
-		b.add( mats.plaster, box( sx, sx + g + 0.001, bot, top - 0.03, z0, z1 ) );
-		b.add( mats.granite, box( sx - 0.025, sx + g, top - 0.03, top, z0 - 0.02, z1 ) ); // pog'ona yuzasi
-		b.add( mats.granite, box( sx - 0.012, sx, top - r, top - 0.03, z0, z1 ) ); // tik yuza
+		b.add( mats.plaster, box( xw - 0.001, xe, bot, top - 0.03, z0, z1 ) );
+		b.add( mats.granite, box( xw, xe + 0.025, top - 0.03, top, z0 - 0.02, z1 ) ); // pog'ona yuzasi
+		b.add( mats.granite, box( xe, xe + 0.012, top - r, top - 0.03, z0, z1 ) ); // tik yuza
 
 	}
 
-	// Oxirgi (18-) ko'tarilish — orayopma qirrasi
-	b.add( mats.granite, box( STAIR.x1 - 0.012, STAIR.x1, FF - r, FF, z0, z1 ) );
-	b.add( mats.granite, box( STAIR.x1, 6.5, FF - 0.04, FF - 0.01, z0 - 0.02, z1 ) );
+	// Oxirgi (18-) ko'tarilish — 2-qavat orayopmasi qirrasi
+	b.add( mats.granite, box( x0, x0 + 0.012, FF - r, FF - 0.01, z0, z1 ) );
 
 	root.add( b.build( { name: 'steps' } ) );
 
@@ -44,8 +45,8 @@ export function buildStair( mats ) {
 
 function pitch( x ) {
 
-	const { x0, rise: r, going: g } = STAIR;
-	return r + ( x - x0 ) * r / g;
+	const { x1, rise: r, going: g } = STAIR;
+	return r + ( x1 - x ) * r / g;
 
 }
 
@@ -57,29 +58,30 @@ function buildRailings( mats ) {
 	const HR = 0.92; // tutqich balandligi
 	const BR = 0.1; // pastki planka
 
-	const xa = STAIR.x0 + 0.03, xb = STAIR.x1;
+	const xa = STAIR.x1 - 0.03, xb = STAIR.x0; // pastki (sharq) → yuqori (g'arb)
 	// qiya tutqich va pastki planka
 	b.add( M, beam( V( xa, pitch( xa ) + HR, zr ), V( xb, pitch( xb ) + HR, zr ), 0.045, 0.045 ) );
 	b.add( M, beam( V( xa, pitch( xa ) + BR, zr ), V( xb, pitch( xb ) + BR, zr ), 0.012, 0.04 ) );
-	// boshlang'ich ustuncha
+	// boshlang'ich ustuncha (pastda, sharqda)
 	b.add( M, box( xa - 0.03, xa + 0.03, 0, pitch( xa ) + HR + 0.03, zr - 0.03, zr + 0.03 ) );
 
 	// Balyasinalar (geometrik naqsh: yakka + "zinapoya" juftlik)
-	panelPattern( b, M, xa + 0.06, xb - 0.04, ( x ) => pitch( x ) + BR, ( x ) => pitch( x ) + HR, ( x, y0, y1 ) => [ V( x, y0, zr ), V( x, y1, zr ) ], 'x' );
+	panelPattern( b, M, xb + 0.04, xa - 0.06, ( x ) => pitch( x ) + BR, ( x ) => pitch( x ) + HR, ( x, y0, y1 ) => [ V( x, y0, zr ), V( x, y1, zr ) ], 'x' );
 
-	// 2-qavatdagi to'siq (teshik atrofida)
+	// 2-qavatdagi to'siq: teshikning shimoliy tomoni va sharqiy uchi (g'arb uchi — chiqish maydonchasi)
 	const y0 = FF;
 	const zn = OPENING.z0 - 0.04;
-	const xw = OPENING.x0 - 0.04;
-	b.add( M, box( xw - 0.0225, xb + 0.0225, y0 + HR - 0.0225, y0 + HR + 0.0225, zn - 0.0225, zn + 0.0225 ) );
-	b.add( M, box( xw, xb, y0 + BR - 0.006, y0 + BR + 0.006, zn - 0.02, zn + 0.02 ) );
-	b.add( M, box( xw - 0.0225, xw + 0.0225, y0 + HR - 0.0225, y0 + HR + 0.0225, zn, OPENING.z1 ) );
-	b.add( M, box( xw - 0.02, xw + 0.02, y0 + BR - 0.006, y0 + BR + 0.006, zn, OPENING.z1 ) );
-	b.add( M, box( xw - 0.03, xw + 0.03, y0, y0 + HR + 0.03, zn - 0.03, zn + 0.03 ) );
+	const xw = OPENING.x0;
+	const xe = OPENING.x1 + 0.04;
+	b.add( M, box( xw - 0.0225, xe + 0.0225, y0 + HR - 0.0225, y0 + HR + 0.0225, zn - 0.0225, zn + 0.0225 ) );
+	b.add( M, box( xw, xe, y0 + BR - 0.006, y0 + BR + 0.006, zn - 0.02, zn + 0.02 ) );
+	b.add( M, box( xe - 0.0225, xe + 0.0225, y0 + HR - 0.0225, y0 + HR + 0.0225, zn, OPENING.z1 ) );
+	b.add( M, box( xe - 0.02, xe + 0.02, y0 + BR - 0.006, y0 + BR + 0.006, zn, OPENING.z1 ) );
+	for ( const x of [ xw, xe ] ) b.add( M, box( x - 0.03, x + 0.03, y0, y0 + HR + 0.03, zn - 0.03, zn + 0.03 ) );
 	// tayanch ustunchalar (pastki planka polga)
-	for ( let x = xw + 0.6; x < xb; x += 0.6 ) b.add( M, box( x - 0.01, x + 0.01, y0, y0 + BR, zn - 0.01, zn + 0.01 ) );
-	panelPattern( b, M, xw + 0.06, xb - 0.04, () => y0 + BR, () => y0 + HR, ( x, a, c ) => [ V( x, a, zn ), V( x, c, zn ) ], 'x' );
-	panelPattern( b, M, zn + 0.06, OPENING.z1 - 0.04, () => y0 + BR, () => y0 + HR, ( z, a, c ) => [ V( xw, a, z ), V( xw, c, z ) ], 'z' );
+	for ( let x = xw + 0.6; x < xe; x += 0.6 ) b.add( M, box( x - 0.01, x + 0.01, y0, y0 + BR, zn - 0.01, zn + 0.01 ) );
+	panelPattern( b, M, xw + 0.06, xe - 0.06, () => y0 + BR, () => y0 + HR, ( x, a, c ) => [ V( x, a, zn ), V( x, c, zn ) ], 'x' );
+	panelPattern( b, M, zn + 0.06, OPENING.z1 - 0.04, () => y0 + BR, () => y0 + HR, ( z, a, c ) => [ V( xe, a, z ), V( xe, c, z ) ], 'z' );
 
 	return b.build( { name: 'railing' } );
 
@@ -126,31 +128,33 @@ function buildWC( mats ) {
 	const { rise: r, going: g } = STAIR;
 	const b = new Batch();
 
-	// Old devor: pastki qirrasi zinapoya ostiga mos (zinapoyasimon)
-	const pts = [ [ x0, 0 ], [ door.x0, 0 ], [ door.x0, door.h ], [ door.x1, door.h ], [ door.x1, 0 ], [ x1, 0 ], [ x1, H ], [ STAIR.x1, H ] ];
-	for ( let i = STAIR.risers - 2; i >= 0; i -- ) {
+	// Old devor: yuqori qirrasi zinapoya ostiga mos (zinapoyasimon), g'arb uchi — shiftgacha
+	const pts = [ [ x0, 0 ], [ door.x0, 0 ], [ door.x0, door.h ], [ door.x1, door.h ], [ door.x1, 0 ], [ x1, 0 ] ];
+	for ( let i = 0; i < STAIR.risers - 1; i ++ ) {
 
-		const sx = STAIR.x0 + i * g;
+		const xe = STAIR.x1 - i * g, xw = xe - g;
+		if ( xw >= x1 ) continue;
 		const y = Math.max( 0, i * r - 0.18 );
-		const xr = sx + g;
-		if ( xr <= x0 ) break;
-		pts.push( [ Math.min( xr, STAIR.x1 ), y ] );
-		pts.push( [ Math.max( sx, x0 ), y ] );
+		pts.push( [ Math.min( xe, x1 ), y ] );
+		pts.push( [ Math.max( xw, x0 ), y ] );
 
 	}
+
+	pts.push( [ STAIR.x0, H ], [ x0, H ] );
 
 	const shape = new THREE.Shape( pts.map( ( [ x, y ] ) => new THREE.Vector2( x, y ) ) );
 	const eg = new THREE.ExtrudeGeometry( shape, { depth: t, bevelEnabled: false } );
 	eg.translate( 0, 0, z0 );
 	b.add( mats.wall, eg );
 
-	// Yon devor (x = x0)
-	const yi = Math.floor( ( x0 - STAIR.x0 ) / g );
-	b.add( mats.wall, box( x0, x0 + t, 0, yi * r - 0.18, z0 + t, WC.z1 ) );
+	// Yon devorlar
+	const ie = Math.floor( ( STAIR.x1 - x1 ) / g );
+	b.add( mats.wall, box( x1 - t, x1, 0, ie * r - 0.18, z0 + t, WC.z1 ) );
+	b.add( mats.wall, box( x0, x0 + t, 0, H, z0 + t, WC.z1 ) );
 	// Plintus
 	b.add( mats.skirting, box( x0 - 0.012, door.x0 - 0.07, 0, 0.08, z0 - 0.012, z0 ) );
 	b.add( mats.skirting, box( door.x1 + 0.07, x1, 0, 0.08, z0 - 0.012, z0 ) );
-	b.add( mats.skirting, box( x0 - 0.012, x0, 0, 0.08, z0, WC.z1 ) );
+	b.add( mats.skirting, box( x1, x1 + 0.012, 0, 0.08, z0, WC.z1 ) );
 
 	// ---------- Eshik (kulrang eman, qora shisha chiziq) ----------
 	const dz = z0 - 0.0; // xona tomoni

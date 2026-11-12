@@ -90,6 +90,6 @@ Diagnostika uchun URL parametrlari: `?q=low` (kuchsiz GPU), `?view=zina`, `?exp=
 1. **Shift balandligi 3.60 m.** Rasmdagi fasad eshiklari va 3.15 m oraliq nisbatidan baholandi.
 2. **O'ng (sharqiy) devor va qiya burchak — g'isht devor.** Rejada uch chiziq bilan (oyna kabi) chizilgan, lekin rasmlarda oq devor va radiatorlar ko'rinadi. Shuning uchun devor qilindi; `plan.js` dan oynaga o'zgartirish oson.
 3. **Fasadda 2 ta eshik.** Rejada faqat pastki eshik bor, rasmda esa ikkala oraliqda ham eshik ko'rinadi.
-4. **Zina:** bitta to'g'ri marsh, 2.37 m dan boshlanib 6.30 m da 2-qavatga chiqadi. Qiyaligi ~43°, rasmlardagidek tik. Eshik zina ostidagi xonaga ochiladi.
+4. **Zina (yangilandi):** bitta to'g'ri marsh, janubiy devor bo'ylab **sharqdan g'arbga** ko'tariladi (6.30 m dan 2.60 m gacha), 2-qavatga kichik xona ro'parasida chiqadi. Bu 2-qavatning haqiqiy rasmlaridan aniqlandi; 1-qavat rasmlari taxminiy edi. Zinaning yuqori uchi ostida kichik omborxona bor (x 2.37…4.10), eshigi shimolga qaragan.
 5. Plitka o'lchami 80×80 sm (rasmda 60×120 ham bo'lishi mumkin).
 6. Oyna tashqarisidagi manzara — vaqtinchalik HDRI. Haqiqiy ko'cha surati bo'lsa, almashtiriladi.

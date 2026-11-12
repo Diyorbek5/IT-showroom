@@ -42,16 +42,25 @@ export const GLAZING2 = [
 	{ id: 'n1', a: [ 0.75, G ], b: [ 7.3, G ], mullions: [ 1.62, 3.27, 4.92 ], sash: [ 1 ] },
 	{ id: 'n2', a: [ 7.875, G ], b: [ 15.375, G ], mullions: [ 1.5, 3.0, 4.5, 6.0 ], sash: [ 2 ] },
 	{ id: 'n3', a: [ 15.95, G ], b: [ 23.2, G ], mullions: [ 1.45, 2.9, 4.35, 5.8 ], sash: [ 1, 3 ] },
-	{ id: 'w1', a: [ G, 3.68 ], b: [ G, 0.53 ], mullions: [ 1.57 ], sash: [ 0 ] },
-	{ id: 'w2', a: [ G, 8.75 ], b: [ G, 4.18 ], mullions: [ 1.52, 3.05 ], sash: [ 1 ] },
+	// G'arbiy fasad: faqat shimoliy burchakdagi tor oyna (rasm 12): qolgani devor, kichik xona va eshik o'rni
+	{ id: 'w1', a: [ G, 1.9 ], b: [ G, 0.53 ], mullions: [ 0.69 ], sash: [] },
 	{ id: 'e-w', a: [ 16.0 + G, 14.95 ], b: [ 16.0 + G, 9.93 ], mullions: [ 1.25, 2.5, 3.75 ], sash: [ 1 ] },
 	{ id: 's-a', a: [ 18.75, 17.01 - G ], b: [ 16.4, 17.01 - G ], mullions: [ 0.6, 1.75 ], sash: [ 1 ] },
 	{ id: 's-b', a: [ 22.95, 17.01 - G ], b: [ 20.65, 17.01 - G ], mullions: [ 0.55, 1.75 ], sash: [ 1 ] },
 ];
 export const TRANSOMS2 = [ 0.9, 3.0 ];
 
+// Zina ro'parasidagi kichik xona (rasm 12: zina teshigi uning devoriga taqaladi)
+export const SMALLROOM2 = { x0: 0, x1: 2.0, z0: 5.6, z1: 8.75 };
+// Orqadagi kichik ochiq joy (tambur): ichida to'q rangli metall eshik (rasm 12, 13)
+export const NOOK2 = { x0: 0, x1: 1.4, z0: 1.9, z1: 3.68, open: [ 2.35, 3.25 ] };
+
 // Ichki devorlar: [x0, x1, z0, z1] (balandligi to'liq)
 export const PARTITIONS2 = [
+	{ x0: 0, x1: 2.0, z0: 5.6, z1: 5.72, doors: [ [ 0.35, 1.15, 'white' ] ] }, // kichik xona shimoliy devori
+	{ x0: 1.88, x1: 2.0, z0: 5.72, z1: 8.75 }, // kichik xona sharqiy devori (zina shu devorga taqaladi)
+	{ x0: 0, x1: 1.4, z0: 1.78, z1: 1.9 }, // tambur shimoliy devori
+	{ x0: 0.75, x1: 1.4, z0: 3.68, z1: 3.8 }, // tambur janubiy devori (ustungacha)
 	{ x0: 15.375, x1: 15.55, z0: 4.56, z1: 8.75 }, // chap blok va o'ng qanot orasidagi devor
 	{ x0: 16.0, x1: 23.35, z0: 11.6, z1: 11.72, doors: [ [ 17.25, 18.15, 'pvc' ], [ 19.25, 20.05, 'white' ], [ 21.2, 22.1, 'pvc' ] ] },
 	{ x0: 18.75, x1: 18.87, z0: 11.72, z1: 17.01 },
@@ -86,7 +95,9 @@ export const PANELS2 = ( () => {
 
 			const x = xa + ( i + 0.5 ) * ( xb - xa ) / nx;
 			const z = za + ( k + 0.5 ) * ( zb - za ) / nz;
-			if ( x > 3.6 && x < 6.6 && z > 7.2 ) continue; // zina teshigi ustida emas
+			if ( x > 2.2 && x < 5.2 && z > 7.2 ) continue; // zina teshigi ustida emas
+			if ( x < 2.1 && z > 5.5 ) continue; // kichik xona
+			if ( x < 1.5 && z > 1.7 && z < 3.9 ) continue; // tambur
 			out.push( [ x, z ] );
 
 		}

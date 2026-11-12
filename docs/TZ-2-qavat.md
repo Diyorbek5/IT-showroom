@@ -70,7 +70,11 @@
 | Ofis A (janubi-g'arb) | 2.75 × 5.3 m, janub va g'arb tomonlari oyna | rasm 08 (oynadan ko'cha va mashinalar ko'rinadi) |
 | Ofis B (janubi-sharq) | 2.55 × 5.3 m, janubi oyna | rasm 04 |
 | Yoritish | chap blok va ofislarda 0.45 m kvadrat panellar, o'ng qanot zalida yumaloq spotlar; ochiq qora kabellar to'sinlar ostidan aylanib o'tadi | rasm 02, 05, 06, 07 |
-| Zina teshigi | 1-qavatdagi qora geometrik panjara; janubiy devorda to'q metall eshik | rasm 02, 07 |
+| Zina teshigi | **x 2.60…4.90**, janubiy devor bo'ylab; panjara shimoliy tomonda va sharqiy uchida, g'arb uchi — chiqish maydonchasi | izoh-rasmlar 10…13 |
+| Kichik xona | zina ro'parasida, g'arbiy devor yonida: x 0…2.0, z 5.6…8.75, eshigi shimol tomonda | izoh-rasm 12 |
+| Tambur (kichik ochiq joy) | g'arbiy devorda, x 0…1.4, z 1.9…3.68; eshiksiz o'tish joyi, ichida to'q rangli metall eshik | izoh-rasmlar 12, 13 |
+| G'arbiy fasad | faqat shimoliy burchakda tor oyna (z 0.53…1.9), qolgani devor | izoh-rasm 12 |
+| Gaz qozon | ichki ustunning (x 7.3) yon yuzasida | rasm 02, izoh-rasm 12 |
 
 ## 7. Ochiq savollar (tasdiqlansa, raqam `plan2.js` da o'zgaradi)
 1. Shift balandligi 4.00 m to'g'rimi?
