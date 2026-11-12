@@ -4,6 +4,7 @@ import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUnifo
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 import { N8AOPass } from 'n8ao';
 
@@ -75,7 +76,7 @@ async function main() {
 
 	// ---------- Renderer ----------
 	const renderer = new THREE.WebGLRenderer( { antialias: LITE, powerPreference: 'high-performance', preserveDrawingBuffer: qs.has( 'shot' ) } );
-	const dpr = LITE ? Math.min( window.devicePixelRatio, 1.0 ) : Math.min( window.devicePixelRatio, 1.5 );
+	const dpr = LITE ? Math.min( window.devicePixelRatio, 1.0 ) : Math.min( window.devicePixelRatio, qs.get( 'q' ) === 'high' ? 1.5 : 1.0 );
 	renderer.setPixelRatio( dpr );
 	renderer.setSize( innerWidth, innerHeight );
 	renderer.toneMapping = THREE.NeutralToneMapping;
@@ -157,7 +158,7 @@ async function main() {
 	const t0 = performance.now();
 	if ( LOW ) skyObjs.sun.shadow.mapSize.set( 2048, 2048 );
 	const bakeOpts = {
-		bounces: LOW ? 1 : 2, cubemapSize: LOW ? 8 : 16, chunk: LOW ? 8 : 24,
+		bounces: 1, cubemapSize: LOW ? 8 : 12, chunk: LOW ? 8 : 32,
 		// Panel chiroqlari (RectAreaLight) faqat GI hisoblanayotganda yoqiladi: ularning yorug'ligi
 		// probe'larga "pishiriladi", real vaqtda esa og'ir hisob qilinmaydi.
 		before: () => {
@@ -237,7 +238,7 @@ async function main() {
 	}
 
 	// ---------- Post-processing ----------
-	let composer = null, n8 = null, bloom = null;
+	let composer = null, n8 = null, bloom = null, renderPass = null;
 	if ( ! LITE ) {
 
 		composer = new EffectComposer( renderer, new THREE.WebGLRenderTarget( innerWidth * dpr, innerHeight * dpr, { type: THREE.HalfFloatType } ) );
@@ -249,9 +250,13 @@ async function main() {
 		n8.configuration.depthAwareUpsampling = true;
 		n8.configuration.gammaCorrection = false;
 		n8.configuration.transparencyAware = false;
-		n8.setQualityMode( 'Medium' );
+		n8.setQualityMode( 'Low' );
+		// Harakat paytida AO o'rniga oddiy render (tez); to'xtaganda AO bilan to'liq sifatli kadr
+		renderPass = new RenderPass( scene, camera );
+		renderPass.enabled = false;
+		composer.addPass( renderPass );
 		composer.addPass( n8 );
-		bloom = new UnrealBloomPass( new THREE.Vector2( innerWidth, innerHeight ), 0.12, 0.3, 5 );
+		bloom = new UnrealBloomPass( new THREE.Vector2( innerWidth / 2, innerHeight / 2 ), 0.12, 0.3, 5 );
 		composer.addPass( bloom );
 		composer.addPass( new OutputPass() );
 		composer.addPass( new SMAAPass() );
@@ -523,8 +528,17 @@ async function main() {
 
 	}
 
-	orbit.addEventListener( 'change', () => invalidate() );
-	walk.plc.addEventListener( 'change', () => invalidate() );
+	// Harakat holati: kamera o'zgargan paytdan 220 ms o'tguncha "moving"
+	let movingUntil = 0;
+	function moved() {
+
+		movingUntil = performance.now() + 220;
+		invalidate();
+
+	}
+
+	orbit.addEventListener( 'change', moved );
+	walk.plc.addEventListener( 'change', moved );
 
 	addEventListener( 'resize', resize );
 	resize();
@@ -568,6 +582,8 @@ async function main() {
 
 	}
 
+	let wasMoving = false;
+
 	// ---------- Kadr sikli ----------
 	const clock = new THREE.Clock();
 	let lastCam = new THREE.Matrix4();
@@ -584,12 +600,15 @@ async function main() {
 
 		}
 
-		if ( anim ) invalidate();
+		if ( anim ) moved();
 		if ( walk.active ) {
 
-			if ( walk.update( dt ) ) invalidate();
+			if ( walk.update( dt ) ) moved();
 
-		} else if ( orbit.update() ) invalidate();
+		} else if ( orbit.update() ) moved();
+		const moving = performance.now() < movingUntil;
+		if ( wasMoving && ! moving ) invalidate( 2 ); // to'xtadi — to'liq sifatli kadr
+		wasMoving = moving;
 
 		// Kamera qaysi qavat ichida? Tashqarida (tepadan) bo'lsa — kesim (maket) ko'rinishi
 		const cp = camera.position;
@@ -645,7 +664,14 @@ async function main() {
 				floor2.visible = f2;
 
 			}
-			if ( composer ) composer.render( dt );
+			if ( composer ) {
+
+				const fast = moving && ! SHOT;
+				renderPass.enabled = fast;
+				n8.enabled = ! fast;
+				composer.render( dt );
+
+			}
 			else renderer.render( scene, camera );
 			adapt();
 
@@ -666,7 +692,7 @@ async function main() {
 	loader.style.opacity = '0';
 	setTimeout( () => loader.remove(), 700 );
 	window.__ready = true;
-	window.__app = { invalidate, pt, bloom, n8, composer, renderFrames: ( n = 1 ) => {
+	window.__app = { invalidate, pt, bloom, n8, composer, renderPass, renderFrames: ( n = 1 ) => {
 
 		for ( let i = 0; i < n; i ++ ) tick();
 		return renderer.domElement.toDataURL( 'image/png' );
