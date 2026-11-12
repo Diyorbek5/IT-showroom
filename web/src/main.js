@@ -22,6 +22,8 @@ const BASE = import.meta.env.BASE_URL;
 const qs = new URLSearchParams( location.search );
 // Telefon/planshetlarda avtomatik yengil rejim (?q=high bilan majburan yuqori sifat)
 const LOW = qs.get( 'q' ) === 'low' || ( qs.get( 'q' ) !== 'high' && matchMedia( '(pointer: coarse)' ).matches );
+// Telefon (yengil) rejimi: post-effektlarsiz, pol aksisiz, GI bake'siz (cubemap yoritish), past o'lcham
+const LITE = LOW;
 const SHOT = qs.has( 'shot' );
 
 // Barcha yorqinliklar HDRI osmonining o'rtacha yorqinligiga nisbatan (osmon = 1)
@@ -72,8 +74,8 @@ const frame = () => new Promise( ( r ) => requestAnimationFrame( () => r() ) );
 async function main() {
 
 	// ---------- Renderer ----------
-	const renderer = new THREE.WebGLRenderer( { antialias: false, powerPreference: 'high-performance', preserveDrawingBuffer: qs.has( 'shot' ) } );
-	const dpr = LOW ? Math.min( window.devicePixelRatio, 1.25 ) : Math.min( window.devicePixelRatio, 1.5 );
+	const renderer = new THREE.WebGLRenderer( { antialias: LITE, powerPreference: 'high-performance', preserveDrawingBuffer: qs.has( 'shot' ) } );
+	const dpr = LITE ? Math.min( window.devicePixelRatio, 1.0 ) : Math.min( window.devicePixelRatio, 1.5 );
 	renderer.setPixelRatio( dpr );
 	renderer.setSize( innerWidth, innerHeight );
 	renderer.toneMapping = THREE.NeutralToneMapping;
@@ -150,7 +152,8 @@ async function main() {
 	setLoad( 0.4, 'Yorug\'lik hisoblanmoqda…' );
 	await frame();
 	renderer.shadowMap.needsUpdate = true;
-	const grids = createProbeGrid();
+	const grids = LITE ? [] : createProbeGrid();
+	if ( LITE ) liteMaterials();
 	const t0 = performance.now();
 	if ( LOW ) skyObjs.sun.shadow.mapSize.set( 2048, 2048 );
 	const bakeOpts = {
@@ -174,16 +177,50 @@ async function main() {
 
 		},
 	};
-	await bakeGIProgressive( renderer, scene, grids, { ...bakeOpts, onProgress: ( f ) => setLoad( 0.4 + f * 0.45, `Yorug'lik hisoblanmoqda… ${Math.round( f * 100 )}%` ) } );
+	if ( ! LITE ) await bakeGIProgressive( renderer, scene, grids, { ...bakeOpts, onProgress: ( f ) => setLoad( 0.4 + f * 0.45, `Yorug'lik hisoblanmoqda… ${Math.round( f * 100 )}%` ) } );
 	console.log( 'bake done', Math.round( performance.now() - t0 ) );
 	setLoad( 0.88, 'Akslar tayyorlanmoqda…' );
 	await frame();
 	reflection.uniforms.reflStrength.value = 0;
 	hdrBackground( true );
-	scene.environment = captureRoomEnv( renderer, scene, new THREE.Vector3( 3.6, 1.5, 5.0 ), LOW ? 64 : 128 );
+	const envSize = LITE ? 64 : 128;
+	const p1 = new THREE.Vector3( 3.6, 1.5, 5.0 ), p2 = new THREE.Vector3( 11.0, Y2 + 1.7, 3.2 );
+	if ( LITE ) {
+
+		// GI o'rniga: xona cubemap'i 2 marta (ikkinchisi birinchisining yorug'ligi bilan) — devorlardan qaytgan yorug'lik
+		params.areaLights = true;
+		applyLightLevels( lights, mats, params );
+		for ( let it = 0; it < 2; it ++ ) {
+
+			const e1 = captureRoomEnv( renderer, scene, p1, envSize, true );
+			const e2 = captureRoomEnv( renderer, scene, p2, envSize, true );
+			scene.environment = e1;
+			setEnvMap( m2, e2 );
+
+		}
+
+		params.areaLights = false;
+		applyLightLevels( lights, mats, params );
+
+	} else {
+
+		scene.environment = captureRoomEnv( renderer, scene, p1, envSize );
+		setEnvMap( m2, captureRoomEnv( renderer, scene, p2, envSize ) );
+
+	}
+
 	scene.environmentRotation.set( 0, 0, 0 );
-	setEnvMap( m2, captureRoomEnv( renderer, scene, new THREE.Vector3( 11.0, Y2 + 1.7, 3.2 ), LOW ? 64 : 128 ) );
 	hdrBackground( false );
+	if ( LITE ) {
+
+		// Cubemap yoritishidagi yashil tusni (daraxtlar) neytral yumshoq to'ldiruvchi bilan muvozanatlash
+		scene.environmentIntensity = 0.7;
+		for ( const m of Object.values( m2 ) ) if ( m.isMeshStandardMaterial ) m.envMapIntensity = 0.7;
+		scene.add( new THREE.HemisphereLight( 0xfdfcf8, 0xb9b2a6, 0.55 ) );
+		params.exposure2 = 1.4;
+
+	}
+
 	reflection.uniforms.reflStrength.value = 1;
 	console.log( 'GI bake ms', Math.round( performance.now() - t0 ) );
 
@@ -191,7 +228,7 @@ async function main() {
 	let rebaking = false;
 	async function rebakeGI() {
 
-		if ( rebaking ) return;
+		if ( rebaking || LITE ) return;
 		rebaking = true;
 		await bakeGIProgressive( renderer, scene, grids, { ...bakeOpts, onProgress: () => invalidate() } );
 		rebaking = false;
@@ -200,22 +237,50 @@ async function main() {
 	}
 
 	// ---------- Post-processing ----------
-	const composer = new EffectComposer( renderer, new THREE.WebGLRenderTarget( innerWidth * dpr, innerHeight * dpr, { type: THREE.HalfFloatType } ) );
-	const n8 = new N8AOPass( scene, camera, innerWidth * dpr, innerHeight * dpr );
-	n8.configuration.aoRadius = 0.9;
-	n8.configuration.distanceFalloff = 0.6;
-	n8.configuration.intensity = params.aoIntensity;
-	n8.configuration.halfRes = false; // n8ao halfRes MRT three r187 bilan mos emas
-	n8.configuration.depthAwareUpsampling = true;
-	n8.configuration.gammaCorrection = false;
-	n8.configuration.transparencyAware = false;
-	n8.setQualityMode( LOW ? 'Low' : 'Medium' );
-	composer.addPass( n8 );
-	const bloom = new UnrealBloomPass( new THREE.Vector2( innerWidth, innerHeight ), 0.12, 0.3, 5 );
-	composer.addPass( bloom );
-	composer.addPass( new OutputPass() );
-	const smaa = new SMAAPass();
-	composer.addPass( smaa );
+	let composer = null, n8 = null, bloom = null;
+	if ( ! LITE ) {
+
+		composer = new EffectComposer( renderer, new THREE.WebGLRenderTarget( innerWidth * dpr, innerHeight * dpr, { type: THREE.HalfFloatType } ) );
+		n8 = new N8AOPass( scene, camera, innerWidth * dpr, innerHeight * dpr );
+		n8.configuration.aoRadius = 0.9;
+		n8.configuration.distanceFalloff = 0.6;
+		n8.configuration.intensity = params.aoIntensity;
+		n8.configuration.halfRes = false; // n8ao halfRes MRT three r187 bilan mos emas
+		n8.configuration.depthAwareUpsampling = true;
+		n8.configuration.gammaCorrection = false;
+		n8.configuration.transparencyAware = false;
+		n8.setQualityMode( 'Medium' );
+		composer.addPass( n8 );
+		bloom = new UnrealBloomPass( new THREE.Vector2( innerWidth, innerHeight ), 0.12, 0.3, 5 );
+		composer.addPass( bloom );
+		composer.addPass( new OutputPass() );
+		composer.addPass( new SMAAPass() );
+
+	}
+
+	// Telefon rejimi: yengil materiallar (clearcoat yo'q, oyna aksi qatlami yo'q, pol aksi yo'q)
+	function liteMaterials() {
+
+		for ( const set of [ mats, m2 ] ) for ( const m of Object.values( set ) ) {
+
+			if ( m.isMeshPhysicalMaterial && m.clearcoat > 0 ) {
+
+				m.clearcoat = 0; m.needsUpdate = true;
+
+			}
+
+		}
+
+		scene.traverse( ( o ) => {
+
+			if ( o.userData.isGlassReflect ) o.visible = false;
+
+		} );
+		reflection.enabled = false;
+		reflection.uniforms.reflStrength.value = 0;
+
+	}
+
 
 	// ---------- Boshqaruv ----------
 	const orbit = new OrbitControls( camera, renderer.domElement );
@@ -433,13 +498,18 @@ async function main() {
 		const w = innerWidth, h = innerHeight;
 		const pr = dpr * scale;
 		camera.aspect = w / h;
+		camera.fov = w < h ? 80 : 62; // telefon (vertikal ekran) — kengroq ko'rinish
 		camera.updateProjectionMatrix();
 		renderer.setPixelRatio( pr );
 		renderer.setSize( w, h );
-		composer.setPixelRatio( pr );
-		composer.setSize( w, h );
-		n8.setSize( w * pr, h * pr );
-		reflection.setSize( w * pr, h * pr );
+		if ( composer ) {
+
+			composer.setPixelRatio( pr );
+			composer.setSize( w, h );
+			n8.setSize( w * pr, h * pr );
+			reflection.setSize( w * pr, h * pr );
+
+		}
 		pt.active && pt.tracer.updateCamera();
 		invalidate();
 
@@ -535,10 +605,10 @@ async function main() {
 		mapGround.visible = outside;
 		hemi.visible = outside;
 		scene.background = outside ? outsideBg : sky.bg;
-		reflection.enabled = cp.y < H;
-		if ( !! params.floor2Live !== in2 ) {
+		reflection.enabled = ! LITE && cp.y < H;
+		if ( !! params.floor2Live !== ( in2 && ! LITE ) ) {
 
-			params.floor2Live = in2;
+			params.floor2Live = in2 && ! LITE;
 			applyLightLevels( lights, mats, params );
 
 		}
@@ -567,11 +637,16 @@ async function main() {
 		} else if ( dirty > 0 || SHOT ) {
 
 			dirty --;
-			const f2 = floor2.visible;
-			floor2.visible = false;
-			reflection.update( renderer, scene, camera );
-			floor2.visible = f2;
-			composer.render( dt );
+			if ( reflection.enabled ) {
+
+				const f2 = floor2.visible;
+				floor2.visible = false;
+				reflection.update( renderer, scene, camera );
+				floor2.visible = f2;
+
+			}
+			if ( composer ) composer.render( dt );
+			else renderer.render( scene, camera );
 			adapt();
 
 		} else {

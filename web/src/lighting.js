@@ -257,14 +257,14 @@ export async function bakeGIProgressive( renderer, scene, grids, { bounces = 1, 
 
 }
 
-export function captureRoomEnv( renderer, scene, pos, size = 256 ) {
+export function captureRoomEnv( renderer, scene, pos, size = 256, keepEnv = false ) {
 
 	const rt = new THREE.WebGLCubeRenderTarget( size, { type: THREE.HalfFloatType, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
 	const cam = new THREE.CubeCamera( 0.02, 100, rt );
 	cam.position.copy( pos );
 	scene.add( cam );
 	const env = scene.environment;
-	scene.environment = null;
+	if ( ! keepEnv ) scene.environment = null;
 	cam.update( renderer, scene );
 	scene.environment = env;
 	scene.remove( cam );
