@@ -1,80 +1,95 @@
-# TZ — IT Showroom, 1-qavat (3D realistik model, Three.js)
+# TZ — IT Showroom, 1-qavat (realistik 3D model, Three.js)
 
-> Holat: **QORALAMA v0.1** — faqat o'lchamli reja (01-plan-olchamlar.jpg) tahlil qilingan.
-> Ichki ko'rinish rasmlari kelgach TZ to'ldiriladi.
+> Holat: **v1.0**. Asos: o'lchamli reja (`reference/1-qavat/01-plan-olchamlar.jpg`) va 4 ta ichki ko'rinish rasmi (`02…05-interyer.jpg`).
+> Ikkalasi bir-biriga zid bo'lgan joylarda **o'lchamlar rejadan**, **materiallar va uslub rasmlardan** olindi (7-bo'lim).
 
 ## 1. Maqsad
-1-qavat interyerining brauzerda ishlaydigan, maksimal realistik 3D modelini yaratish:
-- Three.js (WebGL2), PBR materiallar, HDRI yoritish, real o'lchamlar (1 birlik = 1 metr).
-- Erkin aylanib ko'rish (orbit) + ichkarida yurish rejimi (first-person, WASD).
-- Tayyor kamera nuqtalari (kirish, vitrina, zina, markaziy ustun).
+1-qavat interyerining brauzerda ishlaydigan, iloji boricha realistik 3D modeli:
+- Three.js (WebGL2), real o'lchamlar (1 birlik = 1 m), PBR materiallar.
+- Real vaqt rejimi (aylanib ko'rish va ichida yurish) va **"Foto sifat"** rejimi (GPU path tracing).
+- Tayyor ko'rinishlar rasmlardagi kamera burchaklariga mos: Kirish, Vitrina, Zina, Burchak, Tepadan (maket).
 
-## 2. Chizma tahlili (1-qavat)
+## 2. Reja tahlili
 
-Koordinatalar: **X** — chapdan o'ngga (chap ichki devor = 0), **Z** — yuqoridan pastga (yuqori devor = 0).
-Masshtab chizmadan tekshirildi: ~72 px = 1 m (7.30, 6.55, 8.75 o'lchamlari o'zaro mos keladi).
+Koordinatalar: **X** — chapdan o'ngga (chap ichki devor = 0), **Z** — rejada yuqoridan pastga (yuqori devor = 0), **Y** — balandlik.
+Masshtab chizmadan tekshirildi: ~72 px = 1 m. Berilgan 7.30, 6.55 va 8.75 o'lchamlari bir-biriga mos keladi.
 
-### 2.1 Berilgan o'lchamlar (chizmadagi raqamlar)
+### 2.1 Berilgan o'lchamlar
 | O'lcham | Qiymat | Izoh |
 |---|---|---|
 | Umumiy ichki kenglik | 7.30 m | chap devor → o'ng devor |
-| Ustunlar orasi (yuqori) | 6.55 m | chap-yuqori ustundan o'ng devorgacha |
+| Ustunlar orasi (yuqori) | 6.55 m | chap-yuqori ustun → o'ng devor |
 | Umumiy chuqurlik | 8.75 m | yuqori devor → pastki devor |
-| Chap devor bo'ylab | 3.15 m | yuqori-chap ustun → chap-o'rta ustun |
-| O'ng devor bo'ylab | 2.60 m | yuqori-o'ng ustun → o'ng-o'rta ustun |
-| O'ng devor (pastda) | 1.20 m | o'ng-o'rta ustun → qiya burchak boshi |
-| O'rta qator | 2.55 + 1.00 + 3.00 | chap ustun → markaziy ustun → o'ng devor |
+| Chap devor bo'ylab | 3.15 m | chap-yuqori ustun → chap-o'rta ustun |
+| O'ng devor bo'ylab | 2.60 m + 1.20 m | o'ng-o'rta ustungacha, keyin qiya burchakkacha |
+| O'rta qator | 2.55 + 1.00 + 3.00 m | chap ustun → markaziy ustun → o'ng devor |
 | Markaziy ustun | 1.00 × 0.50 m | xona o'rtasida, alohida turgan |
 | Pastki qator | 2.37 + 3.07 m | chap devor → zina bloki → eshik |
 
-### 2.2 Chizmadan o'lchab olingan (taxminiy, ±5 sm)
-| Element | X (m) | Z (m) | O'lcham |
+### 2.2 Modeldagi koordinatalar (`web/src/plan.js`)
+| Element | X (m) | Z (m) | Izoh |
 |---|---|---|---|
-| Ustun yuqori-chap | 0 … 0.75 | 0 … 0.53 | xonaga 0.75 chiqqan |
-| Ustun chap-o'rta | 0 … 0.75 | 3.68 … 4.18 | 0.75 × 0.50 |
-| Ustun markaziy | 3.30 … 4.30 | 3.68 … 4.18 | 1.00 × 0.50 |
-| Ustun yuqori-o'ng | devor ichida | 0 … 0.97 | |
-| Ustun o'ng-o'rta | devor ichida | 3.57 … 4.55 | |
-| Qiya burchak (fasad) | 7.30 → ~6.50 | 5.75 → ~6.80 | ~45°, uzunligi ~1.3 m |
-| O'ng-pastki devor | ~6.50 | 6.80 … 8.75 | |
-| Kirish eshigi (2 tabaqali) | chap devor | ~6.50 … 7.95 | ~1.45 m, tashqariga ochiladi |
-| Zina bloki | 2.37 … 5.44 | ~7.55 … 8.75 | 3.07 × 1.20 m, marshi o'ngga |
-| Zina oldi to'siq/devor | 2.37 … 5.44 | ~7.55 | yupqa (parapet yoki devor) |
-| Ichki eshik (1 tabaqali) | 5.44 … ~6.40 | ~7.55 | ~0.9 m, xona tomonga ochiladi |
-| Pastki tashqi ustunlar | chap burchak va 3.3…4.3 | 8.75 dan tashqarida | |
+| Xona konturi | (0,0) → (7.30,0) → (7.30,5.76) → (6.50,6.80) → (6.50,8.75) → (0,8.75) | | qiya burchak bilan |
+| Ustun chap-yuqori | 0 … 0.75 | 0 … 0.53 | ikki vitrina tutashgan joyda |
+| Ustun chap-o'rta | 0 … 0.75 | 3.68 … 4.18 | fasaddagi ikki eshik orasida |
+| Ustun markaziy | 3.30 … 4.30 | 3.68 … 4.18 | |
+| Zina | 2.37 … 6.30 | 7.60 … 8.75 | 18 ko'tarilish × 21.7 sm, 17 pog'ona × 23.1 sm |
+| Shiftdagi zina teshigi | 3.90 … 6.30 | 7.55 … 8.75 | 2-qavatda panjara bilan o'ralgan |
+| Zina osti xonasi | 5.44 … 6.50 | 7.55 … 8.75 | eshik 0.80 × 2.05 m |
+| Kirish eshigi 1 | fasad (x = 0) | 0.53 + 0.70 … 2.45 | 2 tabaqali, rasmdan qo'shildi |
+| Kirish eshigi 2 | fasad (x = 0) | 6.50 … 7.95 | 2 tabaqali, rejada bor |
 
-### 2.3 Devor/oyna turlari (chizmadagi chiziqlarga ko'ra)
-- **Yuqori devor** (ustunlar orasida, 6.55 m) — ikki chiziq → katta vitrina oynasi (taxmin).
-- **O'ng devor** (2.60 m va 1.20 m qismlari) — uch chiziq → oyna (vitrina).
-- **Qiya burchak** — oyna (vitrina).
-- **Chap devor** — g'isht/beton devor, pastda kirish eshigi.
-- **Pastki devor** — g'isht/beton devor.
+## 3. Ichki rasmlar tahlili
 
-## 3. Aniqlanishi kerak bo'lgan savollar
-1. Shift balandligi (pol → shift)? Osma shift bormi?
-2. Devor qalinligi (tashqi / ichki)?
-3. Yuqori va o'ng tomon to'liq oyna (vitrina)mi? Oyna pastki/yuqori balandligi?
-4. Zina 2-qavatga chiqadimi yoki podvalga tushadimi? Zina pastida (5.44…6.50) xona — WC/ombor?
-5. Kirish eshigi — oyna eshikmi yoki metall?
-6. Pol materiali, devor rangi, yoritgichlar, mebel (vitrinalar, stollar, TV/ekranlar, kassa) — ichki rasmlardan olinadi.
+| Element | Rasmda ko'ringani | Modelda |
+|---|---|---|
+| Pol | sayqallangan och kulrang keramogranit, mayin marmar tomirlari, ingichka choklar, kuchli akslar | 80×80 sm plitka (protsedural tekstura), planar aks + PBR |
+| Devor va shift | oq, mat bo'yoq | oq PBR, g'adir-budurlik 0.92 |
+| Plintus | qora, ~8 sm, ustunlar atrofida ham | qora, 8 sm × 1.2 sm |
+| Vitrina | poldan shiftgacha oyna, qora alyumin profil | 5.5 sm profil, oyna aks + tus |
+| Kirish eshiklari | 2 tabaqali oynali eshiklar, vertikal tutqichlar | ikkala fasad oralig'ida |
+| Ustunlar | oq to'rtburchak, qora plintus | rejadagi o'lchamlarda |
+| Zina | qora granit pog'onalar, oq zinapoyasimon pastki qism, qora geometrik panjara | xuddi shunday: yakka balyasinalar + "to'rtburchakli" juftliklar |
+| Zina osti eshigi | och kulrang eman, gorizontal chiziqlar, qora shisha lenta, qora tutqich | xuddi shunday |
+| Qandillar | oltin rangli LED halqalar (3 ta halqa, turli burchakda) | 1 ta katta (zina oldida) + 2 ta o'rta |
+| Shift chiroqlari | kvadrat LED panellar | 10 ta 30×30 sm panel + RectAreaLight |
+| Radiatorlar | oq seksiyali alyumin | 3 ta (zina ostida, o'ng devorda) |
+| Rozetkalar | oq, pol yaqinida | 5 ta |
 
-## 4. Texnik yechim (reja)
-- **Stek:** Vite + Three.js (so'nggi barqaror versiya), GitHub Pages / statik hosting.
-- **Geometriya:** reja koordinatalari bitta `plan.js` konfiguratsiyada → devorlar, oyna teshiklari, ustunlar, zina kod orqali quriladi (o'lcham o'zgarsa — faqat raqam o'zgaradi).
-- **Realizm:**
-  - `MeshPhysicalMaterial` (oyna — transmission, metall — roughness/metalness, pol — kafel/laminat teksturalari, normal/roughness map).
-  - HDRI muhit (RGBELoader), ACES Filmic tone mapping, sRGB.
-  - Yumshoq soyalar (PCFSoft), RectAreaLight (shift panellar), SpotLight (track chiroqlar).
-  - SSAO / N8AO, Bloom (ekranlar va chiroqlar), SMAA anti-aliasing.
-  - Statik yoritish uchun lightmap "bake" (keyingi bosqich, sifat uchun).
-- **Boshqaruv:** Orbit + First-person (PointerLock + to'qnashuv), mobil uchun sensor boshqaruv.
-- **Unumdorlik:** instancing, KTX2 teksturalar, 60 FPS maqsad (o'rta noutbuk).
+## 4. Texnik yechim
+- **Stek:** Vite + Three.js r187, `three-gpu-pathtracer` (foto rejim), `n8ao` (ambient occlusion).
+- **Geometriya:** hamma narsa `plan.js` dagi raqamlardan kod orqali quriladi. O'lcham o'zgarsa, faqat raqam o'zgartiriladi.
+  Draw call kam bo'lishi uchun bir xil materialli geometriyalar birlashtiriladi.
+- **Yoritish (real vaqt):**
+  - Ko'cha HDRI (Poly Haven `park_parking`, CC0). Quyosh HDRI'dan avtomatik ajratiladi: yo'nalish va yoritilganlik `DirectionalLight` ga o'tadi, osmondan esa kesib tashlanadi (yorug'lik ikki marta hisoblanmasin).
+  - Oynalardan tashqarisi `GroundedSkybox`, ya'ni HDRI yerga proyeksiyalanadi va asfalt hamda daraxtlar to'g'ri masshtabda ko'rinadi.
+  - **GI:** `LightProbeGridWebGL`, 7×3×9 SH probe, 2 marta qaytish. Probe markazlari ustunlar ichiga tushmasligi uchun maxsus tanlangan.
+  - Akslar: xona markazidan olingan cubemap (PMREM) va polda alohida planar aks (g'adir-budurlikka qarab xiralashadi).
+  - LED panellar `RectAreaLight`, qandillar `PointLight` va emissive halqalar.
+- **Post-processing:** N8AO, Bloom, Neutral tone mapping, SMAA.
+- **Foto sifat:** `WebGLPathTracer`: haqiqiy GI, yumshoq soyalar, shisha o'tkazuvchanligi. Kamera to'xtaganda tasvir aniqlashib boradi.
+- **Boshqaruv:** Orbit (sichqoncha va sensor), "Ichida yurish" (WASD, xona devorlari va ustunlar bilan to'qnashuv).
 
-## 5. Bosqichlar
-1. ✅ Reja tahlili (ushbu hujjat).
-2. ⏳ Ichki ko'rinish rasmlarini qabul qilish va tahlil (materiallar, mebel, yoritish).
-3. TZ ni yakunlash (v1.0).
-4. Bino qobig'i: pol, devorlar, ustunlar, oynalar, eshiklar, zina, shift.
-5. Materiallar + yoritish + post-processing.
-6. Mebel va IT jihozlar (rasmlar asosida).
-7. Kamera nuqtalari, UI, optimizatsiya, deploy.
+## 5. Ishga tushirish
+```bash
+cd web && npm install && npm run dev      # http://localhost:5173
+npm run build                              # web/dist — statik sayt
+```
+Diagnostika uchun URL parametrlari: `?q=low` (kuchsiz GPU), `?view=zina`, `?exp=0.7`, `?rot=200` (HDRI burilishi), `?el=30` (quyosh balandligi).
+
+## 6. Bosqichlar
+1. ✅ Reja tahlili.
+2. ✅ Ichki rasmlar tahlili va TZ v1.0.
+3. ✅ Bino qobig'i: pol, devorlar, ustunlar, vitrina, eshiklar, zina, shift, 2-qavat teshigi.
+4. ✅ Materiallar, yoritish, GI, akslar, post-processing.
+5. ✅ Qandillar, panellar, radiatorlar, eshik, rozetkalar.
+6. ⏳ IT showroom jihozlari (vitrinalar, stollar, ekranlar, kassa). Dizayn bo'yicha rasm yoki ko'rsatma kerak.
+7. ⏳ 2-qavat (rasmlar kutilmoqda).
+
+## 7. Qabul qilingan farazlar (tasdiqlash kerak)
+1. **Shift balandligi 3.60 m.** Rasmdagi fasad eshiklari va 3.15 m oraliq nisbatidan baholandi.
+2. **O'ng (sharqiy) devor va qiya burchak — g'isht devor.** Rejada uch chiziq bilan (oyna kabi) chizilgan, lekin rasmlarda oq devor va radiatorlar ko'rinadi. Shuning uchun devor qilindi; `plan.js` dan oynaga o'zgartirish oson.
+3. **Fasadda 2 ta eshik.** Rejada faqat pastki eshik bor, rasmda esa ikkala oraliqda ham eshik ko'rinadi.
+4. **Zina:** bitta to'g'ri marsh, 2.37 m dan boshlanib 6.30 m da 2-qavatga chiqadi. Qiyaligi ~43°, rasmlardagidek tik. Eshik zina ostidagi xonaga ochiladi.
+5. Plitka o'lchami 80×80 sm (rasmda 60×120 ham bo'lishi mumkin).
+6. Oyna tashqarisidagi manzara — vaqtinchalik HDRI. Haqiqiy ko'cha surati bo'lsa, almashtiriladi.
