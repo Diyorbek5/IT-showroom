@@ -8,7 +8,9 @@ import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 import { N8AOPass } from 'n8ao';
 
 import { H } from './plan.js';
-import { createMaterials } from './materials.js';
+import { Y2, H2, OUTLINE2, COLS2, PARTITIONS2 } from './plan2.js';
+import { createMaterials, createMaterials2, setEnvMap } from './materials.js';
+import { buildFloor2 } from './floor2.js';
 import { buildShell } from './building.js';
 import { buildStair } from './stair.js';
 import { buildFixtures, applyLightLevels } from './fixtures.js';
@@ -29,6 +31,7 @@ const params = {
 	sunScale: 0.5,
 	skyIntensity: 1,
 	exposure: 0.68,
+	exposure2: 1.0, // 2-qavat: qora shift, kamroq qaytgan yorug'lik — fotograflar kabi ekspozitsiya oshiriladi
 	panel: 0.9,
 	chandelier: 0.25,
 	chandelierEmissive: 7,
@@ -38,12 +41,23 @@ const params = {
 };
 
 const VIEWS = [
-	{ id: 'kirish', name: 'Kirish', pos: [ 0.75, 1.55, 7.6 ], target: [ 6.2, 1.55, 2.4 ] },
-	{ id: 'vitrina', name: 'Vitrina', pos: [ 6.15, 1.5, 6.6 ], target: [ 0, 1.55, 2.6 ] },
-	{ id: 'zina', name: 'Zina', pos: [ 4.7, 1.3, 4.7 ], target: [ 3.3, 2.3, 8.7 ] },
-	{ id: 'burchak', name: 'Burchak', pos: [ 6.4, 1.6, 0.7 ], target: [ 1.0, 1.4, 6.8 ] },
-	{ id: 'tepadan', name: 'Tepadan', pos: [ 1.2, 12.5, 11.0 ], target: [ 3.65, 0, 4.4 ] },
+	{ floor: 1, id: 'kirish', name: 'Kirish', pos: [ 0.75, 1.55, 7.6 ], target: [ 6.2, 1.55, 2.4 ] },
+	{ floor: 1, id: 'vitrina', name: 'Vitrina', pos: [ 6.15, 1.5, 6.6 ], target: [ 0, 1.55, 2.6 ] },
+	{ floor: 1, id: 'zina', name: 'Zina', pos: [ 4.7, 1.3, 4.7 ], target: [ 3.3, 2.3, 8.7 ] },
+	{ floor: 1, id: 'burchak', name: 'Burchak', pos: [ 6.4, 1.6, 0.7 ], target: [ 1.0, 1.4, 6.8 ] },
+	{ floor: 1, id: 'tepadan', name: 'Tepadan', pos: [ 1.2, 12.5, 11.0 ], target: [ 3.65, 0, 4.4 ] },
+	{ floor: 2, id: 'zal', name: 'Zal', pos: [ 13.8, 3.9 + 1.6, 7.6 ], target: [ 0.8, 3.9 + 1.4, 1.6 ] },
+	{ floor: 2, id: 'qanot', name: 'Qanot', pos: [ 19.6, 3.9 + 1.6, 11.1 ], target: [ 19.4, 3.9 + 1.45, 0.5 ] },
+	{ floor: 2, id: 'ustunlar', name: 'Ustunlar', pos: [ 22.4, 3.9 + 1.65, 1.3 ], target: [ 12.0, 3.9 + 1.0, 7.5 ] },
+	{ floor: 2, id: 'ofis', name: 'Ofis xona', pos: [ 17.4, 3.9 + 1.55, 12.1 ], target: [ 17.4, 3.9 + 1.4, 17.0 ] },
+	{ floor: 2, id: 'zina2', name: 'Zina', pos: [ 9.2, 3.9 + 1.6, 5.8 ], target: [ 4.6, 3.9 + 0.3, 8.2 ] },
+	{ floor: 2, id: 'tepadan2', name: 'Tepadan', pos: [ 5.5, 3.9 + 15.5, 22.5 ], target: [ 11.7, 3.9, 8.0 ] },
 ];
+
+const FLOOR_INFO = {
+	1: '7.30 × 8.75 m · shift 3.60 m · ~62 m²',
+	2: '23.35 × 17.01 m · shift 4.00 m · ~200 m²',
+};
 
 const $ = ( id ) => document.getElementById( id );
 const setLoad = ( p, text ) => {
@@ -79,10 +93,14 @@ async function main() {
 	const shell = buildShell( mats );
 	const stair = buildStair( mats );
 	const fixtures = buildFixtures( mats, params );
-	scene.add( shell, stair, fixtures );
+	applyLightLevels( fixtures.userData.lights, mats, params );
+	const lights = fixtures.userData.lights;
+	const m2 = createMaterials2( mats );
+	const floor2 = buildFloor2( mats, m2 );
+	lights.floor2 = floor2.userData.lights;
+	scene.add( shell, stair, fixtures, floor2, floor2.userData.mass );
 	const ceilingGroup = shell.userData.ceiling;
 	const floor = shell.userData.floor;
-	const lights = fixtures.userData.lights;
 
 	// Shiftga tegishli ob'ektlar (tepadan ko'rinishda yashiriladi)
 	const overhead = [ ceilingGroup, ...fixtures.children.filter( ( o ) => /chandelier|panel/.test( o.name ) ), ...stair.children.filter( ( o ) => false ) ];
@@ -131,6 +149,7 @@ async function main() {
 	await frame();
 	scene.environment = captureRoomEnv( renderer, scene, new THREE.Vector3( 3.6, 1.5, 5.0 ), LOW ? 64 : 256 );
 	scene.environmentRotation.set( 0, 0, 0 );
+	setEnvMap( m2, captureRoomEnv( renderer, scene, new THREE.Vector3( 11.0, Y2 + 1.7, 3.2 ), LOW ? 64 : 256 ) );
 	reflection.uniforms.reflStrength.value = 1;
 	console.log( 'GI bake ms', Math.round( performance.now() - t0 ) );
 
@@ -157,7 +176,7 @@ async function main() {
 	orbit.enableDamping = true;
 	orbit.dampingFactor = 0.08;
 	orbit.rotateSpeed = 0.55;
-	orbit.maxDistance = 22;
+	orbit.maxDistance = 45;
 	orbit.minDistance = 0.3;
 	orbit.maxPolarAngle = Math.PI * 0.92;
 
@@ -170,6 +189,7 @@ async function main() {
 		const to = { p: new THREE.Vector3( ...v.pos ), t: new THREE.Vector3( ...v.target ) };
 		if ( instant ) {
 
+			anim = null;
 			camera.position.copy( to.p ); orbit.target.copy( to.t ); orbit.update();
 			return;
 
@@ -181,30 +201,82 @@ async function main() {
 	}
 
 	const vbox = $( 'views' );
-	for ( const v of VIEWS ) {
+	let activeFloor = 1;
+	function renderViews() {
 
-		const b = document.createElement( 'button' );
-		b.type = 'button';
-		b.textContent = v.name;
-		b.dataset.id = v.id;
-		b.setAttribute( 'aria-pressed', 'false' );
-		b.onclick = () => {
+		vbox.replaceChildren();
+		for ( const v of VIEWS.filter( ( q ) => q.floor === activeFloor ) ) {
 
-			if ( walk.active ) walk.exit();
-			goTo( v );
-			try {
+			const b = document.createElement( 'button' );
+			b.type = 'button';
+			b.textContent = v.name;
+			b.dataset.id = v.id;
+			b.setAttribute( 'aria-pressed', 'false' );
+			b.onclick = () => {
 
-				history.replaceState( null, '', '#' + v.id );
+				if ( walk.active ) walk.exit();
+				goTo( v );
+				try {
 
-			} catch ( e ) { /* sandbox */ }
+					history.replaceState( null, '', '#' + v.id );
 
-		};
+				} catch ( e ) { /* sandbox */ }
 
-		vbox.appendChild( b );
+			};
+
+			vbox.appendChild( b );
+
+		}
 
 	}
 
+	const WALK_CFG = {
+		1: walk.cfg,
+		2: {
+			poly: OUTLINE2, eye: Y2 + 1.62, start: [ 12, 5.5 ],
+			blockers: [
+				...COLS2.map( ( c ) => [ c.x0, c.x1, c.z0, c.z1 ] ),
+				...PARTITIONS2.slice( 0, 1 ).map( ( c ) => [ c.x0, c.x1, c.z0, c.z1 ] ),
+				[ 16.0, 23.35, 11.6, 17.01 ],
+				[ 3.85, 6.5, 7.45, 8.75 ],
+			],
+		},
+	};
+
+	function setFloor( f, view ) {
+
+		activeFloor = f;
+		walk.cfg = WALK_CFG[ f ];
+		document.querySelectorAll( '#floors button' ).forEach( ( b ) => b.setAttribute( 'aria-pressed', String( + b.dataset.floor === f ) ) );
+		$( 'floor-dims' ).textContent = FLOOR_INFO[ f ];
+		renderViews();
+		const v = view || VIEWS.find( ( q ) => q.floor === f );
+		if ( v ) {
+
+			goTo( v );
+			vbox.querySelector( `[data-id="${v.id}"]` )?.setAttribute( 'aria-pressed', 'true' );
+
+		}
+
+	}
+
+	document.querySelectorAll( '#floors button' ).forEach( ( b ) => {
+
+		b.onclick = () => {
+
+			if ( walk.active ) walk.exit();
+			setFloor( + b.dataset.floor );
+
+		};
+
+	} );
+
 	const start = VIEWS.find( ( v ) => '#' + v.id === location.hash ) || ( qs.get( 'view' ) && VIEWS.find( ( v ) => v.id === qs.get( 'view' ) ) ) || VIEWS[ 0 ];
+	activeFloor = start.floor;
+	walk.cfg = WALK_CFG[ start.floor ];
+	$( 'floor-dims' ).textContent = FLOOR_INFO[ start.floor ];
+	document.querySelectorAll( '#floors button' ).forEach( ( b ) => b.setAttribute( 'aria-pressed', String( + b.dataset.floor === start.floor ) ) );
+	renderViews();
 	goTo( start, true );
 	vbox.querySelector( `[data-id="${start.id}"]` ).setAttribute( 'aria-pressed', 'true' );
 
@@ -318,8 +390,8 @@ async function main() {
 	const hemi = new THREE.HemisphereLight( 0xffffff, 0x5a5c60, 1.6 );
 	hemi.visible = false;
 	scene.add( hemi );
-	const mapGround = new THREE.Mesh( new THREE.CircleGeometry( 16, 64 ).rotateX( - Math.PI / 2 ), new THREE.MeshStandardMaterial( { color: 0x3a3c41, roughness: 1 } ) );
-	mapGround.position.set( 3.65, - 0.02, 4.4 );
+	const mapGround = new THREE.Mesh( new THREE.CircleGeometry( 26, 72 ).rotateX( - Math.PI / 2 ), new THREE.MeshStandardMaterial( { color: 0x3a3c41, roughness: 1 } ) );
+	mapGround.position.set( 11.7, - 0.02, 8.5 );
 	mapGround.receiveShadow = true;
 	mapGround.visible = false;
 	scene.add( mapGround );
@@ -343,13 +415,23 @@ async function main() {
 		if ( walk.active ) walk.update( dt );
 		else orbit.update();
 
-		// Tepadan qaralganda shift va unga osilganlar yashiriladi
-		const outside = camera.position.y > H - 0.02 || camera.position.x < - 0.2 || camera.position.z < - 0.2 || camera.position.x > 7.4 || camera.position.z > 8.9;
-		for ( const o of overhead ) o.visible = ! outside;
-		skyObjs.ground.visible = ! outside;
+		// Kamera qaysi qavat ichida? Tashqarida (tepadan) bo'lsa — kesim (maket) ko'rinishi
+		const cp = camera.position;
+		const in1 = cp.y < H && cp.x > - 0.2 && cp.x < 7.4 && cp.z > - 0.2 && cp.z < 8.9;
+		const in2 = cp.y > Y2 && cp.y < Y2 + H2 && cp.x > - 0.2 && cp.x < 23.5 && cp.z > - 0.2 && ( cp.z < 8.9 || ( cp.x > 15.8 && cp.z < 17.2 ) );
+		const outside = ! in1 && ! in2;
+		const cut1 = outside && activeFloor === 1;
+		for ( const o of overhead ) o.visible = ! cut1;
+		floor2.visible = ! cut1;
+		floor2.userData.ceiling.visible = ! outside;
+		skyObjs.ground.visible = ! outside && cp.y < H + 0.1;
+		skyObjs.ground2.visible = ! outside && cp.y >= H + 0.1;
 		mapGround.visible = outside;
 		hemi.visible = outside;
 		scene.background = outside ? outsideBg : sky.texture;
+		reflection.enabled = cp.y < H;
+		const expT = ( cp.y > Y2 - 0.2 && ! cut1 ) ? params.exposure2 : params.exposure;
+		renderer.toneMappingExposure += ( expT - renderer.toneMappingExposure ) * ( SHOT ? 1 : Math.min( 1, dt * 4 ) );
 
 		if ( pt.active ) {
 
@@ -366,7 +448,10 @@ async function main() {
 
 		} else {
 
+			const f2 = floor2.visible;
+			floor2.visible = false;
 			reflection.update( renderer, scene, camera );
+			floor2.visible = f2;
 			composer.render( dt );
 
 		}
@@ -387,7 +472,7 @@ async function main() {
 		for ( let i = 0; i < n; i ++ ) tick();
 		return renderer.domElement.toDataURL( 'image/png' );
 
-	}, renderer, scene, camera, params, sky, skyObjs, mats, lights, orbit, goTo, VIEWS, togglePT };
+	}, renderer, scene, camera, params, sky, skyObjs, mats, lights, orbit, goTo, VIEWS, togglePT, setFloor, floor2, m2 };
 
 }
 

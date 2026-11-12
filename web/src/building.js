@@ -24,7 +24,7 @@ export function buildShell( mats ) {
 	// ---------- Devorlar, ustunlar, plintus ----------
 	const solid = new Batch();
 	const W = mats.wall;
-	const top = FF;
+	const top = FF - 0.01; // 2-qavat poli bilan z-fighting bo'lmasin
 	// Sharqiy devor (shimoldan qiya burchakkacha)
 	solid.add( W, box( 7.3, 7.3 + WALL_T, 0, top, - WALL_T, 5.76 ) );
 	// Qiya burchak
@@ -112,13 +112,11 @@ export function buildShell( mats ) {
 
 	// Teshik qirralari
 	const edges = new Batch();
-	edges.add( mats.ceiling, box( OPENING.x0, OPENING.x1, H, FF, OPENING.z0 - 0.05, OPENING.z0 ) );
-	edges.add( mats.ceiling, box( OPENING.x0 - 0.05, OPENING.x0, H, FF, OPENING.z0 - 0.05, OPENING.z1 ) );
-	edges.add( mats.ceiling, box( OPENING.x1, OPENING.x1 + 0.05, H, FF - 0.0, OPENING.z0, OPENING.z1 ) );
+	edges.add( mats.ceiling, box( OPENING.x0, OPENING.x1, H, FF - 0.01, OPENING.z0 - 0.05, OPENING.z0 ) );
+	edges.add( mats.ceiling, box( OPENING.x0 - 0.05, OPENING.x0, H, FF - 0.01, OPENING.z0 - 0.05, OPENING.z1 ) );
+	edges.add( mats.ceiling, box( OPENING.x1, OPENING.x1 + 0.05, H, FF - 0.01, OPENING.z0, OPENING.z1 ) );
 	ceil.add( edges.build( { name: 'slab-edges' } ) );
 
-	// ---------- Ikkinchi qavat zina xonasi (teshikdan ko'rinadigan qism) ----------
-	ceil.add( buildUpperWell( mats ) );
 
 	root.add( ceil );
 	root.userData.ceiling = ceil;
@@ -224,50 +222,6 @@ function cylZ( u, y, w0, w1, r ) {
 	const g = new THREE.CylinderGeometry( r, r, Math.abs( w1 - w0 ), 10 );
 	g.rotateX( Math.PI / 2 );
 	g.translate( u, y, ( w0 + w1 ) / 2 );
-	return g;
-
-}
-
-// 2-qavatdagi zina maydonchasi: pol (teshik bilan), devorlar, shift.
-function buildUpperWell( mats ) {
-
-	const x0 = 2.6, x1 = 6.5, z0 = 5.6, z1 = 8.75, y0 = FF, y1 = FF + 3.3;
-	const g = new THREE.Group();
-	g.name = 'upper-well';
-
-	const shape = new THREE.Shape( [ [ x0, z0 ], [ x1, z0 ], [ x1, z1 ], [ x0, z1 ] ].map( ( [ x, z ] ) => new THREE.Vector2( x, - z ) ) );
-	shape.holes.push( new THREE.Path( [
-		new THREE.Vector2( OPENING.x0, - OPENING.z0 ), new THREE.Vector2( OPENING.x1, - OPENING.z0 ),
-		new THREE.Vector2( OPENING.x1, - OPENING.z1 ), new THREE.Vector2( OPENING.x0, - OPENING.z1 ),
-	] ) );
-	const fg = new THREE.ShapeGeometry( shape );
-	fg.rotateX( - Math.PI / 2 );
-	fg.translate( 0, y0, 0 );
-	worldUV( fg );
-	const fl = new THREE.Mesh( fg, mats.floorPlain );
-	fl.receiveShadow = true;
-	g.add( fl );
-
-	const walls = new Batch();
-	const t = 0.2;
-	walls.add( mats.wall, box( x0 - t, x0, y0, y1, z0 - t, z1 ) );
-	walls.add( mats.wall, box( x0 - t, x1 + t, y0, y1, z0 - t, z0 ) );
-	walls.add( mats.wall, box( x1, x1 + t, y0, y1, z0, z1 ) );
-	walls.add( mats.wall, box( x0 - t, x1 + t, y0, y1, z1, z1 + t ) );
-	walls.add( mats.ceiling, box( x0 - t, x1 + t, y1, y1 + 0.2, z0 - t, z1 + t ) );
-	walls.add( mats.skirting, box( x0, x0 + SK_T, y0, y0 + SK_H, z0, z1 ) );
-	walls.add( mats.skirting, box( x0, x1, y0, y0 + SK_H, z0, z0 + SK_T ) );
-	walls.add( mats.skirting, box( x1 - SK_T, x1, y0, y0 + SK_H, z0, z1 ) );
-	g.add( walls.build( { name: 'upper-walls' } ) );
-
-	// Yuqoridagi LED panel
-	const pg = new THREE.PlaneGeometry( 0.3, 0.3 );
-	pg.rotateX( Math.PI / 2 );
-	const p = new THREE.Mesh( pg, mats.ledCool );
-	p.position.set( 5.0, y1 - 0.003, 7.0 );
-	g.add( p );
-	g.userData.panel = p;
-
 	return g;
 
 }

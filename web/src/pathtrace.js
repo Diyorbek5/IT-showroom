@@ -26,6 +26,7 @@ export async function enterPathTracing( { renderer, scene, camera, mats, sky, sk
 	};
 
 	hide( skyObjs.ground );
+	hide( skyObjs.ground2 );
 	grids.forEach( ( g ) => scene.remove( g ) );
 	scene.traverse( ( o ) => {
 

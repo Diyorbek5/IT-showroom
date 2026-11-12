@@ -1,6 +1,6 @@
-# TZ — IT Showroom, 2-qavat (qoralama v0.1)
+# TZ — IT Showroom, 2-qavat (v1.0)
 
-> Holat: reja va 5 ta ichki rasm (`02…06-interyer.jpg`) tahlil qilindi. Boshqa xonalarning rasmlari kutilmoqda, model hali boshlanmagan.
+> Holat: **v1.0, model qurildi** (`web/src/plan2.js`, `web/src/floor2.js`). Asos: reja va 8 ta ichki rasm (`02…09-interyer.jpg`).
 > Koordinatalar 1-qavat bilan bir xil: X — chapdan o'ngga, Z — rejada yuqoridan pastga, (0,0) — chap-yuqori ichki burchak.
 > Masshtab: ~40.6 px = 1 m. 23.35, 16.00 va 17.01 o'lchamlari bir-biriga mos keladi.
 
@@ -57,12 +57,27 @@
 | To'siq devorlar | zal ichida alohida oq devor bloklari, ba'zi xonalar (eshikli) | 03 |
 | Kichik xona | tor xona, bir devori to'liq oyna, radiator, qora shift, ochiq simlar | 04 |
 
-## 6. Aniqlanishi kerak (ichki rasmlardan yoki sizdan)
-1. Shift balandligi qancha?
+## 6. Modelda qabul qilingan joylashuv (rasmlardan xulosa)
+| Qism | Yechim | Asos |
+|---|---|---|
+| Shift balandligi | 4.00 m (pol → qora plita), to'sinlar 45 sm | radiator va eshik nisbatlari (rasm 04, 09) |
+| Shimoliy fasad (23.35 m) | to'liq oyna, 3 oraliq, ko'ndalang profillar 0.9 m va 3.0 m da, ba'zi tavaqalar ochiladi | rasm 02, 05, 06 |
+| G'arbiy fasad | oyna, 2 oraliq (1-qavat kabi) | 1-qavat bilan mos |
+| Chap blok ↔ o'ng qanot | shimoliy yarmi ochiq (ustunlar orasidan o'tiladi, polda ostona chizig'i); janubiy yarmida devor, radiator bilan | rasm 03, 05, 07, 09 (pol yo'nalishi almashadi) |
+| Laminat yo'nalishi | chap blokda X bo'ylab, o'ng qanotda Z bo'ylab | rasm 05, 07 dagi ostona chizig'i |
+| Sharqiy devor | g'isht devor, pilyastrlar, gaz qozon va radiatorlar | rasm 02, 06 |
+| O'ng qanot janubi | ko'ndalang devor (z = 11.6) va 3 ta eshik: ofis A (PVC, to'q oynali), WC (oq), ofis B (PVC) | rasm 03 |
+| Ofis A (janubi-g'arb) | 2.75 × 5.3 m, janub va g'arb tomonlari oyna | rasm 08 (oynadan ko'cha va mashinalar ko'rinadi) |
+| Ofis B (janubi-sharq) | 2.55 × 5.3 m, janubi oyna | rasm 04 |
+| Yoritish | chap blok va ofislarda 0.45 m kvadrat panellar, o'ng qanot zalida yumaloq spotlar; ochiq qora kabellar to'sinlar ostidan aylanib o'tadi | rasm 02, 05, 06, 07 |
+| Zina teshigi | 1-qavatdagi qora geometrik panjara; janubiy devorda to'q metall eshik | rasm 02, 07 |
+
+## 7. Ochiq savollar (tasdiqlansa, raqam `plan2.js` da o'zgaradi)
+1. Shift balandligi 4.00 m to'g'rimi?
 2. Yuqori fasad (23.35 m) to'liq oynami?
-3. O'ng qanotning chap tomonidagi uch chiziqli devor (z 1…8.75 qismi) chap blok bilan o'ng qanotni ajratadimi (devor yoki oyna) yoki zal ochiqmi?
+3. Chap blok va o'ng qanot orasidagi devor qanday: modelda shimoliy yarmi ochiq, janubiy yarmi devor.
 4. O'ng qanotning o'ng va chap tashqi tomonlari oynami?
 5. Chizmaning chap-yuqorisidagi oq chiziq nima — soyabon yoki balkonmi?
 6. 2-qavatdan yuqoriga zina bormi? Hojatxona, xonalar va to'siqlar bormi?
 7. Har bir rasm rejaning qaysi qismidan va qaysi tomonga qarab olingan? Buni keyingi rasmlar bilan birga aniqlayman.
-8. Kichik xona (04-rasm) va eshikli xonalar (03-rasm) rejada qayerda? Rejada ichki devorlar chizilmagan.
+8. Ofis xonalar o'ng qanotning janubiy uchiga joylashtirildi. Haqiqatda boshqa joyda bo'lsa, ayting.

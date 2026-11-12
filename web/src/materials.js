@@ -107,3 +107,60 @@ export function createMaterials() {
 	return m;
 
 }
+
+// 2-qavat materiallari. Klonlar alohida envMap (2-qavat cubemap'i) olishi uchun.
+export function createMaterials2( m ) {
+
+	const m2 = {};
+	const lr = 1 / 2.4;
+	m2.laminate = new THREE.MeshPhysicalMaterial( {
+		map: tex( 'tex/laminate_albedo.jpg', { srgb: true, repeat: lr, aniso: 16 } ),
+		roughnessMap: tex( 'tex/laminate_rough.jpg', { repeat: lr, aniso: 16 } ),
+		normalMap: tex( 'tex/laminate_normal.jpg', { repeat: lr, aniso: 16 } ),
+		roughness: 1, metalness: 0, ior: 1.5, specularIntensity: 0.9,
+		clearcoat: 0.25, clearcoatRoughness: 0.28,
+	} );
+	m2.laminate.normalScale.set( 0.5, 0.5 );
+	m2.wall = m.wall.clone();
+	m2.ceilingBlack = new THREE.MeshStandardMaterial( { color: 0x1d1d1f, roughness: 0.88, metalness: 0 } );
+	m2.skirting = new THREE.MeshStandardMaterial( { color: 0xcbbfa9, roughness: 0.55 } );
+	m2.alu = m.alu.clone();
+	m2.steel = m.steel.clone();
+	m2.blackMetal = m.blackMetal.clone();
+	m2.glassTint = m.glassTint;
+	m2.glassReflect = m.glassReflect.clone();
+	m2.pvc = new THREE.MeshPhysicalMaterial( { color: 0xf4f4f2, roughness: 0.32, clearcoat: 0.4, clearcoatRoughness: 0.2 } );
+	m2.darkGlass = new THREE.MeshPhysicalMaterial( { color: 0x15191b, roughness: 0.04, metalness: 0, clearcoat: 1 } );
+	m2.metalDoor = new THREE.MeshStandardMaterial( { color: 0x2b2c2f, roughness: 0.48, metalness: 0.45 } );
+	m2.boiler = new THREE.MeshPhysicalMaterial( { color: 0xf1f1ef, roughness: 0.38, clearcoat: 0.3 } );
+	m2.boilerGrey = new THREE.MeshStandardMaterial( { color: 0x8e9296, roughness: 0.5 } );
+	m2.radiator = m.radiator.clone();
+	m2.chrome = m.chrome.clone();
+	m2.cable = new THREE.MeshStandardMaterial( { color: 0x0e0e0f, roughness: 0.55 } );
+	m2.panelFrame = m.panelFrame.clone();
+	m2.ledCool = m.ledCool;
+	m.ledCool.userData.sharedEnv = true;
+	m.socketHole.userData.sharedEnv = true;
+	m2.threshold = new THREE.MeshStandardMaterial( { color: 0xbdbcb8, roughness: 0.3, metalness: 1 } );
+	m2.socket = m.socket.clone();
+	m2.socketHole = m.socketHole;
+	m2.mass = new THREE.MeshStandardMaterial( { color: 0xe9e8e4, roughness: 0.9 } );
+	return m2;
+
+}
+
+export function setEnvMap( mats, env ) {
+
+	for ( const k of Object.keys( mats ) ) {
+
+		const mat = mats[ k ];
+		if ( mat.isMeshStandardMaterial && ! mat.userData.sharedEnv ) {
+
+			mat.envMap = env;
+			mat.needsUpdate = true;
+
+		}
+
+	}
+
+}

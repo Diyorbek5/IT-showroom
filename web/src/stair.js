@@ -28,7 +28,7 @@ export function buildStair( mats ) {
 
 	// Oxirgi (18-) ko'tarilish — orayopma qirrasi
 	b.add( mats.granite, box( STAIR.x1 - 0.012, STAIR.x1, FF - r, FF, z0, z1 ) );
-	b.add( mats.granite, box( STAIR.x1, 6.5, FF - 0.03, FF, z0 - 0.02, z1 ) );
+	b.add( mats.granite, box( STAIR.x1, 6.5, FF - 0.04, FF - 0.01, z0 - 0.02, z1 ) );
 
 	root.add( b.build( { name: 'steps' } ) );
 

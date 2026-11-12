@@ -127,8 +127,61 @@ def granite_textures(px=1024):
     Image.fromarray((np.clip(r, 0, 1) * 255).astype(np.uint8)).save(os.path.join(OUT, 'granite_rough.jpg'), quality=90)
 
 
+def laminate_textures(src_path, px=2048, meters=2.4):
+    """Och kulrang-bej eman laminat: 1.2 x 0.2 m taxtalar, siljitilgan choklar."""
+    from PIL import ImageFilter
+    src = Image.open(src_path).convert('L')
+    S = src.size[0]
+    a = np.asarray(src, np.float32) / 255.0
+    blur = np.asarray(src.filter(ImageFilter.GaussianBlur(24)), np.float32) / 255.0
+    detail = a - blur  # faqat tola (grain)
+    ppm = px / meters
+    pw, ph = int(round(1.2 * ppm)), int(round(0.2 * ppm))
+    rows = int(round(meters / 0.2))
+    albedo = np.zeros((px, px, 3), np.float32)
+    rough = np.zeros((px, px), np.float32)
+    height = np.ones((px, px), np.float32)
+    base = np.array([0.80, 0.765, 0.708], np.float32)
+    for r in range(rows):
+        y0, y1 = int(round(r * px / rows)), int(round((r + 1) * px / rows))
+        ph = y1 - y0
+        off = int(rng.integers(0, pw))
+        for k in range(int(np.ceil(px / pw))):
+            sx = int(rng.integers(0, S))
+            sy = int(rng.integers(0, S - ph))
+            cols = (np.arange(pw) + sx) % S
+            crop = detail[sy:sy + ph][:, cols]
+            seed = int(rng.integers(0, 99999))
+            yy, xx = np.mgrid[0:ph, 0:pw].astype(np.float32)
+            w = np.resize(fbm(256, 3, 4, seed)[:ph, :], (ph, pw))
+            cath = np.sin((yy / ph * 3.0 + np.sin(xx / pw * np.pi * rng.uniform(1, 3)) * 1.2 + w * 2.0) * np.pi * 2)
+            tone = rng.uniform(-0.035, 0.035)
+            warmth = rng.uniform(-0.015, 0.015)
+            g = crop * 1.35 + cath * 0.018
+            plank = np.empty((ph, pw, 3), np.float32)
+            for c in range(3):
+                plank[..., c] = base[c] + tone + g + (warmth if c == 0 else -warmth if c == 2 else 0)
+            e = np.minimum(np.minimum(xx, pw - 1 - xx), np.minimum(yy, ph - 1 - yy))
+            bev = smoothstep(0.0, 3.0, e)
+            plank *= (0.82 + 0.18 * bev)[..., None]
+            xs = (off + k * pw + np.arange(pw)) % px
+            albedo[y0:y1][:, xs] = plank
+            rough[y0:y1][:, xs] = 0.36 + crop * 1.2 + (1 - bev) * 0.25
+            height[y0:y1][:, xs] = bev - np.clip(crop, -1, 0) * 3
+    gx = (np.roll(height, -1, 1) - np.roll(height, 1, 1)) * 0.5
+    gy = (np.roll(height, -1, 0) - np.roll(height, 1, 0)) * 0.5
+    n = np.stack([-gx * 1.5, gy * 1.5, np.ones_like(gx)], -1)
+    n /= np.linalg.norm(n, axis=-1, keepdims=True)
+    Image.fromarray((np.clip(albedo, 0, 1) * 255).astype(np.uint8)).save(os.path.join(OUT, 'laminate_albedo.jpg'), quality=90)
+    Image.fromarray((np.clip(rough, 0, 1) * 255).astype(np.uint8)).save(os.path.join(OUT, 'laminate_rough.jpg'), quality=90)
+    Image.fromarray(((n * 0.5 + 0.5) * 255).astype(np.uint8)).save(os.path.join(OUT, 'laminate_normal.jpg'), quality=92)
+
+
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     floor_textures()
     granite_textures()
+    import sys
+    if len(sys.argv) > 1:
+        laminate_textures(sys.argv[1])
     print('ok')

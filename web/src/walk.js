@@ -6,6 +6,8 @@ const R = 0.28; // odam radiusi
 const EYE = 1.62;
 
 // Xona ichida yurish (WASD + sichqoncha). To'qnashuv: xona konturi + ustunlar + zina.
+export const WALK_EYE = EYE;
+
 export class WalkControls {
 
 	constructor( camera, dom ) {
@@ -15,11 +17,14 @@ export class WalkControls {
 		this.keys = {};
 		this.active = false;
 		this.vel = new THREE.Vector3();
-		this.blockers = [
-			...COLUMNS.map( ( c ) => [ c.x0, c.x1, c.z0, c.z1 ] ),
-			[ STAIR.x0 - 0.05, 6.5, STAIR.z0 - 0.05, 8.75 ],
-			[ WC.x0, WC.x1, WC.z0, WC.z1 ],
-		];
+		this.cfg = {
+			poly: ROOM, eye: EYE, start: [ 2.2, 6.2 ],
+			blockers: [
+				...COLUMNS.map( ( c ) => [ c.x0, c.x1, c.z0, c.z1 ] ),
+				[ STAIR.x0 - 0.05, 6.5, STAIR.z0 - 0.05, 8.75 ],
+				[ WC.x0, WC.x1, WC.z0, WC.z1 ],
+			],
+		};
 		const down = ( e ) => {
 
 			this.keys[ e.code ] = true;
@@ -46,8 +51,8 @@ export class WalkControls {
 	enter() {
 
 		const p = this.camera.position;
-		if ( ! this.free( p.x, p.z ) ) p.set( 2.2, EYE, 6.2 );
-		p.y = EYE;
+		if ( ! this.free( p.x, p.z ) ) p.set( this.cfg.start[ 0 ], this.cfg.eye, this.cfg.start[ 1 ] );
+		p.y = this.cfg.eye;
 		this.active = true;
 		this.plc.lock();
 
@@ -61,8 +66,8 @@ export class WalkControls {
 
 	free( x, z ) {
 
-		if ( ! insidePoly( x, z, ROOM, R ) ) return false;
-		for ( const [ x0, x1, z0, z1 ] of this.blockers ) {
+		if ( ! insidePoly( x, z, this.cfg.poly, R ) ) return false;
+		for ( const [ x0, x1, z0, z1 ] of this.cfg.blockers ) {
 
 			if ( x > x0 - R && x < x1 + R && z > z0 - R && z < z1 + R ) return false;
 
@@ -103,7 +108,7 @@ export class WalkControls {
 
 		}
 
-		p.y = EYE;
+		p.y = this.cfg.eye;
 		return true;
 
 	}

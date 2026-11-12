@@ -112,51 +112,7 @@ export function buildFixtures( mats, params ) {
 
 	// ---------- Radiatorlar ----------
 	const rb = new Batch();
-	for ( const r of RADIATORS ) {
-
-		const theta = Math.atan2( r.nx, r.nz );
-		const m = new THREE.Matrix4().compose( V( r.x + r.nx * 0.065, 0, r.z + r.nz * 0.065 ), new THREE.Quaternion().setFromAxisAngle( V( 0, 1, 0 ), theta ), V( 1, 1, 1 ) );
-		const len = r.n * 0.08;
-		for ( let k = 0; k < r.n; k ++ ) {
-
-			const sx = - len / 2 + 0.04 + k * 0.08;
-			const s = new RoundedBoxGeometry( 0.072, 0.56, 0.08, 2, 0.012 );
-			s.translate( sx, 0.42, 0 );
-			rb.add( mats.radiator, s, m );
-			// orqa kollektor (ko'rinmas, lekin soyani to'g'ri beradi)
-
-		}
-
-		const hdr = ( y ) => {
-
-			const g = new THREE.CylinderGeometry( 0.018, 0.018, len, 12 );
-			g.rotateZ( Math.PI / 2 );
-			g.translate( 0, y, - 0.02 );
-			return g;
-
-		};
-
-		rb.add( mats.radiator, hdr( 0.18 ), m );
-		rb.add( mats.radiator, hdr( 0.66 ), m );
-		// quvurlar va kranlar
-		for ( const side of [ - 1, 1 ] ) {
-
-			const px = side * ( len / 2 + 0.035 );
-			const pipe = new THREE.CylinderGeometry( 0.011, 0.011, 0.19, 12 );
-			pipe.translate( px, 0.095, - 0.02 );
-			rb.add( mats.radiator, pipe, m );
-			const elbow = new THREE.CylinderGeometry( 0.011, 0.011, 0.05, 12 );
-			elbow.rotateZ( Math.PI / 2 );
-			elbow.translate( px - side * 0.022, 0.18, - 0.02 );
-			rb.add( mats.radiator, elbow, m );
-			const valve = new THREE.CylinderGeometry( 0.016, 0.016, 0.04, 16 );
-			valve.translate( px, 0.15, - 0.02 );
-			rb.add( mats.chrome, valve, m );
-
-		}
-
-	}
-
+	addRadiators( rb, mats, RADIATORS );
 	root.add( rb.build( { name: 'radiators' } ) );
 
 	// ---------- Rozetkalar ----------
@@ -207,7 +163,63 @@ export function applyLightLevels( lights, mats, p ) {
 
 	}
 
+	for ( const l of lights.floor2 || [] ) {
+
+		l.intensity = p.panel * l.userData.areaFactor;
+		l.visible = p.lightsOn;
+
+	}
+
 	mats.ledCool.emissiveIntensity = p.lightsOn ? p.panelEmissive : 0;
 	mats.ledWarm.emissiveIntensity = p.lightsOn ? p.chandelierEmissive : 0;
+
+}
+
+export function addRadiators( rb, mats, list, y0 = 0 ) {
+
+	for ( const r of list ) {
+
+		const theta = Math.atan2( r.nx, r.nz );
+		const m = new THREE.Matrix4().compose( V( r.x + r.nx * 0.065, y0, r.z + r.nz * 0.065 ), new THREE.Quaternion().setFromAxisAngle( V( 0, 1, 0 ), theta ), V( 1, 1, 1 ) );
+		const len = r.n * 0.08;
+		for ( let k = 0; k < r.n; k ++ ) {
+
+			const sx = - len / 2 + 0.04 + k * 0.08;
+			const s = new RoundedBoxGeometry( 0.072, 0.56, 0.08, 2, 0.012 );
+			s.translate( sx, 0.42, 0 );
+			rb.add( mats.radiator, s, m );
+			// orqa kollektor (ko'rinmas, lekin soyani to'g'ri beradi)
+
+		}
+
+		const hdr = ( y ) => {
+
+			const g = new THREE.CylinderGeometry( 0.018, 0.018, len, 12 );
+			g.rotateZ( Math.PI / 2 );
+			g.translate( 0, y, - 0.02 );
+			return g;
+
+		};
+
+		rb.add( mats.radiator, hdr( 0.18 ), m );
+		rb.add( mats.radiator, hdr( 0.66 ), m );
+		// quvurlar va kranlar
+		for ( const side of [ - 1, 1 ] ) {
+
+			const px = side * ( len / 2 + 0.035 );
+			const pipe = new THREE.CylinderGeometry( 0.011, 0.011, 0.19, 12 );
+			pipe.translate( px, 0.095, - 0.02 );
+			rb.add( mats.radiator, pipe, m );
+			const elbow = new THREE.CylinderGeometry( 0.011, 0.011, 0.05, 12 );
+			elbow.rotateZ( Math.PI / 2 );
+			elbow.translate( px - side * 0.022, 0.18, - 0.02 );
+			rb.add( mats.radiator, elbow, m );
+			const valve = new THREE.CylinderGeometry( 0.016, 0.016, 0.04, 16 );
+			valve.translate( px, 0.15, - 0.02 );
+			rb.add( mats.chrome, valve, m );
+
+		}
+
+	}
 
 }

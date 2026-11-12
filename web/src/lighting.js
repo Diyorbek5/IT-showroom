@@ -110,32 +110,42 @@ export function setupSky( scene, renderer, sky, params ) {
 	scene.backgroundIntensity = params.skyIntensity;
 
 	// Yerga proyeksiyalangan fon — oynadan tashqaridagi asfalt/daraxtlar to'g'ri masshtabda
-	const ground = new GroundedSkybox( sky.texture, 2.2, 60, 96 );
-	ground.position.y = 2.2 - 0.03;
-	ground.rotation.y = rot;
-	ground.material.depthWrite = false;
-	ground.renderOrder = - 10;
-	ground.name = 'grounded-skybox';
-	ground.material.color.setScalar( params.skyIntensity );
-	scene.add( ground );
+	const mkGround = ( h, cx, cz, name ) => {
+
+		const g = new GroundedSkybox( sky.texture, h, 70, 96 );
+		g.position.set( cx, h - 0.03, cz );
+		g.rotation.y = rot;
+		g.material.depthWrite = false;
+		g.renderOrder = - 10;
+		g.name = name;
+		g.material.color.setScalar( params.skyIntensity );
+		scene.add( g );
+		return g;
+
+	};
+
+	// 1-qavat ko'z balandligi uchun va 2-qavat (balandroq) uchun alohida proyeksiya
+	const ground = mkGround( 2.2, 3.6, 4.4, 'grounded-skybox' );
+	const ground2 = mkGround( 5.6, 11.7, 8.5, 'grounded-skybox-2' );
+	ground2.visible = false;
 
 	// Quyosh (yo'naltirilgan yorug'lik, soyalar bilan)
 	const sun = new THREE.DirectionalLight( 0xffffff, 1 );
 	sun.castShadow = true;
 	sun.shadow.mapSize.set( 4096, 4096 );
 	const sc = sun.shadow.camera;
-	sc.left = - 9; sc.right = 9; sc.top = 9; sc.bottom = - 9; sc.near = 0.5; sc.far = 60;
+	sc.left = - 16; sc.right = 16; sc.top = 16; sc.bottom = - 16; sc.near = 0.5; sc.far = 90;
 	sun.shadow.bias = - 0.0002;
 	sun.shadow.normalBias = 0.02;
 	sun.shadow.radius = 3;
-	sun.target.position.set( 3.6, 0, 4.4 );
+	sun.target.position.set( 11.7, 3, 8.5 );
 	scene.add( sun, sun.target );
 
 	const c = new THREE.Color( sky.sunE.x, sky.sunE.y, sky.sunE.z );
 	const m = Math.max( c.r, c.g, c.b ) || 1;
 	sun.color.setRGB( c.r / m, c.g / m, c.b / m );
 
-	const out = { ground, sun };
+	const out = { ground, ground2, sun };
 	updateSun( out, sky, params );
 	return out;
 
@@ -149,7 +159,7 @@ export function updateSun( sk, sky, params ) {
 	const az = Math.atan2( d.z, d.x );
 	const el = params.sunElevation * D2R;
 	const dd = new THREE.Vector3( Math.cos( az ) * Math.cos( el ), Math.sin( el ), Math.sin( az ) * Math.cos( el ) );
-	sk.sun.position.copy( sk.sun.target.position ).addScaledVector( dd, 25 );
+	sk.sun.position.copy( sk.sun.target.position ).addScaledVector( dd, 40 );
 	sk.sun.intensity = sky.sunLum * params.sunScale;
 	sk.sun.visible = params.sunScale > 0;
 
@@ -164,10 +174,23 @@ export function createProbeGrid() {
 	grid.position.set( ( gx0 + gx1 ) / 2, H / 2, ( gz0 + gz1 ) / 2 );
 	grid.name = 'probe-grid';
 
-	const upper = new LightProbeGridWebGL( 3.9, 3.3, 3.15, 3, 2, 2 );
-	upper.position.set( 2.6 + 3.9 / 2, H + 0.3 + 3.3 / 2, 5.6 + 3.15 / 2 );
-	upper.name = 'probe-grid-upper';
-	return [ grid, upper ];
+	// 2-qavat: chap blok, o'ng qanot zali, ofis xonalari
+	const Y2 = H + 0.3, H2 = 4.0;
+	const mk = ( x0, x1, z0, z1, nx, ny, nz, name ) => {
+
+		const g = new LightProbeGridWebGL( x1 - x0, H2, z1 - z0, nx, ny, nz );
+		g.position.set( ( x0 + x1 ) / 2, Y2 + H2 / 2, ( z0 + z1 ) / 2 );
+		g.name = name;
+		return g;
+
+	};
+
+	return [
+		grid,
+		mk( 0.3, 15.66, 0, 8.75, 10, 3, 6, 'probe-grid-2a' ),
+		mk( 15.66, 23.35, 0, 11.6, 5, 3, 8, 'probe-grid-2b' ),
+		mk( 16.0, 23.35, 11.72, 17.01, 5, 2, 3, 'probe-grid-2c' ),
+	];
 
 }
 

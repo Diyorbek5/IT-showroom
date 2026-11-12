@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>IT Showroom 1-qavat</title>
+<title>IT Showroom 3D</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,6 +30,8 @@ body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.4 var(--
 .hud { position: fixed; z-index: 5; background: var(--hud); border: 1px solid var(--hud-line); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2); border-radius: 12px; }
 .title { top: calc(env(safe-area-inset-top, 0px) + 14px); left: max(16px, env(safe-area-inset-left, 0px)); padding: 10px 14px; display: grid; gap: 2px; max-width: calc(100vw - 32px); }
 .title h1 { margin: 0; font-size: 15px; font-weight: 700; letter-spacing: 0.01em; text-wrap: balance; }
+.floors { display: flex; gap: 4px; margin-block: 4px 2px; }
+.floors button { padding: 7px 11px; }
 .title .dims { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
 
 .views { left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); padding: 6px; display: flex; gap: 4px; max-width: calc(100vw - 32px); overflow-x: auto; scrollbar-width: none; }
@@ -66,8 +68,12 @@ button:disabled { opacity: 0.4; cursor: default; }
 <div id="app"></div>
 
 <div class="hud title">
-	<h1>IT Showroom · 1-qavat</h1>
-	<div class="dims">7.30 × 8.75 m · shift 3.60 m · ~62 m²</div>
+	<h1>IT Showroom</h1>
+	<div class="floors" id="floors" role="group" aria-label="Qavatlar">
+		<button type="button" data-floor="1" aria-pressed="true">1-qavat</button>
+		<button type="button" data-floor="2" aria-pressed="false">2-qavat</button>
+	</div>
+	<div class="dims" id="floor-dims">7.30 × 8.75 m · shift 3.60 m · ~62 m²</div>
 </div>
 
 <div class="hud modes" role="group" aria-label="Rejimlar">
@@ -81,7 +87,7 @@ button:disabled { opacity: 0.4; cursor: default; }
 <div class="hud help" id="help" hidden><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> — yurish · sichqoncha — qarash · <kbd>Esc</kbd> — chiqish</div>
 
 <div id="loader"><div class="box">
-	<div class="name">IT Showroom · 1-qavat</div>
+	<div class="name">IT Showroom</div>
 	<div class="bar"><i id="load-bar"></i></div>
 	<div class="step" id="load-step">Yuklanmoqda…</div>
 </div></div>
