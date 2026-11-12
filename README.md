@@ -27,3 +27,6 @@ Brauzerda `http://localhost:5173` ni oching. Statik build: `npm run build` (`web
 - HDRI: [Poly Haven — Park Parking](https://polyhaven.com/a/park_parking) (CC0)
 - Eshik teksturasi: [Poly Haven — Washed Grey Oak Veneer](https://polyhaven.com/a/washed_grey_oak_veneer) (CC0)
 - Pol va granit teksturalari: `web/tools/gen_textures.py` (protsedural)
+
+## Vercel
+Vercel loyihasida **Root Directory = `web`** bo'lishi kerak (Settings → Build and Deployment). Qolgan sozlamalar `web/vercel.json` da.
