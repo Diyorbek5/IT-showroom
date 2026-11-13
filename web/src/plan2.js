@@ -51,14 +51,16 @@ export const GLAZING2 = [
 export const TRANSOMS2 = [ 0.9, 3.0 ];
 
 // Zina ro'parasidagi kichik xona (rasm 12: zina teshigi uning devoriga taqaladi)
-export const SMALLROOM2 = { x0: 0, x1: 2.0, z0: 5.6, z1: 8.75 };
+// Zina chiqishi yonidagi kichik xona (g'arbiy devor va shimoliy marsh orasida), eshigi shimolga qaragan
+export const SMALLROOM2 = { x0: 0, x1: 1.6, z0: 6.4, z1: 8.75 };
 // Orqadagi kichik ochiq joy (tambur): ichida to'q rangli metall eshik (rasm 12, 13)
 export const NOOK2 = { x0: 0, x1: 1.4, z0: 1.9, z1: 3.68, open: [ 2.35, 3.25 ] };
 
 // Ichki devorlar: [x0, x1, z0, z1] (balandligi to'liq)
 export const PARTITIONS2 = [
-	{ x0: 0, x1: 2.0, z0: 5.6, z1: 5.72, doors: [ [ 0.35, 1.15, 'white' ] ] }, // kichik xona shimoliy devori
-	{ x0: 1.88, x1: 2.0, z0: 5.72, z1: 8.75 }, // kichik xona sharqiy devori (zina shu devorga taqaladi)
+	{ x0: 0, x1: 1.6, z0: 6.28, z1: 6.4, doors: [ [ 0.4, 1.2, 'white' ] ] }, // kichik xona shimoliy devori (eshik koridorga qaraydi)
+	{ x0: 1.48, x1: 1.6, z0: 6.4, z1: 8.75 }, // kichik xona sharqiy devori = shimoliy marshning g'arbiy devori
+	{ x0: 2.9, x1: 3.02, z0: 4.56, z1: 6.4 }, // koridor (zina chiqishidan shimolga) sharqiy devori
 	{ x0: 0, x1: 1.4, z0: 1.78, z1: 1.9 }, // tambur shimoliy devori
 	{ x0: 0.75, x1: 1.4, z0: 3.68, z1: 3.8 }, // tambur janubiy devori (ustungacha)
 	{ x0: 15.375, x1: 15.55, z0: 4.56, z1: 8.75 }, // chap blok va o'ng qanot orasidagi devor
@@ -96,7 +98,7 @@ export const PANELS2 = ( () => {
 			const x = xa + ( i + 0.5 ) * ( xb - xa ) / nx;
 			const z = za + ( k + 0.5 ) * ( zb - za ) / nz;
 			if ( x > 2.2 && x < 5.2 && z > 7.2 ) continue; // zina teshigi ustida emas
-			if ( x < 2.1 && z > 5.5 ) continue; // kichik xona
+			if ( x < 1.7 && z > 6.3 ) continue; // kichik xona
 			if ( x < 1.5 && z > 1.7 && z < 3.9 ) continue; // tambur
 			out.push( [ x, z ] );
 

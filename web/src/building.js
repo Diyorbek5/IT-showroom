@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { H, FF, WALL_T, ROOM, COLUMNS, GLAZING, OPENING, STAIR } from './plan.js';
+import { H, FF, WALL_T, ROOM, COLUMNS, GLAZING, OPENING, STAIR, WC } from './plan.js';
 import { Batch, box, worldUV } from './geo.js';
 
 const SK_H = 0.08; // plintus balandligi
@@ -11,7 +11,7 @@ export function buildShell( mats ) {
 	root.name = 'shell';
 
 	// ---------- Pol ----------
-	const fpts = [ [ - 0.12, - 0.12 ], [ 7.3, - 0.12 ], [ 7.3, 5.76 ], [ 6.5, 6.8 ], [ 6.5, 8.75 ], [ - 0.12, 8.75 ] ];
+	const fpts = [ [ - 0.12, - 0.12 ], [ 7.3, - 0.12 ], [ 7.3, 5.76 ], [ 6.5, 6.8 ], [ 6.5, 8.75 ], [ WC.x1, 8.75 ], [ WC.x1, WC.z1 ], [ - 0.12, WC.z1 ], [ - 0.12, 8.75 ] ];
 	const fshape = new THREE.Shape( fpts.map( ( [ x, z ] ) => new THREE.Vector2( x, - z ) ) );
 	const fgeo = new THREE.ShapeGeometry( fshape );
 	fgeo.rotateX( - Math.PI / 2 );
@@ -44,7 +44,10 @@ export function buildShell( mats ) {
 	}
 
 	solid.add( W, box( 6.5, 6.5 + WALL_T, 0, top, 6.8, 8.75 + WALL_T ) );
-	solid.add( W, box( - WALL_T, 6.5 + WALL_T, 0, top, 8.75, 8.75 + WALL_T ) );
+	// Janubiy devor — kichik xona eshigi o'rni bilan (WC.door)
+	solid.add( W, box( - WALL_T, WC.door.x0, 0, top, 8.75, 8.75 + WALL_T ) );
+	solid.add( W, box( WC.door.x0, WC.door.x1, WC.door.h, top, 8.75, 8.75 + WALL_T ) );
+	solid.add( W, box( WC.door.x1, 6.5 + WALL_T, 0, top, 8.75, 8.75 + WALL_T ) );
 
 	for ( const c of COLUMNS ) solid.add( W, box( c.x0, c.x1, 0, H, c.z0, c.z1 ) );
 
@@ -58,7 +61,7 @@ export function buildShell( mats ) {
 	const skZ = ( z, x0, x1, side ) => solid.add( S, box( x0, x1, 0, SK_H, z, z + side * SK_T ) );
 	skX( 7.3, 0, 5.76, - 1 );
 	skX( 6.5, 6.8, 7.55, - 1 );
-	skZ( 8.75, 0, 5.44, - 1 );
+	skZ( 8.75, 0, WC.door.x0 - 0.07, - 1 ); skZ( 8.75, WC.door.x1 + 0.07, STAIR.xW, - 1 );
 	{
 
 		// qiya burchak plintusi
@@ -97,10 +100,7 @@ export function buildShell( mats ) {
 	const ceil = new THREE.Group();
 	ceil.name = 'ceiling';
 	const cshape = new THREE.Shape( [ [ - 0.12, - 0.12 ], [ 7.3, - 0.12 ], ...ROOM.slice( 2 ), [ - 0.12, 8.75 ] ].map( ( [ x, z ] ) => new THREE.Vector2( x, z ) ) );
-	const hole = new THREE.Path( [
-		new THREE.Vector2( OPENING.x0, OPENING.z0 ), new THREE.Vector2( OPENING.x0, OPENING.z1 ),
-		new THREE.Vector2( OPENING.x1, OPENING.z1 ), new THREE.Vector2( OPENING.x1, OPENING.z0 ),
-	] );
+	const hole = new THREE.Path( OPENING.poly.map( ( [ x, z ] ) => new THREE.Vector2( x, z ) ) );
 	cshape.holes.push( hole );
 	const cgeo = new THREE.ShapeGeometry( cshape );
 	cgeo.rotateX( Math.PI / 2 );
@@ -112,9 +112,21 @@ export function buildShell( mats ) {
 
 	// Teshik qirralari
 	const edges = new Batch();
-	edges.add( mats.ceiling, box( OPENING.x0, OPENING.x1, H, FF - 0.01, OPENING.z0 - 0.05, OPENING.z0 ) );
-	edges.add( mats.ceiling, box( OPENING.x0 - 0.05, OPENING.x0, H, FF - 0.01, OPENING.z0 - 0.05, OPENING.z1 ) );
-	edges.add( mats.ceiling, box( OPENING.x1, OPENING.x1 + 0.05, H, FF - 0.01, OPENING.z0, OPENING.z1 ) );
+	{
+
+		const P = OPENING.poly;
+		for ( let i = 0; i < P.length; i ++ ) {
+
+			const [ ax, az ] = P[ i ], [ bx, bz ] = P[ ( i + 1 ) % P.length ];
+			if ( ( ax === bx && ax === OPENING.x0 ) ) continue; // g'arbiy qirra — devor
+			const w = 0.05;
+			edges.add( mats.ceiling, ax === bx
+				? box( ax - w / 2, ax + w / 2, H, FF - 0.01, Math.min( az, bz ) - w / 2, Math.max( az, bz ) + w / 2 )
+				: box( Math.min( ax, bx ) - w / 2, Math.max( ax, bx ) + w / 2, H, FF - 0.01, az - w / 2, az + w / 2 ) );
+
+		}
+
+	}
 	ceil.add( edges.build( { name: 'slab-edges' } ) );
 
 

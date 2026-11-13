@@ -33,23 +33,35 @@ export const GLAZING = [
 	{ id: 'west-s', a: [GLASS_LINE, 8.75], b: [GLASS_LINE, 4.18], mullions: [0.8, 2.25, 3.4], transom: 2.45, doors: [{ t0: 0.8, t1: 2.25, h: 2.45 }] },
 ];
 
-// Zina: janubiy devor bo'ylab, SHARQDAN G'ARBGA ko'tariladi (2-qavat rasmlari: 2-qavatga g'arb uchida,
-// kichik xona ro'parasida chiqadi). x1 — pastki pog'ona (sharq), x0 — yuqori chiqish (g'arb).
+// Zina (rasmlar 10…13): L shakl. Asosiy marsh janubiy devor bo'ylab SHARQDAN G'ARBGA (x1 → xL),
+// g'arb uchida maydoncha (xW…xL), so'ng SHIMOLGA burilib qisqa marsh 2-qavatga chiqadi (z0 → zTop).
 export const STAIR = {
-	x0: 2.6,
-	x1: 6.3,
-	z0: 7.6,
+	x1: 6.3, // pastki pog'ona (sharq)
+	xL: 2.9, // maydonchaning sharqiy qirrasi
+	xW: 1.6, // maydonchaning g'arbiy qirrasi (= kichik xona devori)
+	z0: 7.55,
 	z1: 8.75,
+	zTop: 6.4, // shimoliy marshning yuqori qirrasi
+	risersA: 13,
+	risersB: 5,
 	risers: 18,
 };
 STAIR.rise = FF / STAIR.risers;
-STAIR.going = ( STAIR.x1 - STAIR.x0 ) / ( STAIR.risers - 1 );
+STAIR.goingA = ( STAIR.x1 - STAIR.xL ) / ( STAIR.risersA - 1 );
+STAIR.goingB = ( STAIR.z0 - STAIR.zTop ) / ( STAIR.risersB - 1 );
+STAIR.hLanding = STAIR.risersA * STAIR.rise;
+// moslik uchun
+STAIR.x0 = STAIR.xW;
+STAIR.going = STAIR.goingA;
 
-// Shiftdagi (2-qavat polidagi) zina teshigi — yuqori uchi ustida
-export const OPENING = { x0: 2.6, x1: 4.9, z0: 7.55, z1: 8.75 };
+// 2-qavat polidagi zina teshigi (L shakl): shimoliy marsh ustida + maydoncha va asosiy marshning yuqori qismi
+export const OPENING = {
+	x0: STAIR.xW, x1: 4.6, z0: STAIR.z0, z1: STAIR.z1,
+	poly: [ [ 1.6, 6.4 ], [ 2.9, 6.4 ], [ 2.9, 7.55 ], [ 4.6, 7.55 ], [ 4.6, 8.75 ], [ 1.6, 8.75 ] ],
+};
 
-// Zina yuqori uchi ostidagi kichik xona (omborxona) va eshik
-export const WC = { x0: 2.37, x1: 4.1, z0: 7.55, z1: 8.75, t: 0.1, door: { x0: 2.8, x1: 3.6, h: 2.05 } };
+// Zina oldidagi eshik (janubiy devorda, maydoncha ostida) va uning orqasidagi kichik xona
+export const WC = { x0: 0, x1: 2.9, z0: 8.75, z1: 10.75, t: 0.1, door: { x0: 0.4, x1: 1.2, h: 2.05 } };
 
 // Qandillar
 export const CHANDELIERS = [
@@ -67,7 +79,8 @@ export const PANELS = [
 
 // Radiatorlar: markaz, devor normali yo'nalishi (xonaga), seksiyalar soni
 export const RADIATORS = [
-	{ x: 4.75, z: 8.75, nx: 0, nz: - 1, n: 10 },
+	{ x: 4.9, z: 7.55, nx: 0, nz: - 1, n: 10 },
+	{ x: 2.0, z: 8.75, nx: 0, nz: - 1, n: 8 },
 	{ x: 7.3, z: 2.2, nx: - 1, nz: 0, n: 10 },
 	{ x: 7.3, z: 5.05, nx: - 1, nz: 0, n: 8 },
 ];

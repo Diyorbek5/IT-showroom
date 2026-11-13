@@ -22,8 +22,7 @@ export function buildFloor2( mats, m2 ) {
 
 		const left = new THREE.Shape( [ [ - 0.12, - 0.12 ], [ XJ, - 0.12 ], [ XJ, 8.75 ], [ - 0.12, 8.75 ] ].map( ( [ x, z ] ) => new THREE.Vector2( x, - z ) ) );
 		left.holes.push( new THREE.Path( [
-			new THREE.Vector2( OPENING.x0, - OPENING.z0 ), new THREE.Vector2( OPENING.x1, - OPENING.z0 ),
-			new THREE.Vector2( OPENING.x1, - OPENING.z1 ), new THREE.Vector2( OPENING.x0, - OPENING.z1 ),
+			...OPENING.poly.map( ( [ x, z ] ) => new THREE.Vector2( x, - z ) ),
 		] ) );
 		const right = new THREE.Shape( [ [ XJ, - 0.12 ], [ 23.35, - 0.12 ], [ 23.35, 17.01 ], [ 16.0, 17.01 ], [ 16.0, 8.75 ], [ XJ, 8.75 ] ].map( ( [ x, z ] ) => new THREE.Vector2( x, - z ) ) );
 		for ( const [ shape, swap ] of [ [ left, false ], [ right, true ] ] ) {
@@ -120,9 +119,11 @@ export function buildFloor2( mats, m2 ) {
 	const skz = ( z, x0, x1, side ) => w.add( S, box( x0, x1, Y2, Y2 + SK_H, z, z + side * SK_T ) );
 	skx( 23.35, 1.0, 3.57, - 1 ); skx( 23.35, 4.56, 9.0, - 1 ); skx( 23.35, 9.95, 11.6, - 1 );
 	skx( 23.35, 11.72, 14.95, - 1 ); skx( 23.35, 15.94, 16.45, - 1 );
-	skz( 8.75, 2.0, OPENING.x0, - 1 ); skz( 8.75, OPENING.x1 + 0.05, 15.375, - 1 );
+	skz( 8.75, OPENING.x1 + 0.05, 15.375, - 1 );
 	skx( 0, 4.18, 5.6, 1 ); skx( 0.75, 3.8, 3.68, 1 );
-	skx( 2.0, 5.6, 8.75, 1 ); skz( 5.6, 0, 0.28, - 1 ); skz( 5.6, 1.22, 2.0, - 1 ); skx( 1.4, 1.9, 2.35, 1 ); skx( 1.4, 3.25, 3.8, 1 );
+	skz( 6.28, 0, 0.33, - 1 ); skz( 6.28, 1.27, 1.6, - 1 ); skx( 2.9, 4.56, 6.4, - 1 ); skx( 3.02, 4.56, 6.4, 1 ); skx( 0, 4.18, 6.28, 1 ); skx( 1.4, 1.9, 2.35, 1 ); skx( 1.4, 3.25, 3.8, 1 );
+	// kichik xona ichi
+	skz( 8.75, 0, 1.48, - 1 ); skx( 1.48, 6.4, 8.75, - 1 ); skx( 0, 6.4, 8.75, 1 );
 	skx( 15.375, 4.56, 8.75, - 1 ); skx( 15.55, 4.56, 8.75, 1 );
 	skx( 16.0, 8.75, 8.94, 1 );
 	let sx = 16.0;
