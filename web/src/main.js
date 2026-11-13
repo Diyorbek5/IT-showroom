@@ -34,7 +34,7 @@ const params = {
 	sunScale: 0.5,
 	skyIntensity: 1,
 	exposure: 0.68,
-	exposure2: 1.15, // 2-qavat: qora shift, kamroq qaytgan yorug'lik — fotograflar kabi ekspozitsiya oshiriladi
+	exposure2: 1.6, // 2-qavat: qora shift, kamroq qaytgan yorug'lik — fotograflar kabi ekspozitsiya oshiriladi
 	panel: 0.9,
 	chandelier: 0.25,
 	chandelierEmissive: 7,
@@ -46,14 +46,14 @@ const params = {
 const VIEWS = [
 	{ floor: 1, id: 'kirish', name: 'Kirish', pos: [ 0.8, 1.55, 5.0 ], target: [ 7.0, 1.4, 1.0 ] },
 	{ floor: 1, id: 'vitrina', name: 'Vitrina', pos: [ 6.15, 1.5, 6.6 ], target: [ 0, 1.55, 2.6 ] },
-	{ floor: 1, id: 'zina', name: 'Zina', pos: [ 6.6, 1.45, 3.2 ], target: [ 1.6, 1.6, 8.6 ] },
-	{ floor: 1, id: 'burchak', name: 'Eshik va zina', pos: [ 6.9, 1.5, 2.2 ], target: [ 0.6, 1.3, 8.4 ] },
+	{ floor: 1, id: 'zina', name: 'Zina', pos: [ 0.9, 1.5, 3.6 ], target: [ 5.6, 1.7, 8.6 ] },
+	{ floor: 1, id: 'burchak', name: 'Eshik va zina', pos: [ 1.2, 1.5, 7.0 ], target: [ 6.4, 1.6, 8.0 ] },
 	{ floor: 1, id: 'tepadan', name: 'Tepadan', pos: [ 1.2, 12.5, 11.0 ], target: [ 3.65, 0, 4.4 ] },
 	{ floor: 2, id: 'zal', name: 'Zal', pos: [ 13.8, 3.9 + 1.6, 7.9 ], target: [ 2.0, 3.9 + 1.2, 3.0 ] },
 	{ floor: 2, id: 'qanot', name: 'Qanot', pos: [ 19.6, 3.9 + 1.6, 11.1 ], target: [ 19.4, 3.9 + 1.45, 0.5 ] },
 	{ floor: 2, id: 'ustunlar', name: 'Ustunlar', pos: [ 22.4, 3.9 + 1.65, 1.3 ], target: [ 12.0, 3.9 + 1.0, 7.5 ] },
 	{ floor: 2, id: 'ofis', name: 'Ofis xona', pos: [ 17.4, 3.9 + 1.55, 12.1 ], target: [ 17.4, 3.9 + 1.4, 17.0 ] },
-	{ floor: 2, id: 'zina2', name: 'Zina', pos: [ 7.6, 3.9 + 1.55, 2.4 ], target: [ 1.6, 3.9 + 1.1, 7.2 ] },
+	{ floor: 2, id: 'zina2', name: 'Zina', pos: [ 9.4, 3.9 + 1.65, 5.2 ], target: [ 5.4, 3.9 + 0.5, 7.4 ] },
 	{ floor: 2, id: 'tepadan2', name: 'Tepadan', pos: [ 5.5, 3.9 + 15.5, 22.5 ], target: [ 11.7, 3.9, 8.0 ] },
 ];
 
@@ -354,10 +354,8 @@ async function main() {
 				...COLS2.map( ( c ) => [ c.x0, c.x1, c.z0, c.z1 ] ),
 				...PARTITIONS2.slice( 0, 1 ).map( ( c ) => [ c.x0, c.x1, c.z0, c.z1 ] ),
 				[ 16.0, 23.35, 11.6, 17.01 ],
-				[ 1.5, 4.7, 7.45, 8.75 ],
-				[ 1.5, 3.0, 6.3, 7.6 ],
-				[ 0, 1.6, 6.28, 8.75 ],
-				[ 2.9, 3.02, 4.56, 6.4 ],
+				[ 3.8, 6.6, 7.45, 8.75 ],
+				[ 5.1, 6.6, 6.3, 7.6 ],
 				[ 0, 1.4, 1.78, 3.8 ],
 			],
 		},

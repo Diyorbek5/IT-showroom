@@ -11,26 +11,26 @@ export function buildStair( mats ) {
 
 	const root = new THREE.Group();
 	root.name = 'stair';
-	const { x1, xL, xW, z0, z1, zTop, risersA, risersB, rise: r, goingA: gA, goingB: gB, hLanding } = STAIR;
+	const { x0, xL, xE, z0, z1, zTop, risersA, risersB, rise: r, goingA: gA, goingB: gB, hLanding } = STAIR;
 	const b = new Batch();
 
-	// ---- Asosiy marsh: i = 0 eng pastki pog'ona (sharqda) ----
+	// ---- Asosiy marsh: i = 0 eng pastki pog'ona (g'arbda, kiraverish tomoni) ----
 	for ( let i = 0; i < risersA - 1; i ++ ) {
 
-		const xe = x1 - i * gA; // pog'onaning sharqiy (old) qirrasi
-		const xw = xe - gA;
+		const xw = x0 + i * gA; // pog'onaning g'arbiy (old) qirrasi
+		const xe = xw + gA;
 		const top = ( i + 1 ) * r;
 		const bot = Math.max( 0, i * r - SLAB );
-		b.add( mats.plaster, box( xw - 0.001, xe, bot, top - T, z0, z1 ) );
-		b.add( mats.granite, box( xw, xe + 0.025, top - T, top, z0 - 0.02, z1 ) );
-		b.add( mats.granite, box( xe, xe + 0.012, top - r, top - T, z0, z1 ) );
+		b.add( mats.plaster, box( xw, xe + 0.001, bot, top - T, z0, z1 ) );
+		b.add( mats.granite, box( xw - 0.025, xe, top - T, top, z0 - 0.02, z1 ) );
+		b.add( mats.granite, box( xw - 0.012, xw, top - r, top - T, z0, z1 ) );
 
 	}
 
-	// ---- Maydoncha (g'arb uchida) ----
-	b.add( mats.plaster, box( xW, xL + 0.001, hLanding - SLAB - r, hLanding - T, z0, z1 ) );
-	b.add( mats.granite, box( xW, xL + 0.025, hLanding - T, hLanding, z0 - 0.02, z1 ) );
-	b.add( mats.granite, box( xL, xL + 0.012, hLanding - r, hLanding - T, z0, z1 ) );
+	// ---- Maydoncha (sharq uchida) ----
+	b.add( mats.plaster, box( xL - 0.001, xE, hLanding - SLAB - r, hLanding - T, z0, z1 ) );
+	b.add( mats.granite, box( xL - 0.025, xE, hLanding - T, hLanding, z0 - 0.02, z1 ) );
+	b.add( mats.granite, box( xL - 0.012, xL, hLanding - r, hLanding - T, z0, z1 ) );
 
 	// ---- Shimoliy marsh: maydonchadan 2-qavatga, j = 0 eng pastki ----
 	for ( let j = 0; j < risersB - 1; j ++ ) {
@@ -39,38 +39,16 @@ export function buildStair( mats ) {
 		const zn = zs - gB; // old (shimoliy) qirrasi
 		const top = hLanding + ( j + 1 ) * r;
 		const bot = hLanding + j * r - SLAB;
-		b.add( mats.plaster, box( xW, xL, bot, top - T, zn - 0.001, zs ) );
-		b.add( mats.granite, box( xW, xL + 0.02, top - T, top, zn - 0.025, zs ) );
-		b.add( mats.granite, box( xW, xL, top - r, top - T, zn - 0.012, zn ) );
+		b.add( mats.plaster, box( xL, xE, bot, top - T, zn - 0.001, zs ) );
+		b.add( mats.granite, box( xL - 0.02, xE, top - T, top, zn - 0.025, zs ) );
+		b.add( mats.granite, box( xL, xE, top - r, top - T, zn - 0.012, zn ) );
 
 	}
 
 	// oxirgi ko'tarilish — 2-qavat orayopmasi qirrasi
-	b.add( mats.granite, box( xW, xL, FF - r, FF - 0.01, zTop - 0.012, zTop ) );
+	b.add( mats.granite, box( xL, xE, FF - r, FF - 0.01, zTop - 0.012, zTop ) );
 
-	// ---- Asosiy marsh ostidagi berk devor (rasm 11: oq devor, oldida radiator) ----
-	{
-
-		const pts = [ [ xL, 0 ], [ x1 - 0.25, 0 ] ];
-		for ( let i = 0; i < risersA - 1; i ++ ) {
-
-			const xe = x1 - i * gA, xw = xe - gA;
-			const y = Math.max( 0, i * r - SLAB );
-			if ( y <= 0 ) continue;
-			pts.push( [ Math.min( xe, x1 - 0.25 ), y ] );
-			pts.push( [ xw, y ] );
-
-		}
-
-		pts.push( [ xL, hLanding - SLAB - r ] );
-		const shape = new THREE.Shape( pts.map( ( [ x, y ] ) => new THREE.Vector2( x, y ) ) );
-		const eg = new THREE.ExtrudeGeometry( shape, { depth: 0.1, bevelEnabled: false } );
-		eg.translate( 0, 0, z0 - 0.1 );
-		b.add( mats.wall, eg );
-		b.add( mats.skirting, box( xL, x1 - 0.25, 0, 0.08, z0 - 0.112, z0 - 0.1 ) );
-
-	}
-
+	// Marsh janubiy devorga mahkamlangan, osti ochiq: devordagi radiator va burchakdagi eshik ko'rinadi (rasm 14)
 	// Maydoncha va shimoliy marsh osti ochiq (rasm 10, 11: eshik va radiator shu yerdan ko'rinadi)
 
 	root.add( b.build( { name: 'steps' } ) );
@@ -80,54 +58,61 @@ export function buildStair( mats ) {
 
 }
 
-const pitchA = ( x ) => STAIR.rise + ( STAIR.x1 - x ) * STAIR.rise / STAIR.goingA;
+const pitchA = ( x ) => STAIR.rise + ( x - STAIR.x0 ) * STAIR.rise / STAIR.goingA;
 const pitchB = ( z ) => STAIR.hLanding + STAIR.rise + ( STAIR.z0 - z ) * STAIR.rise / STAIR.goingB;
 
 function buildRailings( mats ) {
 
 	const b = new Batch();
 	const M = mats.railing;
-	const { x1, xL, z0, z1, zTop, hLanding } = STAIR;
+	const { x0, xL, xE, z0, z1, zTop, hLanding } = STAIR;
 	const HR = 0.92, BR = 0.1;
 	const zr = z0 + 0.035; // asosiy marsh panjarasi — shimoliy (ochiq) tomonda
-	const xr = xL - 0.035; // shimoliy marsh panjarasi — sharqiy (ochiq) tomonda
+	const xr = xL + 0.035; // shimoliy marsh panjarasi — g'arbiy (ochiq) tomonda
 
-	// Asosiy marsh: pastki uchdan (sharq) maydonchagacha
-	const xa = x1 - 0.03, xb = xL;
+	// Asosiy marsh: pastki uchdan (g'arb) maydonchagacha
+	const xa = x0 + 0.03, xb = xL;
 	b.add( M, beam( V( xa, pitchA( xa ) + HR, zr ), V( xb, pitchA( xb ) + HR, zr ), 0.045, 0.045 ) );
 	b.add( M, beam( V( xa, pitchA( xa ) + BR, zr ), V( xb, pitchA( xb ) + BR, zr ), 0.012, 0.04 ) );
 	b.add( M, box( xa - 0.03, xa + 0.03, 0, pitchA( xa ) + HR + 0.03, zr - 0.03, zr + 0.03 ) );
-	panelPattern( b, M, xb + 0.04, xa - 0.06, ( x ) => pitchA( x ) + BR, ( x ) => pitchA( x ) + HR, ( x, a, c ) => [ V( x, a, zr ), V( x, c, zr ) ] );
+	panelPattern( b, M, xa + 0.06, xb - 0.04, ( x ) => pitchA( x ) + BR, ( x ) => pitchA( x ) + HR, ( x, a, c ) => [ V( x, a, zr ), V( x, c, zr ) ] );
 
 	// Maydoncha burchagidagi ustuncha
 	b.add( M, box( xL - 0.03, xL + 0.03, hLanding, hLanding + HR + 0.03, zr - 0.03, zr + 0.03 ) );
 
-	// Shimoliy marsh: sharqiy ochiq tomoni bo'ylab, maydonchadan 2-qavatgacha
+	// Shimoliy marsh: g'arbiy ochiq tomoni bo'ylab, maydonchadan 2-qavatgacha
 	const za = z0 + 0.035, zb = zTop;
 	b.add( M, beam( V( xr, pitchB( za ) + HR, za ), V( xr, pitchB( zb ) + HR, zb ), 0.045, 0.045 ) );
 	b.add( M, beam( V( xr, pitchB( za ) + BR, za ), V( xr, pitchB( zb ) + BR, zb ), 0.012, 0.04 ) );
 	panelPattern( b, M, zb + 0.04, za - 0.06, ( z ) => pitchB( z ) + BR, ( z ) => pitchB( z ) + HR, ( z, a, c ) => [ V( xr, a, z ), V( xr, c, z ) ] );
 
-	// ---- 2-qavat: teshik atrofidagi to'siq ----
+	// ---- 2-qavat: teshik atrofidagi to'siq (chiqish tomoni — shimol — ochiq) ----
 	const y0 = FF;
-	const xe = OPENING.x1 + 0.04; // sharqiy uch
-	const zn = z0 - 0.04; // shimoliy qirra (x xL…xe)
-	// shimoliy marshning sharqiy qirrasi davomi (x = xr, z zTop…zn)
+	const xw = OPENING.x0 - 0.04; // g'arbiy uch
+	const zn = z0 - 0.04; // shimoliy qirra (x xw…xr)
+	const xe = xE + 0.04; // sharqiy qirra (2-qavatda bu yerda devor yo'q)
+	// shimoliy marshning g'arbiy qirrasi davomi (x = xr, z zTop…zn)
 	b.add( M, box( xr - 0.0225, xr + 0.0225, y0 + HR - 0.0225, y0 + HR + 0.0225, zTop - 0.0225, zn + 0.0225 ) );
 	b.add( M, box( xr - 0.02, xr + 0.02, y0 + BR - 0.006, y0 + BR + 0.006, zTop, zn ) );
 	b.add( M, box( xr - 0.03, xr + 0.03, y0, y0 + HR + 0.03, zTop - 0.03, zTop + 0.03 ) );
 	panelPattern( b, M, zTop + 0.06, zn - 0.06, () => y0 + BR, () => y0 + HR, ( z, a, c ) => [ V( xr, a, z ), V( xr, c, z ) ] );
-	// shimoliy qirra
-	b.add( M, box( xr - 0.0225, xe + 0.0225, y0 + HR - 0.0225, y0 + HR + 0.0225, zn - 0.0225, zn + 0.0225 ) );
-	b.add( M, box( xr, xe, y0 + BR - 0.006, y0 + BR + 0.006, zn - 0.02, zn + 0.02 ) );
+	// shimoliy qirra (maydonchadan g'arbga, asosiy marsh ustida)
+	b.add( M, box( xw - 0.0225, xr + 0.0225, y0 + HR - 0.0225, y0 + HR + 0.0225, zn - 0.0225, zn + 0.0225 ) );
+	b.add( M, box( xw, xr, y0 + BR - 0.006, y0 + BR + 0.006, zn - 0.02, zn + 0.02 ) );
 	b.add( M, box( xr - 0.03, xr + 0.03, y0, y0 + HR + 0.03, zn - 0.03, zn + 0.03 ) );
-	b.add( M, box( xe - 0.03, xe + 0.03, y0, y0 + HR + 0.03, zn - 0.03, zn + 0.03 ) );
-	for ( let x = xr + 0.6; x < xe; x += 0.6 ) b.add( M, box( x - 0.01, x + 0.01, y0, y0 + BR, zn - 0.01, zn + 0.01 ) );
-	panelPattern( b, M, xr + 0.06, xe - 0.06, () => y0 + BR, () => y0 + HR, ( x, a, c ) => [ V( x, a, zn ), V( x, c, zn ) ] );
-	// sharqiy uch
-	b.add( M, box( xe - 0.0225, xe + 0.0225, y0 + HR - 0.0225, y0 + HR + 0.0225, zn, z1 ) );
-	b.add( M, box( xe - 0.02, xe + 0.02, y0 + BR - 0.006, y0 + BR + 0.006, zn, z1 ) );
-	panelPattern( b, M, zn + 0.06, z1 - 0.04, () => y0 + BR, () => y0 + HR, ( z, a, c ) => [ V( xe, a, z ), V( xe, c, z ) ] );
+	b.add( M, box( xw - 0.03, xw + 0.03, y0, y0 + HR + 0.03, zn - 0.03, zn + 0.03 ) );
+	for ( let x = xw + 0.6; x < xr; x += 0.6 ) b.add( M, box( x - 0.01, x + 0.01, y0, y0 + BR, zn - 0.01, zn + 0.01 ) );
+	panelPattern( b, M, xw + 0.06, xr - 0.06, () => y0 + BR, () => y0 + HR, ( x, a, c ) => [ V( x, a, zn ), V( x, c, zn ) ] );
+	// g'arbiy uch
+	b.add( M, box( xw - 0.0225, xw + 0.0225, y0 + HR - 0.0225, y0 + HR + 0.0225, zn, z1 ) );
+	b.add( M, box( xw - 0.02, xw + 0.02, y0 + BR - 0.006, y0 + BR + 0.006, zn, z1 ) );
+	panelPattern( b, M, zn + 0.06, z1 - 0.04, () => y0 + BR, () => y0 + HR, ( z, a, c ) => [ V( xw, a, z ), V( xw, c, z ) ] );
+	// sharqiy qirra (teshik bo'ylab, 2-qavat zalidan)
+	b.add( M, box( xe - 0.0225, xe + 0.0225, y0 + HR - 0.0225, y0 + HR + 0.0225, zTop - 0.0225, z1 ) );
+	b.add( M, box( xe - 0.02, xe + 0.02, y0 + BR - 0.006, y0 + BR + 0.006, zTop, z1 ) );
+	b.add( M, box( xe - 0.03, xe + 0.03, y0, y0 + HR + 0.03, zTop - 0.03, zTop + 0.03 ) );
+	for ( let z = zTop + 0.6; z < z1; z += 0.6 ) b.add( M, box( xe - 0.01, xe + 0.01, y0, y0 + BR, z - 0.01, z + 0.01 ) );
+	panelPattern( b, M, zTop + 0.06, z1 - 0.04, () => y0 + BR, () => y0 + HR, ( z, a, c ) => [ V( xe, a, z ), V( xe, c, z ) ] );
 
 	return b.build( { name: 'railing' } );
 
@@ -171,9 +156,9 @@ function buildCloset( mats ) {
 
 	const { x0, x1, z0, z1, t, door } = WC;
 	const b = new Batch();
-	b.add( mats.wall, box( x0 - 0.3, x1 + t, 0, FF - 0.01, z1, z1 + 0.3 ) );
-	b.add( mats.wall, box( x1, x1 + t, 0, FF - 0.01, z0 + 0.3, z1 ) );
-	b.add( mats.wall, box( x0 - 0.3, x0, 0, FF - 0.01, z0 + 0.3, z1 ) );
+	b.add( mats.wall, box( x0 - t, x1 + 0.3, 0, FF - 0.01, z1, z1 + 0.3 ) );
+	b.add( mats.wall, box( x1, x1 + 0.3, 0, FF - 0.01, z0 + 0.3, z1 ) );
+	b.add( mats.wall, box( x0 - t, x0, 0, FF - 0.01, z0 + 0.3, z1 ) );
 	b.add( mats.ceiling, box( x0, x1, H, H + 0.05, z0 + 0.3, z1 ) );
 	b.add( mats.skirting, box( x0, x1, 0, 0.08, z1 - 0.012, z1 ) );
 	b.add( mats.skirting, box( x1 - 0.012, x1, 0, 0.08, z0 + 0.3, z1 ) );

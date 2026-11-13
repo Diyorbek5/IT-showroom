@@ -33,12 +33,13 @@ export const GLAZING = [
 	{ id: 'west-s', a: [GLASS_LINE, 8.75], b: [GLASS_LINE, 4.18], mullions: [0.8, 2.25, 3.4], transom: 2.45, doors: [{ t0: 0.8, t1: 2.25, h: 2.45 }] },
 ];
 
-// Zina (rasmlar 10…13): L shakl. Asosiy marsh janubiy devor bo'ylab SHARQDAN G'ARBGA (x1 → xL),
-// g'arb uchida maydoncha (xW…xL), so'ng SHIMOLGA burilib qisqa marsh 2-qavatga chiqadi (z0 → zTop).
+// Zina (rasmlar 10…14): L shakl. Kiraverishdan (g'arb) kirib kelinganda zina shu yerdan boshlanib
+// SHARQQA ko'tariladi (x0 → xL), sharq uchida maydoncha (xL…xE), so'ng CHAPGA (shimolga) burilib
+// qisqa marsh 2-qavatga chiqadi (z0 → zTop). Burchakdagi eshik — maydoncha ostida, janubiy devorda.
 export const STAIR = {
-	x1: 6.3, // pastki pog'ona (sharq)
-	xL: 2.9, // maydonchaning sharqiy qirrasi
-	xW: 1.6, // maydonchaning g'arbiy qirrasi (= kichik xona devori)
+	x0: 2.2, // pastki pog'ona (g'arb, kiraverish tomoni)
+	xL: 5.2, // maydonchaning g'arbiy qirrasi
+	xE: 6.5, // maydonchaning sharqiy qirrasi (= sharqiy devor)
 	z0: 7.55,
 	z1: 8.75,
 	zTop: 6.4, // shimoliy marshning yuqori qirrasi
@@ -47,21 +48,20 @@ export const STAIR = {
 	risers: 18,
 };
 STAIR.rise = FF / STAIR.risers;
-STAIR.goingA = ( STAIR.x1 - STAIR.xL ) / ( STAIR.risersA - 1 );
+STAIR.goingA = ( STAIR.xL - STAIR.x0 ) / ( STAIR.risersA - 1 );
 STAIR.goingB = ( STAIR.z0 - STAIR.zTop ) / ( STAIR.risersB - 1 );
 STAIR.hLanding = STAIR.risersA * STAIR.rise;
-// moslik uchun
-STAIR.x0 = STAIR.xW;
+STAIR.x1 = STAIR.xE;
 STAIR.going = STAIR.goingA;
 
 // 2-qavat polidagi zina teshigi (L shakl): shimoliy marsh ustida + maydoncha va asosiy marshning yuqori qismi
 export const OPENING = {
-	x0: STAIR.xW, x1: 4.6, z0: STAIR.z0, z1: STAIR.z1,
-	poly: [ [ 1.6, 6.4 ], [ 2.9, 6.4 ], [ 2.9, 7.55 ], [ 4.6, 7.55 ], [ 4.6, 8.75 ], [ 1.6, 8.75 ] ],
+	x0: 3.9, x1: 6.5, z0: STAIR.z0, z1: STAIR.z1,
+	poly: [ [ 5.2, 6.4 ], [ 6.5, 6.4 ], [ 6.5, 8.75 ], [ 3.9, 8.75 ], [ 3.9, 7.55 ], [ 5.2, 7.55 ] ],
 };
 
-// Zina oldidagi eshik (janubiy devorda, maydoncha ostida) va uning orqasidagi kichik xona
-export const WC = { x0: 0, x1: 2.9, z0: 8.75, z1: 10.75, t: 0.1, door: { x0: 0.4, x1: 1.2, h: 2.05 } };
+// Burchakdagi eshik (janubiy devorda, maydoncha ostida) va uning orqasidagi kichik xona
+export const WC = { x0: 4.4, x1: 6.5, z0: 8.75, z1: 10.75, t: 0.1, door: { x0: 5.5, x1: 6.3, h: 2.05 } };
 
 // Qandillar
 export const CHANDELIERS = [
@@ -79,8 +79,7 @@ export const PANELS = [
 
 // Radiatorlar: markaz, devor normali yo'nalishi (xonaga), seksiyalar soni
 export const RADIATORS = [
-	{ x: 4.9, z: 7.55, nx: 0, nz: - 1, n: 10 },
-	{ x: 2.0, z: 8.75, nx: 0, nz: - 1, n: 8 },
+	{ x: 4.6, z: 8.75, nx: 0, nz: - 1, n: 8 },
 	{ x: 7.3, z: 2.2, nx: - 1, nz: 0, n: 10 },
 	{ x: 7.3, z: 5.05, nx: - 1, nz: 0, n: 8 },
 ];
