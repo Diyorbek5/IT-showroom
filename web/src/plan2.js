@@ -58,6 +58,12 @@ export const NOOK2 = { x0: 0, x1: 1.4, z0: 1.9, z1: 3.68, open: [ 2.35, 3.25 ] }
 
 // Ichki devorlar: [x0, x1, z0, z1] (balandligi to'liq)
 export const PARTITIONS2 = [
+	// Zina yonidagi kichik xona (eshiksiz, ochiq o'tish joyi) — rasm 14
+	{ x0: 1.9, x1: 3.9, z0: 6.5, z1: 6.62, doors: [ [ 2.45, 3.35, 'open' ] ] },
+	{ x0: 1.9, x1: 2.02, z0: 6.62, z1: 8.75 },
+	{ x0: 3.78, x1: 3.9, z0: 6.62, z1: 8.75 }, // = zina teshigining g'arbiy devori
+	// Zina shaxtasining narigi (sharqiy) devori — 2-qavat shu devordan boshlanadi
+	{ x0: 6.5, x1: 6.8, z0: 6.4, z1: 8.75 },
 	{ x0: 0, x1: 1.4, z0: 1.78, z1: 1.9 }, // tambur shimoliy devori
 	{ x0: 0.75, x1: 1.4, z0: 3.68, z1: 3.8 }, // tambur janubiy devori (ustungacha)
 	{ x0: 15.375, x1: 15.55, z0: 4.56, z1: 8.75 }, // chap blok va o'ng qanot orasidagi devor
@@ -94,7 +100,7 @@ export const PANELS2 = ( () => {
 
 			const x = xa + ( i + 0.5 ) * ( xb - xa ) / nx;
 			const z = za + ( k + 0.5 ) * ( zb - za ) / nz;
-			if ( x > 3.6 && x < 6.8 && z > 6.1 ) continue; // zina teshigi ustida emas
+			if ( x > 1.7 && x < 7.0 && z > 6.1 ) continue; // zina teshigi va kichik xona ustida emas
 			if ( x < 1.5 && z > 1.7 && z < 3.9 ) continue; // tambur
 			out.push( [ x, z ] );
 

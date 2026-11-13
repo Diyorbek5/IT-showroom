@@ -60,8 +60,9 @@ export const OPENING = {
 	poly: [ [ 5.2, 6.4 ], [ 6.5, 6.4 ], [ 6.5, 8.75 ], [ 3.9, 8.75 ], [ 3.9, 7.55 ], [ 5.2, 7.55 ] ],
 };
 
-// Burchakdagi eshik (janubiy devorda, maydoncha ostida) va uning orqasidagi kichik xona
-export const WC = { x0: 4.4, x1: 6.5, z0: 8.75, z1: 10.75, t: 0.1, door: { x0: 5.5, x1: 6.3, h: 2.05 } };
+// Zina tagidagi kladovka: zinaning eni bo'yicha (z 7.55…8.75), bino ichida. Old devori zina bo'ylab,
+// eshik shu devorning burchagida (maydoncha ostida). Rasm 15.
+export const WC = { x0: 2.55, x1: 6.5, z0: 7.55, z1: 8.75, t: 0.1, door: { x0: 5.55, x1: 6.35, h: 2.05 } };
 
 // Qandillar
 export const CHANDELIERS = [
@@ -79,7 +80,7 @@ export const PANELS = [
 
 // Radiatorlar: markaz, devor normali yo'nalishi (xonaga), seksiyalar soni
 export const RADIATORS = [
-	{ x: 4.6, z: 8.75, nx: 0, nz: - 1, n: 8 },
+	{ x: 4.55, z: 7.55, nx: 0, nz: - 1, n: 8 },
 	{ x: 7.3, z: 2.2, nx: - 1, nz: 0, n: 10 },
 	{ x: 7.3, z: 5.05, nx: - 1, nz: 0, n: 8 },
 ];

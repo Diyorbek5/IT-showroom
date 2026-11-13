@@ -21,7 +21,7 @@ export class WalkControls {
 			poly: ROOM, eye: EYE, start: [ 2.2, 6.2 ],
 			blockers: [
 				...COLUMNS.map( ( c ) => [ c.x0, c.x1, c.z0, c.z1 ] ),
-				[ STAIR.x0 - 0.05, STAIR.xE, STAIR.zTop - 0.15, 8.75 ],
+				[ STAIR.x0 - 0.05, STAIR.xE, STAIR.z0 - 0.15, 8.75 ],
 				[ WC.x0, WC.x1, WC.z0, WC.z1 ],
 			],
 		};

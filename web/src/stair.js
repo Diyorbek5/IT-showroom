@@ -103,16 +103,7 @@ function buildRailings( mats ) {
 	b.add( M, box( xw - 0.03, xw + 0.03, y0, y0 + HR + 0.03, zn - 0.03, zn + 0.03 ) );
 	for ( let x = xw + 0.6; x < xr; x += 0.6 ) b.add( M, box( x - 0.01, x + 0.01, y0, y0 + BR, zn - 0.01, zn + 0.01 ) );
 	panelPattern( b, M, xw + 0.06, xr - 0.06, () => y0 + BR, () => y0 + HR, ( x, a, c ) => [ V( x, a, zn ), V( x, c, zn ) ] );
-	// g'arbiy uch
-	b.add( M, box( xw - 0.0225, xw + 0.0225, y0 + HR - 0.0225, y0 + HR + 0.0225, zn, z1 ) );
-	b.add( M, box( xw - 0.02, xw + 0.02, y0 + BR - 0.006, y0 + BR + 0.006, zn, z1 ) );
-	panelPattern( b, M, zn + 0.06, z1 - 0.04, () => y0 + BR, () => y0 + HR, ( z, a, c ) => [ V( xw, a, z ), V( xw, c, z ) ] );
-	// sharqiy qirra (teshik bo'ylab, 2-qavat zalidan)
-	b.add( M, box( xe - 0.0225, xe + 0.0225, y0 + HR - 0.0225, y0 + HR + 0.0225, zTop - 0.0225, z1 ) );
-	b.add( M, box( xe - 0.02, xe + 0.02, y0 + BR - 0.006, y0 + BR + 0.006, zTop, z1 ) );
-	b.add( M, box( xe - 0.03, xe + 0.03, y0, y0 + HR + 0.03, zTop - 0.03, zTop + 0.03 ) );
-	for ( let z = zTop + 0.6; z < z1; z += 0.6 ) b.add( M, box( xe - 0.01, xe + 0.01, y0, y0 + BR, z - 0.01, z + 0.01 ) );
-	panelPattern( b, M, zTop + 0.06, z1 - 0.04, () => y0 + BR, () => y0 + HR, ( z, a, c ) => [ V( xe, a, z ), V( xe, c, z ) ] );
+	// g'arbiy uch — kichik xona devori, sharqiy qirra — zina shaxtasi devori (floor2.js)
 
 	return b.build( { name: 'railing' } );
 
@@ -151,39 +142,57 @@ function panelPattern( b, M, s0, s1, yLo, yHi, pts ) {
 
 }
 
-// Janubiy devordagi eshik (maydoncha ostida) va uning orqasidagi kichik xona
+// Zina tagidagi kladovka: old devori zina chetida (z0), yuqori qirrasi zinapoyasimon ostga mos;
+// eshik burchakda — maydoncha ostida (rasm 15).
 function buildCloset( mats ) {
 
 	const { x0, x1, z0, z1, t, door } = WC;
+	const { x0: sx0, xL, risersA, rise: r, goingA: gA, hLanding } = STAIR;
+	const SL = 0.18;
 	const b = new Batch();
-	b.add( mats.wall, box( x0 - t, x1 + 0.3, 0, FF - 0.01, z1, z1 + 0.3 ) );
-	b.add( mats.wall, box( x1, x1 + 0.3, 0, FF - 0.01, z0 + 0.3, z1 ) );
-	b.add( mats.wall, box( x0 - t, x0, 0, FF - 0.01, z0 + 0.3, z1 ) );
-	b.add( mats.ceiling, box( x0, x1, H, H + 0.05, z0 + 0.3, z1 ) );
-	b.add( mats.skirting, box( x0, x1, 0, 0.08, z1 - 0.012, z1 ) );
-	b.add( mats.skirting, box( x1 - 0.012, x1, 0, 0.08, z0 + 0.3, z1 ) );
-	b.add( mats.skirting, box( x0, x0 + 0.012, 0, 0.08, z0 + 0.3, z1 ) );
-	b.add( mats.skirting, box( x0, door.x0 - 0.07, 0, 0.08, z0 + 0.3, z0 + 0.312 ) );
-	b.add( mats.skirting, box( door.x1 + 0.07, x1, 0, 0.08, z0 + 0.3, z0 + 0.312 ) );
-	b.add( mats.ledCool, new THREE.PlaneGeometry( 0.3, 0.3 ).rotateX( Math.PI / 2 ).translate( ( x0 + x1 ) / 2, H - 0.003, ( z0 + z1 ) / 2 + 0.15 ) );
+	const landBot = hLanding - SL - r;
 
-	// ---------- Eshik (kulrang eman, qora shisha chiziq) — xonaga qaragan yuza z0 da ----------
-	const dz = z0;
+	// Old devor (z0…z0+t): pastdan zinapoya ostigacha
+	const pts = [ [ x0, 0 ], [ door.x0, 0 ], [ door.x0, door.h ], [ door.x1, door.h ], [ door.x1, 0 ], [ x1, 0 ], [ x1, landBot ], [ xL, landBot ] ];
+	for ( let i = risersA - 2; i >= 0; i -- ) {
+
+		const xw = sx0 + i * gA, xe = xw + gA;
+		if ( xe <= x0 ) break;
+		const y = Math.max( 0, i * r - SL );
+		pts.push( [ Math.min( xe, xL ), y ] );
+		pts.push( [ Math.max( xw, x0 ), y ] );
+
+	}
+
+	const shape = new THREE.Shape( pts.map( ( [ x, y ] ) => new THREE.Vector2( x, y ) ) );
+	const eg = new THREE.ExtrudeGeometry( shape, { depth: t, bevelEnabled: false } );
+	eg.translate( 0, 0, z0 - t );
+	b.add( mats.wall, eg );
+	// G'arbiy yon devor (past)
+	const iw = Math.floor( ( x0 - sx0 ) / gA );
+	b.add( mats.wall, box( x0, x0 + t, 0, Math.max( 0.3, iw * r - SL ), z0, z1 ) );
+	// Plintus
+	b.add( mats.skirting, box( x0, door.x0 - 0.07, 0, 0.08, z0 - t - 0.012, z0 - t ) );
+	b.add( mats.skirting, box( door.x1 + 0.07, x1, 0, 0.08, z0 - t - 0.012, z0 - t ) );
+	b.add( mats.skirting, box( x0 - 0.012, x0, 0, 0.08, z0 - t, z1 ) );
+
+	// ---------- Eshik (kulrang eman, qora shisha chiziq), xonaga qaragan yuzasi z0 - t ----------
+	const dz = z0 - t;
 	const lx0 = door.x0 + 0.005, lx1 = door.x1 - 0.005;
 	b.add( mats.oak, box( lx0, lx1, 0.01, door.h - 0.005, dz + 0.01, dz + 0.05 ) );
 	const aw = 0.07, at = 0.012;
 	b.add( mats.oak, box( door.x0 - aw, door.x0, 0, door.h + aw, dz - at, dz ) );
 	b.add( mats.oak, box( door.x1, door.x1 + aw, 0, door.h + aw, dz - at, dz ) );
 	b.add( mats.oak, box( door.x0 - aw, door.x1 + aw, door.h, door.h + aw, dz - at, dz ) );
-	b.add( mats.oak, box( door.x0, door.x0 + 0.005, 0, door.h, dz, z0 + 0.3 ) );
-	b.add( mats.oak, box( door.x1 - 0.005, door.x1, 0, door.h, dz, z0 + 0.3 ) );
-	b.add( mats.oak, box( door.x0, door.x1, door.h, door.h + 0.005, dz, z0 + 0.3 ) );
+	b.add( mats.oak, box( door.x0, door.x0 + 0.005, 0, door.h, dz, z0 ) );
+	b.add( mats.oak, box( door.x1 - 0.005, door.x1, 0, door.h, dz, z0 ) );
 	for ( const y of [ 0.38, 0.72, 1.06, 1.74 ] ) b.add( mats.groove, box( lx0 + 0.09, lx1 - 0.09, y, y + 0.004, dz + 0.0085, dz + 0.0105 ) );
 	b.add( mats.blackGlass, box( lx0 + 0.09, lx1 - 0.09, 1.4, 1.46, dz + 0.007, dz + 0.0105 ) );
-	const hx = lx1 - 0.075;
+	// tutqich — burchakdan uzoq tomonda (g'arb)
+	const hx = lx0 + 0.075;
 	b.add( mats.blackMetal, new THREE.CylinderGeometry( 0.026, 0.026, 0.012, 24 ).rotateX( Math.PI / 2 ).translate( hx, 1.0, dz + 0.004 ) );
 	b.add( mats.blackMetal, beam( V( hx, 1.0, dz + 0.004 ), V( hx, 1.0, dz - 0.055 ), 0.009, 0.009, true ) );
-	b.add( mats.blackMetal, box( hx - 0.13, hx, 0.99, 1.012, dz - 0.068, dz - 0.05 ) );
+	b.add( mats.blackMetal, box( hx, hx + 0.13, 0.99, 1.012, dz - 0.068, dz - 0.05 ) );
 	b.add( mats.blackMetal, new THREE.CylinderGeometry( 0.02, 0.02, 0.01, 20 ).rotateX( Math.PI / 2 ).translate( hx, 0.86, dz + 0.004 ) );
 
 	return b.build( { name: 'closet' } );

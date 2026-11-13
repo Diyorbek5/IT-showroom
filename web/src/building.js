@@ -11,7 +11,7 @@ export function buildShell( mats ) {
 	root.name = 'shell';
 
 	// ---------- Pol ----------
-	const fpts = [ [ - 0.12, - 0.12 ], [ 7.3, - 0.12 ], [ 7.3, 5.76 ], [ 6.5, 6.8 ], [ 6.5, 8.75 ], [ WC.x1, 8.75 ], [ WC.x1, WC.z1 ], [ WC.x0, WC.z1 ], [ WC.x0, 8.75 ], [ - 0.12, 8.75 ] ];
+	const fpts = [ [ - 0.12, - 0.12 ], [ 7.3, - 0.12 ], [ 7.3, 5.76 ], [ 6.5, 6.8 ], [ 6.5, 8.75 ], [ - 0.12, 8.75 ] ];
 	const fshape = new THREE.Shape( fpts.map( ( [ x, z ] ) => new THREE.Vector2( x, - z ) ) );
 	const fgeo = new THREE.ShapeGeometry( fshape );
 	fgeo.rotateX( - Math.PI / 2 );
@@ -44,10 +44,7 @@ export function buildShell( mats ) {
 	}
 
 	solid.add( W, box( 6.5, 6.5 + WALL_T, 0, top, 6.8, 8.75 + WALL_T ) );
-	// Janubiy devor — kichik xona eshigi o'rni bilan (WC.door)
-	solid.add( W, box( - WALL_T, WC.door.x0, 0, top, 8.75, 8.75 + WALL_T ) );
-	solid.add( W, box( WC.door.x0, WC.door.x1, WC.door.h, top, 8.75, 8.75 + WALL_T ) );
-	solid.add( W, box( WC.door.x1, 6.5 + WALL_T, 0, top, 8.75, 8.75 + WALL_T ) );
+	solid.add( W, box( - WALL_T, 6.5 + WALL_T, 0, top, 8.75, 8.75 + WALL_T ) );
 
 	for ( const c of COLUMNS ) solid.add( W, box( c.x0, c.x1, 0, H, c.z0, c.z1 ) );
 
@@ -61,7 +58,7 @@ export function buildShell( mats ) {
 	const skZ = ( z, x0, x1, side ) => solid.add( S, box( x0, x1, 0, SK_H, z, z + side * SK_T ) );
 	skX( 7.3, 0, 5.76, - 1 );
 	skX( 6.5, 6.8, 7.55, - 1 );
-	skZ( 8.75, 0, STAIR.x0, - 1 ); skZ( 8.75, STAIR.xL, WC.door.x0 - 0.07, - 1 ); skZ( 8.75, WC.door.x1 + 0.07, 6.5, - 1 );
+	skZ( 8.75, 0, WC.x0, - 1 );
 	{
 
 		// qiya burchak plintusi

@@ -85,3 +85,7 @@
 6. 2-qavatdan yuqoriga zina bormi? Hojatxona, xonalar va to'siqlar bormi?
 7. Har bir rasm rejaning qaysi qismidan va qaysi tomonga qarab olingan? Buni keyingi rasmlar bilan birga aniqlayman.
 8. Ofis xonalar o'ng qanotning janubiy uchiga joylashtirildi. Haqiqatda boshqa joyda bo'lsa, ayting.
+
+## 8. Zina atrofi (v3, izoh-rasm 14)
+- Zina shaxtasining sharqiy tomoni devor (x 6.50…6.80): 2-qavat zinadan chiqqach shu devordan boshlanadi, narigi tomonda ochiq joy yo'q.
+- Zina yonida (g'arbda) eshiksiz kichik xona: x 1.9…3.9, z 6.5…8.75, shimol tomonida ochiq o'tish joyi.

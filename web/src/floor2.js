@@ -119,7 +119,8 @@ export function buildFloor2( mats, m2 ) {
 	const skz = ( z, x0, x1, side ) => w.add( S, box( x0, x1, Y2, Y2 + SK_H, z, z + side * SK_T ) );
 	skx( 23.35, 1.0, 3.57, - 1 ); skx( 23.35, 4.56, 9.0, - 1 ); skx( 23.35, 9.95, 11.6, - 1 );
 	skx( 23.35, 11.72, 14.95, - 1 ); skx( 23.35, 15.94, 16.45, - 1 );
-	skz( 8.75, 0, OPENING.x0 - 0.05, - 1 ); skz( 8.75, OPENING.x1 + 0.05, 15.375, - 1 );
+	skz( 8.75, 0, 1.9, - 1 ); skz( 8.75, 6.8, 15.375, - 1 ); skx( 6.8, 6.4, 8.75, 1 ); skz( 6.5, 1.9, 2.38, - 1 ); skz( 6.5, 3.42, 3.9, - 1 ); skz( 6.4, 6.5, 6.8, - 1 );
+	skz( 8.75, 2.02, 3.78, - 1 ); skx( 2.02, 6.62, 8.75, 1 ); skx( 3.78, 6.62, 8.75, - 1 );
 	skx( 0, 4.18, 5.6, 1 ); skx( 0.75, 3.8, 3.68, 1 );
 	skx( 0, 4.18, 8.75, 1 ); skx( 1.4, 1.9, 2.35, 1 ); skx( 1.4, 3.25, 3.8, 1 );
 	skx( 15.375, 4.56, 8.75, - 1 ); skx( 15.55, 4.56, 8.75, 1 );
@@ -245,6 +246,22 @@ export function buildFloor2( mats, m2 ) {
 function addDoor( b, m2, d ) {
 
 	const zc = ( d.z0 + d.z1 ) / 2;
+	if ( d.type === 'open' ) {
+
+		// eshiksiz o'tish joyi — faqat oq ramka
+		for ( const side of [ - 1, 1 ] ) {
+
+			const zf = side < 0 ? d.z0 : d.z1, t = side * 0.012;
+			b.add( m2.pvc, box( d.x0 - 0.06, d.x0, Y2, Y2 + DOOR_H + 0.06, zf, zf + t ) );
+			b.add( m2.pvc, box( d.x1, d.x1 + 0.06, Y2, Y2 + DOOR_H + 0.06, zf, zf + t ) );
+			b.add( m2.pvc, box( d.x0 - 0.06, d.x1 + 0.06, Y2 + DOOR_H, Y2 + DOOR_H + 0.06, zf, zf + t ) );
+
+		}
+
+		return;
+
+	}
+
 	const lx0 = d.x0 + 0.005, lx1 = d.x1 - 0.005;
 	const leafMat = d.type === 'pvc' || d.type === 'white' ? m2.pvc : m2.metalDoor;
 	b.add( leafMat, box( lx0, lx1, Y2 + 0.01, Y2 + DOOR_H - 0.005, zc - 0.025, zc + 0.025 ) );
