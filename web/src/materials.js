@@ -118,11 +118,18 @@ export function createMaterials2( m ) {
 		roughnessMap: tex( 'tex/laminate_rough.jpg', { repeat: lr, aniso: 16 } ),
 		normalMap: tex( 'tex/laminate_normal.jpg', { repeat: lr, aniso: 16 } ),
 		roughness: 1, metalness: 0, ior: 1.5, specularIntensity: 0.9,
-		clearcoat: 0.25, clearcoatRoughness: 0.28,
+		clearcoat: 0.4, clearcoatRoughness: 0.18, color: 0xfff8ef,
 	} );
-	m2.laminate.normalScale.set( 0.5, 0.5 );
+	m2.laminate.normalScale.set( 0.35, 0.35 );
+	// Rasm 21: taxtalar orasidagi ton farqi juda kam — kontrastni pasaytiramiz
+	m2.laminate.onBeforeCompile = ( sh ) => {
+
+		sh.fragmentShader = sh.fragmentShader.replace( '#include <map_fragment>', `#include <map_fragment>
+			diffuseColor.rgb = mix( vec3( 0.59, 0.53, 0.45 ), diffuseColor.rgb, 0.65 );` );
+
+	};
 	m2.wall = m.wall.clone();
-	m2.ceilingBlack = new THREE.MeshStandardMaterial( { color: 0x1d1d1f, roughness: 0.88, metalness: 0 } );
+	m2.ceilingBlack = new THREE.MeshStandardMaterial( { color: 0x1d1d1f, roughness: 0.88, metalness: 0, emissive: 0x111113 } ); // rasm 21: neytral qora (yashil tus yo'q)
 	m2.skirting = new THREE.MeshStandardMaterial( { color: 0xcbbfa9, roughness: 0.55 } );
 	m2.alu = m.alu.clone();
 	m2.steel = m.steel.clone();
@@ -130,7 +137,7 @@ export function createMaterials2( m ) {
 	m2.glassTint = m.glassTint;
 	m2.glassReflect = m.glassReflect.clone();
 	m2.pvc = new THREE.MeshPhysicalMaterial( { color: 0xf4f4f2, roughness: 0.32, clearcoat: 0.4, clearcoatRoughness: 0.2 } );
-	m2.darkGlass = new THREE.MeshPhysicalMaterial( { color: 0x15191b, roughness: 0.04, metalness: 0, clearcoat: 1 } );
+	m2.darkGlass = new THREE.MeshPhysicalMaterial( { color: 0x2c2f33, roughness: 0.2, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.05 } );
 	m2.metalDoor = new THREE.MeshStandardMaterial( { color: 0x2b2c2f, roughness: 0.48, metalness: 0.45 } );
 	m2.boiler = new THREE.MeshPhysicalMaterial( { color: 0xf1f1ef, roughness: 0.38, clearcoat: 0.3 } );
 	m2.boilerGrey = new THREE.MeshStandardMaterial( { color: 0x8e9296, roughness: 0.5 } );

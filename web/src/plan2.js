@@ -44,7 +44,7 @@ export const GLAZING2 = [
 	{ id: 'n3', a: [ 15.95, G ], b: [ 23.2, G ], mullions: [ 1.45, 2.9, 4.35, 5.8 ], sash: [ 1, 3 ] },
 	// G'arbiy fasad: faqat shimoliy burchakdagi tor oyna (rasm 12): qolgani devor, kichik xona va eshik o'rni
 	{ id: 'w1', a: [ G, 2.55 ], b: [ G, 0.53 ], mullions: [ 0.67, 1.34 ], sash: [ 1 ] },
-	{ id: 'e-w', a: [ 16.0 + G, 14.95 ], b: [ 16.0 + G, 11.2 ], mullions: [ 1.25, 2.5 ], sash: [ 1 ] },
+	// o'ng qanot g'arbiy (yon) devorida oyna yo'q (rasm 21)
 	// Janubiy (oxirgi) fasadda oyna yo'q — o'ng tomondagi oyna o'rnida eshik (belgilangan reja 3)
 ];
 export const TRANSOMS2 = [ 0.9, 3.0 ];
@@ -110,18 +110,11 @@ export const PANELS2 = ( () => {
 
 	}
 
-	return out;
+	// o'ng qanot zali: kvadrat panellar to'ri (rasm 21 — hamma joyda kvadrat panel)
+	for ( const [ za, zb ] of [ [ 0.5, 3.8 ], [ 4.4, 9.1 ], [ 9.8, 15.1 ], [ 15.8, 16.8 ] ] ) {
 
-} )();
-
-// Mayda yumaloq spotlar — o'ng qanot zali
-export const SPOTS2 = ( () => {
-
-	const out = [];
-	for ( const [ za, zb ] of [ [ 0.5, 3.8 ], [ 4.4, 9.1 ], [ 9.8, 15.2 ], [ 15.7, 16.7 ] ] ) {
-
-		const nz = Math.max( 1, Math.round( ( zb - za ) / 1.4 ) );
-		for ( let k = 0; k < nz; k ++ ) for ( let i = 0; i < 5; i ++ ) out.push( [ 16.55 + i * 1.5, za + ( k + 0.5 ) * ( zb - za ) / nz ] );
+		const nz = Math.max( 1, Math.round( ( zb - za ) / 2.0 ) );
+		for ( let i = 0; i < 4; i ++ ) for ( let k = 0; k < nz; k ++ ) out.push( [ 16.3 + ( i + 0.5 ) * 6.8 / 4, za + ( k + 0.5 ) * ( zb - za ) / nz ] );
 
 	}
 
@@ -129,11 +122,13 @@ export const SPOTS2 = ( () => {
 
 } )();
 
+// Mayda yumaloq spotlar — o'ng qanot zali
+export const SPOTS2 = []; // rasm 21: qanotda ham kvadrat panellar
+
 export const RADIATORS2 = [
 	{ x: 9.6, z: 8.75, nx: 0, nz: - 1, n: 10 },
 	{ x: 12.8, z: 8.75, nx: 0, nz: - 1, n: 10 },
 	{ x: 6.5, z: 4.1, nx: - 1, nz: 0, n: 10 },
 	{ x: 23.35, z: 6.8, nx: - 1, nz: 0, n: 10 },
-	{ x: 23.35, z: 13.2, nx: - 1, nz: 0, n: 10 },
-	{ x: 18.9, z: 17.01, nx: 0, nz: - 1, n: 10 },
+	{ x: 16.0, z: 12.6, nx: 1, nz: 0, n: 10 }, // yon devorda, oq eshik yonida (rasm 21)
 ];

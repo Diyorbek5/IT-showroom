@@ -54,8 +54,7 @@ export function buildFloor2( mats, m2 ) {
 	const yb = Y2 - 0.3, yt = TOP + ROOF_T;
 	w.add( W, box( 23.35, 23.65, yb, yt, - 0.3, 17.31 ) ); // sharqiy devor
 	w.add( W, box( - 0.3, 15.7, yb, yt, 8.75, 9.05 ) ); // chap blok janubiy devori
-	w.add( W, box( 15.7, 16.0, yb, yt, 8.75, 11.2 ) ); // 2-eshik shu devorda
-	w.add( W, box( 15.7, 16.0, yb, yt, 14.95, 17.31 ) );
+	w.add( W, box( 15.7, 16.0, yb, yt, 8.75, 17.31 ) ); // o'ng qanot yon devori — oynasiz (rasm 21), 2-eshik shu devorda
 	// janubiy (oxirgi) devor: oynasiz, bitta eshik bilan
 	const SD = SOUTH_DOOR2;
 	w.add( W, box( 15.7, SD.x0, yb, yt, 17.01, 17.31 ) );
@@ -75,7 +74,6 @@ export function buildFloor2( mats, m2 ) {
 	w.add( W, box( - 0.3, 0, yb, yt, 2.55, 8.75 ) ); // g'arbiy devor (oynasiz qism, eshik shu yerda)
 
 
-	band( 15.7, 16.0, 11.2, 14.95 );
 
 	for ( const c of COLS2 ) w.add( W, box( c.x0, c.x1, Y2, TOP, c.z0, c.z1 ) );
 
@@ -138,7 +136,7 @@ export function buildFloor2( mats, m2 ) {
 	skz( 17.01, 16.4, SD.x0 - 0.07, - 1 ); skz( 17.01, SD.x1 + 0.07, 22.95, - 1 ); skx( 16.0, 15.94, 16.45, 1 );
 	skz( 8.75, 0, 1.9, - 1 ); skz( 8.75, 6.5, 16.0, - 1 ); skz( 6.28, 1.9, 3.78, - 1 ); skx( 6.5, 0, 1.93, - 1 ); skx( 6.5, 2.97, 5.18, - 1 ); skx( 6.8, 0, 1.93, 1 ); skx( 6.8, 2.97, 5.18, 1 );
 	skz( 3.86, 0.75, 3.3, - 1 ); skz( 3.98, 0.75, 3.3, 1 ); skz( 3.86, 4.3, 4.68, - 1 ); skz( 3.86, 5.72, 6.5, - 1 ); skz( 3.98, 4.3, 4.68, 1 ); skz( 3.98, 5.72, 6.5, 1 );
-	skz( 5.18, 3.78, 6.5, - 1 ); skz( 5.3, 3.9, 6.8, 1 ); skx( 3.78, 5.18, 6.28, - 1 ); skx( 3.9, 5.3, 6.4, 1 ); skx( 16.0, 8.75, 10.0, 1 ); skx( 16.0, 10.95, 11.2, 1 );
+	skz( 5.18, 3.78, 6.5, - 1 ); skz( 5.3, 3.9, 6.8, 1 ); skx( 3.78, 5.18, 6.28, - 1 ); skx( 3.9, 5.3, 6.4, 1 ); skx( 16.15, 8.75, 8.94, 1 ); skx( 16.0, 9.93, 10.0, 1 ); skx( 16.0, 10.95, 14.95, 1 );
 	skz( 8.75, 2.02, 3.78, - 1 ); skx( 2.02, 6.4, 8.75, 1 ); skx( 3.78, 6.4, 8.75, - 1 );
 	skx( 0, 4.18, 5.6, 1 ); skx( 0.75, 3.8, 3.68, 1 );
 	skx( 0, 4.18, 8.75, 1 ); skx( 0, 2.55, 2.62, 1 ); skx( 0, 3.63, 3.68, 1 ); 
@@ -161,7 +159,7 @@ export function buildFloor2( mats, m2 ) {
 	// ---------- Eshiklar ----------
 	for ( const d of doors ) addDoor( w, m2, d );
 	addDoor( w, m2, { x0: SD.x0, x1: SD.x1, z0: 17.01, z1: 17.31, type: 'pvc' } );
-	// 2-eshik: to'q rangli metall eshik — o'ng qanot g'arbiy devorida, burchak yonida (belgilangan reja)
+	// 2-eshik: oq tor eshik — o'ng qanot yon devorida, ustun yonida (rasm 21)
 	addSurfaceDoorX( w, m2, 10.05, 10.9, 16.0 );
 
 	// Zina teshigi atrofidagi pol qirrasi va ostona chiziqlari
@@ -171,7 +169,7 @@ export function buildFloor2( mats, m2 ) {
 	// ---------- Radiatorlar, gaz qozon, rozetkalar ----------
 	addRadiators( w, m2, RADIATORS2, Y2 );
 	addBoiler( w, m2, 7.59, 1.0, 0 ); // rasm 12: qozon ustunning janubiy yuzasida
-	for ( const [ x, z, nx, nz ] of [ [ 23.35, 6.0, - 1, 0 ], [ 9.0, 8.75, 0, - 1 ], [ 15.375, 5.4, - 1, 0 ], [ 23.35, 12.2, - 1, 0 ], [ 17.4, 17.01, 0, - 1 ], [ 16.0, 13.5, 1, 0 ] ] ) addSocket( w, m2, x, Y2 + 0.32, z, nx, nz );
+	for ( const [ x, z, nx, nz ] of [ [ 23.35, 6.0, - 1, 0 ], [ 9.0, 8.75, 0, - 1 ], [ 15.375, 5.4, - 1, 0 ], [ 23.35, 12.2, - 1, 0 ], [ 17.4, 17.01, 0, - 1 ], [ 16.0, 11.6, 1, 0 ] ] ) addSocket( w, m2, x, Y2 + 0.32, z, nx, nz );
 
 	root.add( w.build( { name: 'floor2-walls' } ) );
 
@@ -326,10 +324,13 @@ function addDoorZ( b, m2, p ) {
 // Devor yuzasidagi metall eshik (x = const devor, sharqqa qaragan)
 function addSurfaceDoorX( b, m2, z0, z1, x ) {
 
-	b.add( m2.metalDoor, box( x, x + 0.02, Y2, Y2 + DOOR_H + 0.05, z0 - 0.05, z1 + 0.05 ) );
-	b.add( m2.metalDoor, box( x + 0.02, x + 0.045, Y2 + 0.005, Y2 + DOOR_H, z0, z1 ) );
-	for ( let y = 0.3; y < DOOR_H - 0.1; y += 0.16 ) b.add( m2.blackMetal, box( x + 0.044, x + 0.047, Y2 + y, Y2 + y + 0.006, z0 + 0.06, z1 - 0.06 ) );
-	b.add( m2.chrome, box( x + 0.08, x + 0.1, Y2 + 1.0, Y2 + 1.02, z1 - 0.16, z1 - 0.04 ) );
+	// oq eshik: ramka (nalichnik) + tavaqa + tutqich
+	b.add( m2.pvc, box( x, x + 0.015, Y2, Y2 + DOOR_H + 0.07, z0 - 0.07, z0 ) );
+	b.add( m2.pvc, box( x, x + 0.015, Y2, Y2 + DOOR_H + 0.07, z1, z1 + 0.07 ) );
+	b.add( m2.pvc, box( x, x + 0.015, Y2 + DOOR_H, Y2 + DOOR_H + 0.07, z0 - 0.07, z1 + 0.07 ) );
+	b.add( m2.pvc, box( x, x + 0.04, Y2 + 0.005, Y2 + DOOR_H, z0, z1 ) );
+	b.add( m2.chrome, box( x + 0.075, x + 0.09, Y2 + 1.0, Y2 + 1.02, z1 - 0.17, z1 - 0.05 ) );
+	b.add( m2.chrome, box( x + 0.04, x + 0.085, Y2 + 0.99, Y2 + 1.03, z1 - 0.07, z1 - 0.05 ) );
 
 }
 

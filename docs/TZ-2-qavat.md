@@ -112,3 +112,12 @@
 - Qanotdagi barcha ichki devorlar (ko'ndalang devor z 11.6, koridor devori x 17.6, xonalar orasidagi devor x 20.53) va ulardagi eshiklar olib tashlandi — qanot bitta katta ochiq zal.
 - Janubiy (oxirgi) fasadda oynalar yo'q: s-a oyna o'rni devor, s-b oyna o'rnida eshik (x 21.35…22.25).
 - Ofis xonalaridagi kvadrat panellar o'rniga butun qanot bo'ylab spotlar; radiatorlar sharqiy va janubiy devorlarga ko'chirildi.
+
+## 13. O'ng qanot zali — rasm 21 bo'yicha (1:1)
+
+- Rasm 21 qanotning shimoli-sharqidan (x ≈ 21.5, z ≈ 0.7) janubi-g'arbga qarab olingan: chapda sharqiy devor, uzoqda janubiy devor va burchak yonidagi PVC eshik, o'rtada yon devordagi oq tor eshik, o'ngda ustunlar, zina panjarasi va 1-eshik.
+- Yon (g'arbiy) devordagi oyna (e-w) olib tashlandi — qanot devorlarida oyna yo'q.
+- 2-eshik (x 16.0, z 10.05…10.9) — oq tor eshik; radiator uning yonida.
+- Qanot yoritgichlari: yumaloq spotlar o'rniga kvadrat panellar to'ri (har qatorda 4 ta).
+- Laminat: taxtalar orasidagi ton farqi pasaytirildi, iliqroq va yaltiroqroq; qora shift neytral; eshik oynasi kulrang.
+- "Qanot zali" ko'rinishi rasm 21 nuqtasidan.
