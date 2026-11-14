@@ -112,6 +112,8 @@ async function main() {
 	const overhead = [ ceilingGroup, ...fixtures.children.filter( ( o ) => /chandelier|panel/.test( o.name ) ), ...stair.children.filter( ( o ) => false ) ];
 
 	const reflection = new FloorReflection( floor, { resolution: 0.35 } );
+	// 2-qavat laminati: chiroqlarning poldagi aksi (rasm 21)
+	const reflection2 = new FloorReflection( floor2.userData.floors, { resolution: 0.35, y: Y2 } );
 
 	// ---------- Osmon / quyosh ----------
 	setLoad( 0.25, 'Ko\'cha manzarasi yuklanmoqda…' );
@@ -188,7 +190,7 @@ async function main() {
 		// probe'larga "pishiriladi", real vaqtda esa og'ir hisob qilinmaydi.
 		before: () => {
 
-			reflection.uniforms.reflStrength.value = 0;
+			reflection.uniforms.reflStrength.value = reflection2.uniforms.reflStrength.value = 0;
 			hdrBackground( true );
 			params.areaLights = true;
 			applyLightLevels( lights, mats, params );
@@ -196,7 +198,7 @@ async function main() {
 		},
 		after: () => {
 
-			reflection.uniforms.reflStrength.value = 1;
+			reflection.uniforms.reflStrength.value = reflection2.uniforms.reflStrength.value = 1;
 			hdrBackground( false );
 			params.areaLights = false;
 			applyLightLevels( lights, mats, params );
@@ -207,7 +209,7 @@ async function main() {
 	console.log( 'bake done', Math.round( performance.now() - t0 ) );
 	setLoad( 0.88, 'Akslar tayyorlanmoqda…' );
 	await frame();
-	reflection.uniforms.reflStrength.value = 0;
+	reflection.uniforms.reflStrength.value = reflection2.uniforms.reflStrength.value = 0;
 	hdrBackground( true );
 	const envSize = LITE ? 64 : 128;
 	const p1 = new THREE.Vector3( 3.6, 1.5, 5.0 ), p2 = new THREE.Vector3( 11.0, Y2 + 1.7, 3.2 );
@@ -241,13 +243,13 @@ async function main() {
 
 		// Cubemap yoritishidagi yashil tusni (daraxtlar) neytral yumshoq to'ldiruvchi bilan muvozanatlash
 		scene.environmentIntensity = 0.7;
-		for ( const m of Object.values( m2 ) ) if ( m.isMeshStandardMaterial ) m.envMapIntensity = 0.7;
+		for ( const m of Object.values( m2 ) ) if ( m.isMeshStandardMaterial ) m.envMapIntensity = Math.min( m.envMapIntensity, 0.7 );
 		scene.add( new THREE.HemisphereLight( 0xfdfcf8, 0xb9b2a6, 0.55 ) );
 		params.exposure2 = 1.4;
 
 	}
 
-	reflection.uniforms.reflStrength.value = 1;
+	reflection.uniforms.reflStrength.value = reflection2.uniforms.reflStrength.value = 1;
 	console.log( 'GI bake ms', Math.round( performance.now() - t0 ) );
 
 	// Chiroqlar almashtirilganda GI fonda qayta hisoblanadi
@@ -307,7 +309,8 @@ async function main() {
 
 		} );
 		reflection.enabled = false;
-		reflection.uniforms.reflStrength.value = 0;
+		reflection2.enabled = false;
+		reflection.uniforms.reflStrength.value = reflection2.uniforms.reflStrength.value = 0;
 
 	}
 
@@ -551,6 +554,7 @@ async function main() {
 			composer.setSize( w, h );
 			n8.setSize( w * pr, h * pr );
 			reflection.setSize( w * pr, h * pr );
+			reflection2.setSize( w * pr, h * pr );
 
 		}
 		pt.active && pt.tracer.updateCamera();
@@ -668,6 +672,7 @@ async function main() {
 		hemi.visible = outside;
 		scene.background = sky.bg;
 		reflection.enabled = ! LITE && cp.y < H;
+		reflection2.enabled = ! LITE && in2;
 		if ( !! params.floor2Live !== ( in2 && ! LITE ) ) {
 
 			params.floor2Live = in2 && ! LITE;
@@ -708,6 +713,8 @@ async function main() {
 				floor2.visible = f2;
 
 			}
+
+			if ( reflection2.enabled ) reflection2.update( renderer, scene, camera );
 			if ( composer ) {
 
 				const fast = moving && ! SHOT;

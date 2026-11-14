@@ -118,7 +118,7 @@ export function createMaterials2( m ) {
 		roughnessMap: tex( 'tex/laminate_rough.jpg', { repeat: lr, aniso: 16 } ),
 		normalMap: tex( 'tex/laminate_normal.jpg', { repeat: lr, aniso: 16 } ),
 		roughness: 1, metalness: 0, ior: 1.5, specularIntensity: 0.9,
-		clearcoat: 0.4, clearcoatRoughness: 0.18, color: 0xfff8ef,
+		clearcoat: 0.6, clearcoatRoughness: 0.14, color: 0xfff8ef,
 	} );
 	m2.laminate.normalScale.set( 0.35, 0.35 );
 	// Rasm 21: taxtalar orasidagi ton farqi juda kam — kontrastni pasaytiramiz
@@ -137,7 +137,8 @@ export function createMaterials2( m ) {
 	m2.glassTint = m.glassTint;
 	m2.glassReflect = m.glassReflect.clone();
 	m2.pvc = new THREE.MeshPhysicalMaterial( { color: 0xf4f4f2, roughness: 0.32, clearcoat: 0.4, clearcoatRoughness: 0.2 } );
-	m2.darkGlass = new THREE.MeshPhysicalMaterial( { color: 0x2c2f33, roughness: 0.2, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.05 } );
+	// eshik oynasi: kulrang (rasm 21) — uzoqdan ham yashil aks bermasligi uchun env aksi kuchsiz
+	m2.darkGlass = new THREE.MeshStandardMaterial( { color: 0x5b5e62, roughness: 0.35, metalness: 0, envMapIntensity: 0.25 } );
 	m2.metalDoor = new THREE.MeshStandardMaterial( { color: 0x2b2c2f, roughness: 0.48, metalness: 0.45 } );
 	m2.boiler = new THREE.MeshPhysicalMaterial( { color: 0xf1f1ef, roughness: 0.38, clearcoat: 0.3 } );
 	m2.boilerGrey = new THREE.MeshStandardMaterial( { color: 0x8e9296, roughness: 0.5 } );

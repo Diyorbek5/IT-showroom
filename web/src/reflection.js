@@ -5,9 +5,10 @@ import * as THREE from 'three';
 // g'adir-budurlikka qarab mip-blur qilinadi.
 export class FloorReflection {
 
-	constructor( floorMesh, { resolution = 0.5 } = {} ) {
+	constructor( floorMesh, { resolution = 0.5, y = 0 } = {} ) {
 
-		this.mesh = floorMesh;
+		this.meshes = [].concat( floorMesh );
+		this.y = y;
 		this.resolution = resolution;
 		this.enabled = true;
 		this.rt = new THREE.WebGLRenderTarget( 2, 2, {
@@ -26,9 +27,11 @@ export class FloorReflection {
 			reflLodScale: { value: 7.0 },
 		};
 
-		const mat = floorMesh.material;
-		mat.onBeforeCompile = ( shader ) => {
+		const mat = this.meshes[ 0 ].material;
+		const prev = mat.onBeforeCompile;
+		mat.onBeforeCompile = ( shader, r ) => {
 
+			prev.call( mat, shader, r );
 			Object.assign( shader.uniforms, this.uniforms );
 			shader.vertexShader = shader.vertexShader
 				.replace( '#include <common>', '#include <common>\nuniform mat4 reflMatrix;\nvarying vec4 vReflUv;' )
@@ -45,11 +48,20 @@ export class FloorReflection {
 					vec2 e = smoothstep( vec2( 0.0 ), vec2( 0.03 ), ruv ) * smoothstep( vec2( 1.0 ), vec2( 0.97 ), ruv );
 					float k = e.x * e.y * reflStrength;
 					radiance = mix( radiance, refl, k );
+					#ifdef USE_CLEARCOAT
+					// lak qatlami: chiroqlarning aniqroq (lekin yumshoq) aksi
+					// laminat taxtalari bo'ylab cho'zilgan aks (rasm 21 dagi kabi vertikal chiziqlar)
+					float ccLod = clamp( material.clearcoatRoughness * reflLodScale + 1.2, 0.0, 8.0 );
+					vec3 ccRefl = vec3( 0.0 );
+					for ( int i = - 4; i <= 4; i ++ ) ccRefl += textureLod( tReflect, ruv + vec2( 0.0, float( i ) * 0.012 ), ccLod ).rgb;
+					ccRefl /= 9.0;
+					clearcoatRadiance = mix( clearcoatRadiance, ccRefl, k );
+					#endif
 				}` );
 
 		};
 
-		mat.customProgramCacheKey = () => 'floor-reflection';
+		mat.customProgramCacheKey = () => 'floor-reflection-' + y;
 
 	}
 
@@ -64,9 +76,9 @@ export class FloorReflection {
 		if ( ! this.enabled ) return;
 		const vc = this.virtualCamera;
 		const normal = new THREE.Vector3( 0, 1, 0 );
-		const pos = new THREE.Vector3( 0, 0, 0 );
+		const pos = new THREE.Vector3( 0, this.y, 0 );
 		const camPos = new THREE.Vector3().setFromMatrixPosition( camera.matrixWorld );
-		if ( camPos.y <= 0.001 ) return;
+		if ( camPos.y <= this.y + 0.001 ) return;
 
 		const view = pos.clone().sub( camPos );
 		view.reflect( normal ).negate().add( pos );
@@ -107,11 +119,11 @@ export class FloorReflection {
 		const prevShadow = renderer.shadowMap.autoUpdate;
 		renderer.xr.enabled = false;
 		renderer.shadowMap.autoUpdate = false;
-		this.mesh.visible = false;
+		for ( const m of this.meshes ) m.visible = false;
 		renderer.setRenderTarget( this.rt );
 		renderer.clear();
 		renderer.render( scene, vc );
-		this.mesh.visible = true;
+		for ( const m of this.meshes ) m.visible = true;
 		renderer.setRenderTarget( prevTarget );
 		renderer.xr.enabled = prevXr;
 		renderer.shadowMap.autoUpdate = prevShadow;
