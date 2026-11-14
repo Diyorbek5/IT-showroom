@@ -14,6 +14,7 @@ import { Y2, H2, OUTLINE2, COLS2, PARTITIONS2 } from './plan2.js';
 import { createMaterials, createMaterials2, setEnvMap } from './materials.js';
 import { buildFloor2 } from './floor2.js';
 import { buildDimensions } from './dims.js';
+import { buildSurroundings } from './surround.js';
 import { buildShell } from './building.js';
 import { buildStair } from './stair.js';
 import { buildFixtures, applyLightLevels } from './fixtures.js';
@@ -609,6 +610,9 @@ async function main() {
 	studio.add( studioGround, studioShadow );
 	studio.visible = false;
 	scene.add( studio );
+	// Oynadan tashqari ko'rinish (rasmlar bo'yicha) — faqat bino ichidan
+	const surround = buildSurroundings( sky.texture );
+	scene.add( surround );
 
 	// Kadr vaqtiga qarab render o'lchamini sozlash (uzluksiz harakat paytida)
 	const perf = { last: 0, acc: 0, n: 0, cool: 0 };
@@ -694,6 +698,7 @@ async function main() {
 		}
 		hemi.visible = outside;
 		studio.visible = outside && ! rebaking;
+		surround.visible = ! outside;
 		scene.background = studio.visible ? studioColor : sky.bg;
 		scene.backgroundIntensity = bgIntensity;
 		reflection.enabled = ! LITE && cp.y < H;

@@ -102,3 +102,8 @@ Diagnostika uchun URL parametrlari: `?q=low` (kuchsiz GPU), `?view=zina`, `?exp=
 - Poldagi chiziqli panjara: 1-eshik chetidan ichkariga, x 0.35…2.4, z ≈ 1.2.
 - Yorug'lik: rasmlar yumshoq kunduzgi yorug'likda — ichkarida quyosh soyalari deyarli yo'q, oq balans neytral-sovuq, ekspozitsiya rasm yorqinligiga moslangan (ustun yuzasi ~204/255). Tashqaridan (maket) ko'rinishda quyosh avvalgidek.
 - Zina ostidagi eshik (rasm 17): kulrang yasen laminat (`tex/ash_grey.jpg`) — chetki stoykalarda vertikal, panellarda gorizontal tola; ingichka chiziqlar 1.89 / 1.71 / 1.62 / 1.01 / 0.68 / 0.36 m da; qora shisha chiziq 1.34…1.40 m; qora kvadrat rozetkali dasta va kalit rozetkasi sharqiy (burchak) tomonda; 3 ta qora sharnir g'arbiy tomonda.
+
+## 9. Oynadan tashqari ko'rinish (rasm 16, 17, 2-qavat 02) — `web/src/surround.js`
+- Shimol: kulrang plitkali hovli (13 m), qo'shni binoning gofrirovka qilingan kulrang devori (4.4 m), devorda sharqdan g'arbga ko'tariladigan tashqi metall zina, ikki eshik va qizil o't o'chirish qutisi; devor ustida yashil qurilish to'ri (to'siq), uzoqda ko'p qavatli uylar.
+- G'arb: piyodalar yo'lagi, bordyur, binoga burni bilan turgan mashinalar (parkovka chiziqlari bilan), ko'cha; narida — HDRI daraxtlari.
+- Faqat bino ichidan ko'rinadi; tashqaridan (maket) — oddiy kulrang maydon. Materiallar yoritilmaydigan (soya-yorug'lik vertex rangda), GI/probe'larga ta'sir qilmaydi.
