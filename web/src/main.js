@@ -13,6 +13,7 @@ import { Y2, H2, OUTLINE2, COLS2, PARTITIONS2 } from './plan2.js';
 import { createMaterials, createMaterials2, setEnvMap } from './materials.js';
 import { buildFloor2 } from './floor2.js';
 import { buildSite } from './site.js';
+import { buildDimensions } from './dims.js';
 import { buildShell } from './building.js';
 import { buildStair } from './stair.js';
 import { buildFixtures, applyLightLevels } from './fixtures.js';
@@ -342,6 +343,7 @@ async function main() {
 
 	const vbox = $( 'views' );
 	let activeFloor = 1;
+	const dims = buildDimensions(); // chizmadagi o'lchamlar (overlay)
 	function renderViews() {
 
 		vbox.replaceChildren();
@@ -390,6 +392,7 @@ async function main() {
 
 		activeFloor = f;
 		walk.cfg = WALK_CFG[ f ];
+		dims.show( f );
 		document.querySelectorAll( '#floors button' ).forEach( ( b ) => b.setAttribute( 'aria-pressed', String( + b.dataset.floor === f ) ) );
 		$( 'floor-dims' ).textContent = FLOOR_INFO[ f ];
 		renderViews();
@@ -416,6 +419,7 @@ async function main() {
 
 	const start = VIEWS.find( ( v ) => '#' + v.id === location.hash ) || ( qs.get( 'view' ) && VIEWS.find( ( v ) => v.id === qs.get( 'view' ) ) ) || VIEWS[ 0 ];
 	activeFloor = start.floor;
+	dims.show( activeFloor );
 	walk.cfg = WALK_CFG[ start.floor ];
 	$( 'floor-dims' ).textContent = FLOOR_INFO[ start.floor ];
 	document.querySelectorAll( '#floors button' ).forEach( ( b ) => b.setAttribute( 'aria-pressed', String( + b.dataset.floor === start.floor ) ) );
@@ -511,6 +515,15 @@ async function main() {
 	}
 
 	$( 'btn-pt' ).onclick = () => togglePT( ! pt.active );
+
+	$( 'btn-dims' ).onclick = () => {
+
+		dims.visible = ! dims.visible;
+		$( 'btn-dims' ).setAttribute( 'aria-pressed', String( dims.visible ) );
+		dims.show( dims.floor ?? activeFloor );
+		invalidate();
+
+	};
 
 	function status( text ) {
 
@@ -639,6 +652,13 @@ async function main() {
 		const in2 = cp.y > Y2 && cp.y < Y2 + H2 && cp.x > - 0.2 && cp.x < 23.5 && cp.z > - 0.2 && ( cp.z < 8.9 || ( cp.x > 15.8 && cp.z < 17.2 ) );
 		const outside = ! in1 && ! in2;
 		const cut1 = outside && activeFloor === 1;
+		const dimFloor = in1 ? 1 : in2 ? 2 : activeFloor;
+		if ( dimFloor !== dims.floor ) {
+
+			dims.floor = dimFloor;
+			dims.show( dimFloor );
+
+		}
 		for ( const o of overhead ) o.visible = ! cut1;
 		floor2.visible = ! cut1;
 		floor2.userData.ceiling.visible = ! outside;
@@ -674,6 +694,7 @@ async function main() {
 			}
 
 			pt.tracer.renderSample();
+			dims.render( renderer, camera );
 			status( `Foto sifat · ${Math.floor( pt.tracer.samples )} namuna` );
 
 		} else if ( dirty > 0 || SHOT ) {
@@ -696,6 +717,7 @@ async function main() {
 
 			}
 			else renderer.render( scene, camera );
+			dims.render( renderer, camera );
 			adapt();
 
 		} else {
