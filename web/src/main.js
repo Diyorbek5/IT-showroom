@@ -4,6 +4,7 @@ import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUnifo
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 import { N8AOPass } from 'n8ao';
@@ -33,13 +34,14 @@ const SHOT = qs.has( 'shot' );
 const params = {
 	hdriRotation: 200,
 	sunElevation: 30,
-	sunScale: 0.5,
+	sunScale: 0.02,
+	sunScaleOut: 0.5, // rasmlar bulutli/yumshoq yorug'likda olingan — quyosh soyalari kuchsiz
 	skyIntensity: 1,
-	exposure: 0.68,
+	exposure: 1.6,
 	exposure2: 1.9, // 2-qavat: qora shift, kamroq qaytgan yorug'lik — fotograflar kabi ekspozitsiya oshiriladi
 	exposureOut: 0.85, // tashqaridan (maket) ko'rinish
 	panel: 0.9,
-	chandelier: 0.25,
+	chandelier: 0.08,
 	chandelierEmissive: 7,
 	panelEmissive: 4,
 	lightsOn: true,
@@ -47,8 +49,8 @@ const params = {
 };
 
 const VIEWS = [
-	{ floor: 1, id: 'kirish', name: 'Kirish', pos: [ 0.8, 1.55, 5.0 ], target: [ 7.0, 1.4, 1.0 ] },
-	{ floor: 1, id: 'vitrina', name: 'Vitrina', pos: [ 6.15, 1.5, 6.6 ], target: [ 0, 1.55, 2.6 ] },
+	{ floor: 1, id: 'kirish', name: 'Kirish', pos: [ 0.45, 1.35, 6.6 ], target: [ 4.8, 1.6, 4.1 ] }, // rasm 16
+	{ floor: 1, id: 'vitrina', name: 'Vitrina', pos: [ 6.25, 1.5, 0.95 ], target: [ 2.35, 1.3, 4.1 ] }, // rasm 17
 	{ floor: 1, id: 'zina', name: 'Zina', pos: [ 0.9, 1.5, 3.6 ], target: [ 5.6, 1.7, 8.6 ] },
 	{ floor: 1, id: 'burchak', name: 'Eshik va zina', pos: [ 3.2, 1.35, 4.6 ], target: [ 5.4, 2.2, 8.75 ] },
 	{ floor: 1, id: 'tepadan', name: 'Tepadan', pos: [ 1.2, 12.5, 11.0 ], target: [ 3.65, 0, 4.4 ] },
@@ -190,6 +192,7 @@ async function main() {
 		// probe'larga "pishiriladi", real vaqtda esa og'ir hisob qilinmaydi.
 		before: () => {
 
+			skyObjs.sun.intensity = sky.sunLum * params.sunScale; // GI har doim ichki (yumshoq) yorug'lik bilan
 			reflection.uniforms.reflStrength.value = reflection2.uniforms.reflStrength.value = 0;
 			hdrBackground( true );
 			params.areaLights = true;
@@ -265,7 +268,8 @@ async function main() {
 	}
 
 	// ---------- Post-processing ----------
-	let composer = null, n8 = null, bloom = null, renderPass = null;
+	let composer = null, n8 = null, bloom = null, renderPass = null, wbPass = null;
+	const WB1 = new THREE.Vector3( 1.36, 1.38, 1.72 ), WB0 = new THREE.Vector3( 1, 1, 1 );
 	if ( ! LITE ) {
 
 		composer = new EffectComposer( renderer, new THREE.WebGLRenderTarget( innerWidth * dpr, innerHeight * dpr, { type: THREE.HalfFloatType } ) );
@@ -285,6 +289,13 @@ async function main() {
 		composer.addPass( n8 );
 		bloom = new UnrealBloomPass( new THREE.Vector2( innerWidth / 2, innerHeight / 2 ), 0.12, 0.3, 5 );
 		composer.addPass( bloom );
+		// Oq balans (chiziqli HDR'da): 1-qavat rasmlari (16, 17) kabi neytral-sovuq oq
+		wbPass = new ShaderPass( {
+			uniforms: { tDiffuse: { value: null }, gain: { value: new THREE.Vector3( 1, 1, 1 ) } },
+			vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
+			fragmentShader: 'uniform sampler2D tDiffuse; uniform vec3 gain; varying vec2 vUv; void main() { vec4 c = texture2D( tDiffuse, vUv ); gl_FragColor = vec4( c.rgb * gain, c.a ); }',
+		} );
+		composer.addPass( wbPass );
 		composer.addPass( new OutputPass() );
 		composer.addPass( new SMAAPass() );
 
@@ -669,6 +680,14 @@ async function main() {
 		skyObjs.ground.visible = ! outside && cp.y < H + 0.1;
 		skyObjs.ground2.visible = ! outside && cp.y >= H + 0.1;
 		mapGround.visible = outside;
+		// Ichkarida rasmlardagi kabi yumshoq yorug'lik; tashqaridan (maket) qaraganda quyosh soyalari bilan
+		const sunI = sky.sunLum * ( outside ? params.sunScaleOut : params.sunScale );
+		if ( skyObjs.sun.intensity !== sunI ) {
+
+			skyObjs.sun.intensity = sunI;
+			invalidate();
+
+		}
 		hemi.visible = outside;
 		scene.background = sky.bg;
 		reflection.enabled = ! LITE && cp.y < H;
@@ -679,6 +698,18 @@ async function main() {
 			applyLightLevels( lights, mats, params );
 
 		}
+		if ( wbPass ) {
+
+			const g = ( ! outside && cp.y < H ) ? WB1 : WB0;
+			if ( ! wbPass.uniforms.gain.value.equals( g ) ) {
+
+				wbPass.uniforms.gain.value.copy( g );
+				invalidate();
+
+			}
+
+		}
+
 		const expT = outside ? params.exposureOut : ( cp.y > Y2 - 0.2 ) ? params.exposure2 : params.exposure;
 		const de = expT - renderer.toneMappingExposure;
 		if ( Math.abs( de ) > 0.002 ) {
@@ -744,7 +775,7 @@ async function main() {
 	loader.style.opacity = '0';
 	setTimeout( () => loader.remove(), 700 );
 	window.__ready = true;
-	window.__app = { invalidate, pt, bloom, n8, composer, renderPass, renderFrames: ( n = 1 ) => {
+	window.__app = { invalidate, pt, bloom, n8, composer, renderPass, WB1, renderFrames: ( n = 1 ) => {
 
 		for ( let i = 0; i < n; i ++ ) tick();
 		return renderer.domElement.toDataURL( 'image/png' );

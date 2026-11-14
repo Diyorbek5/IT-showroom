@@ -140,6 +140,13 @@ export function buildFixtures( mats, params ) {
 
 	root.add( sb.build( { name: 'sockets', castShadow: false } ) );
 
+	// Poldagi chiziqli panjara — g'arbiy (1-) kirish eshigi chetidan ichkariga (rasm 16, 17)
+	const gb = new Batch();
+	const gx0 = 0.35, gx1 = 2.4, gz0 = 1.14, gz1 = 1.24;
+	gb.add( mats.alu, box( gx0, gx1, 0.0, 0.0025, gz0, gz1 ) );
+	for ( let x = gx0 + 0.02; x < gx1 - 0.015; x += 0.022 ) gb.add( mats.blackMetal, box( x, x + 0.008, 0.0025, 0.004, gz0 + 0.01, gz1 - 0.01 ) );
+	root.add( gb.build( { name: 'floor-grille', castShadow: false } ) );
+
 	applyLightLevels( lights, mats, params );
 	root.userData.lights = lights;
 	return root;

@@ -49,39 +49,39 @@ def floor_textures(px=2048, tiles=4):
     height = np.zeros((px, px), np.float32)
 
     yy, xx = np.mgrid[0:tp, 0:tp].astype(np.float32) / tp
-    base = np.array([0.905, 0.900, 0.885], np.float32)  # linear-ish light warm grey
-    vein_col = np.array([0.62, 0.62, 0.63], np.float32)
+    # Rasm 16/17: och kulrang marmar keramogranit — yumshoq bulutsimon kulrang dog'lar va xira keng tomirlar
+    base = np.array([0.835, 0.835, 0.845], np.float32)
+    cloud_col = np.array([0.74, 0.74, 0.755], np.float32)
+    vein_col = np.array([0.69, 0.69, 0.705], np.float32)
 
     for ty in range(tiles):
         for tx in range(tiles):
             s = int(rng.integers(0, 10_000))
-            warp1 = fbm(tp, 3, 5, s)
-            warp2 = fbm(tp, 4, 5, s + 7)
-            cloud = fbm(tp, 2, 5, s + 13)
+            warp1 = fbm(tp, 2, 6, s)
+            warp2 = fbm(tp, 3, 6, s + 7)
+            cloud = fbm(tp, 3, 6, s + 13, gain=0.6)
             mask = fbm(tp, 2, 3, s + 19)
             th = rng.uniform(0, np.pi)
             u = xx * np.cos(th) + yy * np.sin(th)
-            v = -xx * np.sin(th) + yy * np.cos(th)
-            freq = rng.uniform(4.0, 7.0)
-            # main soft veins
-            p = u * freq + warp1 * 3.2 + warp2 * 1.4
+            freq = rng.uniform(2.0, 3.5)
+            # keng, xira tomirlar (yumshoq chekka)
+            p = u * freq + warp1 * 1.8 + warp2 * 0.9
             d = np.abs(np.sin(p * np.pi))
-            veins = (1 - smoothstep(0.0, 0.05, d)) * smoothstep(0.35, 0.75, mask)
-            # secondary hairline veins
-            p2 = v * freq * 1.7 + warp2 * 4.0
-            d2 = np.abs(np.sin(p2 * np.pi))
-            hair = (1 - smoothstep(0.0, 0.018, d2)) * smoothstep(0.55, 0.85, 1 - mask) * 0.6
-            # broad cloudy haze
-            haze = smoothstep(0.3, 0.9, cloud) * 0.06
-            tone = rng.uniform(-0.012, 0.012)
-            t = np.zeros((tp, tp, 3), np.float32)
+            veins = (1 - smoothstep(0.0, 0.25, d)) * smoothstep(0.3, 0.7, mask) * 0.5
+            # ingichka tomirlar
+            d2 = np.abs(np.sin((u * freq * 1.9 + warp2 * 1.6 + warp1 * 0.6) * np.pi))
+            hair = (1 - smoothstep(0.0, 0.05, d2)) * smoothstep(0.5, 0.8, mask) * 0.08
+            # bulutsimon dog'lar
+            haze = smoothstep(0.35, 0.8, cloud) * 0.85
+            tone = rng.uniform(-0.01, 0.01)
             col = base + tone
-            k = np.clip(veins * 0.55 + hair * 0.35, 0, 1)[..., None]
+            t = np.zeros((tp, tp, 3), np.float32)
             t[:] = col
-            t = t * (1 - haze[..., None]) + (col * 0.93) * haze[..., None]
+            t = t * (1 - haze[..., None] * 0.6) + cloud_col * (haze[..., None] * 0.6)
+            k = np.clip(veins + hair, 0, 1)[..., None]
             t = t * (1 - k) + vein_col * k
             albedo[ty * tp:(ty + 1) * tp, tx * tp:(tx + 1) * tp] = t
-            rough[ty * tp:(ty + 1) * tp, tx * tp:(tx + 1) * tp] = 0.055 + 0.03 * fbm(tp, 8, 3, s + 31)
+            rough[ty * tp:(ty + 1) * tp, tx * tp:(tx + 1) * tp] = 0.05 + 0.03 * fbm(tp, 8, 3, s + 31)
 
     # grout + tiny bevel (px units). 3px grout ~ 4.7 mm
     coord = np.arange(px)
@@ -91,7 +91,7 @@ def floor_textures(px=2048, tiles=4):
     e = np.minimum(ex, ey)
     grout = (e < 1.5).astype(np.float32)
     bevel = smoothstep(1.5, 4.0, e)
-    grout_col = np.array([0.66, 0.655, 0.64], np.float32)
+    grout_col = np.array([0.6, 0.6, 0.61], np.float32)
     albedo = albedo * (1 - grout[..., None]) + grout_col * grout[..., None]
     rough = rough * (1 - grout) + 0.75 * grout
     rough = np.maximum(rough, (1 - bevel) * 0.25)

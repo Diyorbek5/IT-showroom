@@ -66,7 +66,7 @@ export const WC = { x0: 2.55, x1: 6.5, z0: 7.55, z1: 8.75, t: 0.1, door: { x0: 5
 
 // Qandillar
 export const CHANDELIERS = [
-	{ type: 'big', x: 3.0, z: 5.9 },
+	{ type: 'big', x: 1.0, z: 6.0 }, // rasm 16: g'arbiy (2-) kirish eshigi oldida
 	{ type: 'mid', x: 1.9, z: 2.1 },
 	{ type: 'mid', x: 5.6, z: 1.9 },
 ];

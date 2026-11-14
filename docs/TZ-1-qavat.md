@@ -93,3 +93,11 @@ Diagnostika uchun URL parametrlari: `?q=low` (kuchsiz GPU), `?view=zina`, `?exp=
 4. **Zina (v3, rasmlar 10…14 asosida):** L shakl. Kiraverish (g'arb) tomondan boshlanib janubiy devor bo'ylab sharqqa ko'tariladi (x 2.20 → 5.20, 13 ko'tarilish), sharq uchida maydoncha (5.20…6.50 m), so'ng chapga (shimolga) burilib 5 pog'ona bilan 2-qavatga chiqadi (z 7.55 → 6.40). Zina tagida, zinaning eni bo'yicha kladovka (x 2.55…6.50, z 7.55…8.75): old devori zina chetida, yuqori qirrasi zinapoyasimon; eshik burchakda, maydoncha ostida (x 5.55…6.35); radiator shu devorda. 1-qavat to'rtburchak, tashqariga chiqqan joy yo'q. Eski izoh: bitta to'g'ri marsh, janubiy devor bo'ylab **sharqdan g'arbga** ko'tariladi (6.30 m dan 2.60 m gacha), 2-qavatga kichik xona ro'parasida chiqadi. Bu 2-qavatning haqiqiy rasmlaridan aniqlandi; 1-qavat rasmlari taxminiy edi. Zinaning yuqori uchi ostida kichik omborxona bor (x 2.37…4.10), eshigi shimolga qaragan.
 5. Plitka o'lchami 80×80 sm (rasmda 60×120 ham bo'lishi mumkin).
 6. Oyna tashqarisidagi manzara — vaqtinchalik HDRI. Haqiqiy ko'cha surati bo'lsa, almashtiriladi.
+
+## 8. Rasm 16, 17 bo'yicha 1:1 moslash (v2)
+
+- Rasmlar olingan nuqtalar rasmdagi belgilardan hisoblandi: rasm 16 — g'arbiy (2-) eshik yonidan (x ≈ 0.05, z ≈ 6.8) sharq-shimoli-sharqqa; rasm 17 — shimoli-sharq burchakdan (x ≈ 6.25, z ≈ 0.8) g'arb-janubi-g'arbga. "Kirish" va "Vitrina" ko'rinishlari shu nuqtalardan.
+- Katta qandil (x 1.0, z 6.0) — g'arbiy kirish oldida (avval x 3.0 edi; rasm 16 da tepada, kameraga yaqin).
+- Pol: och kulrang marmar keramogranit, yumshoq bulutsimon kulrang dog'lar va xira tomirlar (rasmdagi kabi).
+- Poldagi chiziqli panjara: 1-eshik chetidan ichkariga, x 0.35…2.4, z ≈ 1.2.
+- Yorug'lik: rasmlar yumshoq kunduzgi yorug'likda — ichkarida quyosh soyalari deyarli yo'q, oq balans neytral-sovuq, ekspozitsiya rasm yorqinligiga moslangan (ustun yuzasi ~204/255). Tashqaridan (maket) ko'rinishda quyosh avvalgidek.
