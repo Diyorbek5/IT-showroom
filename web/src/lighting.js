@@ -204,8 +204,8 @@ export function createProbeGrid() {
 	return [
 		grid,
 		mk( 0.3, 15.66, 0, 8.75, 8, 2, 5, 'probe-grid-2a' ),
-		mk( 15.66, 23.35, 0, 11.6, 4, 2, 6, 'probe-grid-2b' ),
-		mk( 16.0, 23.35, 11.72, 17.01, 4, 2, 2, 'probe-grid-2c' ),
+		mk( 15.66, 23.35, 0, 9.0, 4, 2, 5, 'probe-grid-2b' ),
+		mk( 16.0, 23.35, 9.0, 17.01, 4, 2, 4, 'probe-grid-2c' ),
 	];
 
 }

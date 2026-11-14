@@ -45,10 +45,11 @@ export const GLAZING2 = [
 	// G'arbiy fasad: faqat shimoliy burchakdagi tor oyna (rasm 12): qolgani devor, kichik xona va eshik o'rni
 	{ id: 'w1', a: [ G, 2.55 ], b: [ G, 0.53 ], mullions: [ 0.67, 1.34 ], sash: [ 1 ] },
 	{ id: 'e-w', a: [ 16.0 + G, 14.95 ], b: [ 16.0 + G, 11.2 ], mullions: [ 1.25, 2.5 ], sash: [ 1 ] },
-	{ id: 's-a', a: [ 18.75, 17.01 - G ], b: [ 16.4, 17.01 - G ], mullions: [ 0.6, 1.75 ], sash: [ 1 ] },
-	{ id: 's-b', a: [ 22.95, 17.01 - G ], b: [ 20.65, 17.01 - G ], mullions: [ 0.55, 1.75 ], sash: [ 1 ] },
+	// Janubiy (oxirgi) fasadda oyna yo'q — o'ng tomondagi oyna o'rnida eshik (belgilangan reja 3)
 ];
 export const TRANSOMS2 = [ 0.9, 3.0 ];
+// Janubiy fasaddagi eshik (s-b oynasi o'rnida)
+export const SOUTH_DOOR2 = { x0: 21.35, x1: 22.25 };
 
 // Zina ro'parasidagi kichik xona (rasm 12: zina teshigi uning devoriga taqaladi)
 // Zina chiqishi yonidagi kichik xona (g'arbiy devor va shimoliy marsh orasida), eshigi shimolga qaragan
@@ -70,11 +71,7 @@ export const PARTITIONS2 = [
 	// Ofis xona: ustunlar qatori bo'ylab devor (z ≈ 3.9), ichki o'tish joyi bilan (belgilangan reja 2)
 	{ x0: 0.75, x1: 3.3, z0: 3.86, z1: 3.98 },
 	{ x0: 4.3, x1: 6.5, z0: 3.86, z1: 3.98, doors: [ [ 4.75, 5.65, 'open' ] ] },
-	// O'ng qanot: ko'ndalang devor — g'arbiy devor bo'ylab uzun koridor uchun ochiq (x 16…17.6); bitta eshik (o'ng ofis)
-	{ x0: 17.6, x1: 23.35, z0: 11.6, z1: 11.72, doors: [ [ 21.2, 22.1, 'pvc' ] ] },
-	// Koridor devori (x 17.6), o'rtadagi xonaga eshik koridordan
-	{ x0: 17.6, x1: 17.72, z0: 11.72, z1: 17.01, doorsZ: [ [ 12.4, 13.3 ] ] },
-	{ x0: 20.53, x1: 20.65, z0: 11.72, z1: 17.01 },
+	// O'ng qanot: ichki devorlar olib tashlandi — butun qanot bitta katta ochiq zal (belgilangan reja 3)
 ];
 
 // Shiftdagi to'sinlar: o'q bo'yicha [axis, koordinata, boshlanish, tugash, kenglik]
@@ -113,13 +110,6 @@ export const PANELS2 = ( () => {
 
 	}
 
-	// ofis xonalari (rasm 08/09: 4 tadan panel)
-	for ( const [ xa, xb ] of [ [ 16.0, 18.75 ], [ 20.65, 23.2 ] ] ) {
-
-		for ( const fx of [ 0.3, 0.7 ] ) for ( const z of [ 13.1, 15.9 ] ) out.push( [ xa + ( xb - xa ) * fx, z ] );
-
-	}
-
 	return out;
 
 } )();
@@ -128,7 +118,7 @@ export const PANELS2 = ( () => {
 export const SPOTS2 = ( () => {
 
 	const out = [];
-	for ( const [ za, zb ] of [ [ 0.5, 3.8 ], [ 4.4, 9.1 ], [ 9.8, 11.3 ] ] ) {
+	for ( const [ za, zb ] of [ [ 0.5, 3.8 ], [ 4.4, 9.1 ], [ 9.8, 15.2 ], [ 15.7, 16.7 ] ] ) {
 
 		const nz = Math.max( 1, Math.round( ( zb - za ) / 1.4 ) );
 		for ( let k = 0; k < nz; k ++ ) for ( let i = 0; i < 5; i ++ ) out.push( [ 16.55 + i * 1.5, za + ( k + 0.5 ) * ( zb - za ) / nz ] );
@@ -144,6 +134,6 @@ export const RADIATORS2 = [
 	{ x: 12.8, z: 8.75, nx: 0, nz: - 1, n: 10 },
 	{ x: 6.5, z: 4.1, nx: - 1, nz: 0, n: 10 },
 	{ x: 23.35, z: 6.8, nx: - 1, nz: 0, n: 10 },
-	{ x: 17.4, z: 11.72, nx: 0, nz: 1, n: 8 },
-	{ x: 21.9, z: 11.72, nx: 0, nz: 1, n: 8 },
+	{ x: 23.35, z: 13.2, nx: - 1, nz: 0, n: 10 },
+	{ x: 18.9, z: 17.01, nx: 0, nz: - 1, n: 10 },
 ];

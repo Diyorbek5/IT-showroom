@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { OPENING } from './plan.js';
-import { Y2, H2, BEAM_D, ROOF_T, XJ, OUTLINE2, COLS2, GLAZING2, TRANSOMS2, PARTITIONS2, BEAMS2, PANELS2, SPOTS2, RADIATORS2, NOOK2 } from './plan2.js';
+import { Y2, H2, BEAM_D, ROOF_T, XJ, OUTLINE2, COLS2, GLAZING2, TRANSOMS2, PARTITIONS2, BEAMS2, PANELS2, SPOTS2, RADIATORS2, NOOK2, SOUTH_DOOR2 } from './plan2.js';
 import { Batch, box, worldUV } from './geo.js';
 import { buildGlazingRun } from './glazing.js';
 import { addRadiators } from './fixtures.js';
@@ -56,7 +56,12 @@ export function buildFloor2( mats, m2 ) {
 	w.add( W, box( - 0.3, 15.7, yb, yt, 8.75, 9.05 ) ); // chap blok janubiy devori
 	w.add( W, box( 15.7, 16.0, yb, yt, 8.75, 11.2 ) ); // 2-eshik shu devorda
 	w.add( W, box( 15.7, 16.0, yb, yt, 14.95, 17.31 ) );
-	for ( const [ x0, x1 ] of [ [ 15.7, 16.4 ], [ 18.75, 20.65 ], [ 22.95, 23.65 ] ] ) w.add( W, box( x0, x1, yb, yt, 17.01, 17.31 ) );
+	// janubiy (oxirgi) devor: oynasiz, bitta eshik bilan
+	const SD = SOUTH_DOOR2;
+	w.add( W, box( 15.7, SD.x0, yb, yt, 17.01, 17.31 ) );
+	w.add( W, box( SD.x1, 23.65, yb, yt, 17.01, 17.31 ) );
+	w.add( W, box( SD.x0, SD.x1, yb, Y2, 17.01, 17.31 ) );
+	w.add( W, box( SD.x0, SD.x1, Y2 + DOOR_H, yt, 17.01, 17.31 ) );
 	// oyna ustidagi va ostidagi fasad lentalari
 	const band = ( x0, x1, z0, z1 ) => {
 
@@ -71,8 +76,6 @@ export function buildFloor2( mats, m2 ) {
 
 
 	band( 15.7, 16.0, 11.2, 14.95 );
-	band( 16.4, 18.75, 17.01, 17.31 );
-	band( 20.65, 22.95, 17.01, 17.31 );
 
 	for ( const c of COLS2 ) w.add( W, box( c.x0, c.x1, Y2, TOP, c.z0, c.z1 ) );
 
@@ -130,25 +133,16 @@ export function buildFloor2( mats, m2 ) {
 	const S = m2.skirting;
 	const skx = ( x, z0, z1, side ) => w.add( S, box( x, x + side * SK_T, Y2, Y2 + SK_H, z0, z1 ) );
 	const skz = ( z, x0, x1, side ) => w.add( S, box( x0, x1, Y2, Y2 + SK_H, z, z + side * SK_T ) );
-	skx( 23.35, 1.0, 3.57, - 1 ); skx( 23.35, 4.56, 9.0, - 1 ); skx( 23.35, 9.95, 11.6, - 1 );
-	skx( 23.35, 11.72, 14.95, - 1 ); skx( 23.35, 15.94, 16.45, - 1 );
+	skx( 23.35, 1.0, 3.57, - 1 ); skx( 23.35, 4.56, 9.0, - 1 ); skx( 23.35, 9.95, 14.95, - 1 );
+	skx( 23.35, 15.94, 16.45, - 1 );
+	skz( 17.01, 16.4, SD.x0 - 0.07, - 1 ); skz( 17.01, SD.x1 + 0.07, 22.95, - 1 ); skx( 16.0, 15.94, 16.45, 1 );
 	skz( 8.75, 0, 1.9, - 1 ); skz( 8.75, 6.5, 16.0, - 1 ); skz( 6.28, 1.9, 3.78, - 1 ); skx( 6.5, 0, 1.93, - 1 ); skx( 6.5, 2.97, 5.18, - 1 ); skx( 6.8, 0, 1.93, 1 ); skx( 6.8, 2.97, 5.18, 1 );
 	skz( 3.86, 0.75, 3.3, - 1 ); skz( 3.98, 0.75, 3.3, 1 ); skz( 3.86, 4.3, 4.68, - 1 ); skz( 3.86, 5.72, 6.5, - 1 ); skz( 3.98, 4.3, 4.68, 1 ); skz( 3.98, 5.72, 6.5, 1 );
-	skx( 17.6, 11.72, 12.33, - 1 ); skx( 17.6, 13.37, 17.01, - 1 ); skx( 17.72, 11.72, 12.33, 1 ); skx( 17.72, 13.37, 17.01, 1 );
 	skz( 5.18, 3.78, 6.5, - 1 ); skz( 5.3, 3.9, 6.8, 1 ); skx( 3.78, 5.18, 6.28, - 1 ); skx( 3.9, 5.3, 6.4, 1 ); skx( 16.0, 8.75, 10.0, 1 ); skx( 16.0, 10.95, 11.2, 1 );
 	skz( 8.75, 2.02, 3.78, - 1 ); skx( 2.02, 6.4, 8.75, 1 ); skx( 3.78, 6.4, 8.75, - 1 );
 	skx( 0, 4.18, 5.6, 1 ); skx( 0.75, 3.8, 3.68, 1 );
 	skx( 0, 4.18, 8.75, 1 ); skx( 0, 2.55, 2.62, 1 ); skx( 0, 3.63, 3.68, 1 ); 
 	skx( 16.0, 8.75, 8.94, 1 );
-	let sx = 17.6;
-	for ( const d of doors.filter( ( q ) => q.x0 > 17 ) ) {
-
-		skz( 11.6, sx, d.x0 - 0.07, - 1 ); skz( 11.72, sx, d.x0 - 0.07, 1 ); sx = d.x1 + 0.07;
-
-	}
-
-	skz( 11.6, sx, 23.35, - 1 ); skz( 11.72, sx, 23.35, 1 );
-	skx( 20.53, 11.72, 17.01, - 1 ); skx( 20.65, 11.72, 17.01, 1 );
 	for ( const c of COLS2.slice( 2, 7 ) ) {
 
 		if ( c.x0 > 0 && c.z0 > 0 ) {
@@ -166,6 +160,7 @@ export function buildFloor2( mats, m2 ) {
 
 	// ---------- Eshiklar ----------
 	for ( const d of doors ) addDoor( w, m2, d );
+	addDoor( w, m2, { x0: SD.x0, x1: SD.x1, z0: 17.01, z1: 17.31, type: 'pvc' } );
 	// 2-eshik: to'q rangli metall eshik — o'ng qanot g'arbiy devorida, burchak yonida (belgilangan reja)
 	addSurfaceDoorX( w, m2, 10.05, 10.9, 16.0 );
 
@@ -176,7 +171,7 @@ export function buildFloor2( mats, m2 ) {
 	// ---------- Radiatorlar, gaz qozon, rozetkalar ----------
 	addRadiators( w, m2, RADIATORS2, Y2 );
 	addBoiler( w, m2, 7.59, 1.0, 0 ); // rasm 12: qozon ustunning janubiy yuzasida
-	for ( const [ x, z, nx, nz ] of [ [ 23.35, 6.0, - 1, 0 ], [ 9.0, 8.75, 0, - 1 ], [ 15.375, 5.4, - 1, 0 ], [ 17.0, 11.72, 0, 1 ], [ 22.6, 11.72, 0, 1 ], [ 19.0, 11.6, 0, - 1 ] ] ) addSocket( w, m2, x, Y2 + 0.32, z, nx, nz );
+	for ( const [ x, z, nx, nz ] of [ [ 23.35, 6.0, - 1, 0 ], [ 9.0, 8.75, 0, - 1 ], [ 15.375, 5.4, - 1, 0 ], [ 23.35, 12.2, - 1, 0 ], [ 17.4, 17.01, 0, - 1 ], [ 16.0, 13.5, 1, 0 ] ] ) addSocket( w, m2, x, Y2 + 0.32, z, nx, nz );
 
 	root.add( w.build( { name: 'floor2-walls' } ) );
 
@@ -230,7 +225,7 @@ export function buildFloor2( mats, m2 ) {
 
 	// Real yorug'lik: panel guruhlari uchun bir nechta katta RectAreaLight
 	const lights = [];
-	const zones = [ [ 0.6, 3.5, 0.5, 8.4 ], [ 4.1, 7.3, 0.5, 7.0 ], [ 7.9, 15.35, 0.5, 8.4 ], [ 16.4, 22.8, 0.5, 11.2 ], [ 16.0, 18.75, 12, 17 ], [ 20.65, 23.2, 12, 17 ] ];
+	const zones = [ [ 0.6, 3.5, 0.5, 8.4 ], [ 4.1, 7.3, 0.5, 7.0 ], [ 7.9, 15.35, 0.5, 8.4 ], [ 16.4, 22.8, 0.5, 9.2 ], [ 16.3, 23.0, 9.7, 16.9 ] ];
 	for ( const [ x0, x1, z0, z1 ] of zones ) {
 
 		const n = PANELS2.filter( ( [ x, z ] ) => x > x0 && x < x1 && z > z0 && z < z1 ).length * 0.185 + SPOTS2.filter( ( [ x, z ] ) => x > x0 && x < x1 && z > z0 && z < z1 ).length * 0.06;

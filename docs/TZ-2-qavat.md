@@ -106,3 +106,9 @@
 - Uzun devor oynagacha cho'zildi (oyna bilan devor orasidagi ochiq joy yopildi). 1-eshikdan kirilganda ofis xona: g'arbiy zonaning shimoliy qismi (x 0…6.5, z 0…3.9), janubiy qismdan ustunlar qatori bo'ylab devor bilan ajratilgan (ichida eshiksiz o'tish joyi x 4.75…5.65).
 - O'ng qanot: ko'ndalang devordagi o'rtadagi eshik olib tashlandi. G'arbiy devor bo'ylab uzun koridor (x 16.0…17.6, z 11.6…17.0), zaldan ochiq; o'rtadagi xonaga eshik koridordan.
 - Ranglar: GI va akslarda osmon rangi neytrallashtirildi (devorlar yashil tus olmaydi), devorlar oqroq, 2-qavat yorug'roq.
+
+## 12. O'zgartirish: o'ng qanot — ochiq zal (belgilangan reja 3)
+
+- Qanotdagi barcha ichki devorlar (ko'ndalang devor z 11.6, koridor devori x 17.6, xonalar orasidagi devor x 20.53) va ulardagi eshiklar olib tashlandi — qanot bitta katta ochiq zal.
+- Janubiy (oxirgi) fasadda oynalar yo'q: s-a oyna o'rni devor, s-b oyna o'rnida eshik (x 21.35…22.25).
+- Ofis xonalaridagi kvadrat panellar o'rniga butun qanot bo'ylab spotlar; radiatorlar sharqiy va janubiy devorlarga ko'chirildi.
