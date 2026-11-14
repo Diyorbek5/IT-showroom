@@ -272,11 +272,15 @@ export function buildCarParts( type = 'sedan' ) {
 
 	// --- g'ildiraklar ---
 	const xr = L - P.fo - P.wb, xf = L - P.fo;
-	const tire = [], rim = [], arch = [], hub = [];
+	const tire = [], rim = [], arch = [], hub = [], archLip = [];
 	for ( const wx of [ xr, xf ] ) for ( const s of [ - 1, 1 ] ) {
 
 		const zc = s * ( hw0 - 0.1 );
-		tire.push( new THREE.CylinderGeometry( r, r, 0.205, 28, 1 ).rotateX( Math.PI / 2 ).translate( wx, r, zc ) );
+		// shina: yumaloq yon devorli (lathe profil)
+		const tp = [ [ 0.66, - 0.1 ], [ 0.88, - 0.106 ], [ 0.97, - 0.092 ], [ 1.0, - 0.055 ], [ 1.0, 0.055 ], [ 0.97, 0.092 ], [ 0.88, 0.106 ], [ 0.66, 0.1 ] ];
+		tire.push( new THREE.LatheGeometry( tp.map( ( [ a, b ] ) => new THREE.Vector2( a * r, b ) ), 30 ).rotateX( Math.PI / 2 ).translate( wx, r, zc ) );
+		// arka cheti (kuzov rangida) — g'ildirak ustida bo'rtib turgan yarim halqa
+		archLip.push( new THREE.TorusGeometry( r + 0.07, 0.026, 6, 22, Math.PI ).translate( wx, r, s * ( hw0 - 0.012 ) ) );
 		// disk: kumush halqa + 5 ta parra + markaz qopqog'i; ichi qorong'i
 		const zf = zc + s * 0.104;
 		hub.push( new THREE.CircleGeometry( r * 0.68, 24 ).rotateY( s > 0 ? 0 : Math.PI ).translate( wx, r, zf - s * 0.004 ) );
@@ -298,11 +302,16 @@ export function buildCarParts( type = 'sedan' ) {
 	}
 
 	// --- old/orqa detallar ---
-	const lamp = [], dark = [], red = [], plate = [], chrome = [], mirrorPaint = [];
+	const lamp = [], dark = [], red = [], plate = [], chrome = [], mirrorPaint = [], drl = [];
 	const front = L, ny = P.nose;
 	for ( const s of [ - 1, 1 ] ) {
 
 		lamp.push( new THREE.BoxGeometry( 0.05, 0.1, 0.4 ).rotateY( s * 0.42 ).translate( front - 0.1, ny - 0.07, s * ( hw0 - 0.34 ) ) );
+		// fara ichidagi linzalar va kunduzgi chiroq chizig'i
+		for ( const k of [ - 0.09, 0.07 ] ) dark.push( new THREE.CylinderGeometry( 0.032, 0.032, 0.02, 14 ).rotateZ( Math.PI / 2 ).rotateY( s * 0.42 ).translate( front - 0.075 - Math.abs( k ) * 0.35 * ( k * s > 0 ? 1 : - 1 ), ny - 0.07, s * ( hw0 - 0.34 ) + k ) );
+		drl.push( new THREE.BoxGeometry( 0.02, 0.014, 0.34 ).rotateY( s * 0.42 ).translate( front - 0.07, ny - 0.13, s * ( hw0 - 0.35 ) ) );
+		// tuman chiroqlari
+		lamp.push( new THREE.CylinderGeometry( 0.042, 0.042, 0.03, 14 ).rotateZ( Math.PI / 2 ).translate( front - 0.03, yB + 0.18, s * ( hw0 - 0.24 ) ) );
 		red.push( new THREE.BoxGeometry( 0.05, 0.11, 0.42 ).rotateY( - s * 0.35 ).translate( 0.06, P.tail - 0.1, s * ( hw0 - 0.32 ) ) );
 		// ko'zgular
 		const mx = P.ws[ 0 ] - 0.18, my = belt( mx ) + 0.06;
@@ -314,10 +323,55 @@ export function buildCarParts( type = 'sedan' ) {
 
 	}
 
+	// deraza atrofidagi qora hoshiya: beltline bo'ylab va tom ostida (kabina yon yuzasida)
+	const sideStrip = ( x0, x1, yFn, h, side, n = 14 ) => {
+
+		const pos = [], idx = [];
+		for ( let i = 0; i <= n; i ++ ) {
+
+			const x = lerp( x0, x1, i / n ), y = yFn( x );
+			pos.push( x, y, side * ( sideAt( x, y ) + 0.002 ), x, y + h, side * ( sideAt( x, y + h ) + 0.002 ) );
+
+		}
+
+		for ( let i = 0; i < n; i ++ ) {
+
+			const a = i * 2;
+			if ( side > 0 ) idx.push( a, a + 2, a + 1, a + 1, a + 2, a + 3 ); else idx.push( a, a + 1, a + 2, a + 1, a + 3, a + 2 );
+
+		}
+
+		const g = new THREE.BufferGeometry();
+		g.setAttribute( 'position', new THREE.Float32BufferAttribute( pos, 3 ) );
+		g.setIndex( idx );
+		g.computeVertexNormals();
+		return g;
+
+	};
+
+	for ( const s of [ - 1, 1 ] ) {
+
+		dark.push( sideStrip( P.rw[ 1 ] + 0.08, P.ws[ 0 ] - 0.06, ( x ) => belt( x ) - 0.02, 0.035, s ) );
+		dark.push( sideStrip( P.roof[ 1 ] + 0.02, P.roof[ 0 ] - 0.02, ( x ) => roofLine( x ) - 0.05, 0.03, s ) );
+		if ( type === 'suv' ) {
+
+			// tom relslari va pastki qora qoplama (krossover)
+			const top = hw0 - 0.035 - 0.2 - 0.04 * ( H - 1.4 );
+			dark.push( new THREE.BoxGeometry( P.roof[ 0 ] - P.roof[ 1 ] - 0.1, 0.03, 0.035 ).translate( ( P.roof[ 0 ] + P.roof[ 1 ] ) / 2, H + 0.05, s * ( top - 0.06 ) ) );
+			for ( const lx of [ P.roof[ 1 ] + 0.1, P.roof[ 0 ] - 0.1 ] ) dark.push( new THREE.BoxGeometry( 0.06, 0.06, 0.04 ).translate( lx, H + 0.025, s * ( top - 0.06 ) ) );
+			dark.push( new THREE.BoxGeometry( P.wb - 2 * r - 0.25, 0.13, 0.02 ).translate( L - P.fo - P.wb / 2, yB + 0.07, s * ( hw0 + 0.003 ) ) );
+
+		}
+
+	}
+
 	// panjara, pastki havo olgich, raqamlar
 	dark.push( new THREE.BoxGeometry( 0.06, 0.13, 0.78 ).translate( front - 0.03, ny - 0.12, 0 ) );
 	dark.push( new THREE.BoxGeometry( 0.06, 0.1, 1.1 ).translate( front - 0.05, yB + 0.14, 0 ) );
 	chrome.push( new THREE.BoxGeometry( 0.065, 0.018, 0.8 ).translate( front - 0.03, ny - 0.045, 0 ) );
+	for ( const dy of [ 0.09, 0.13, 0.17 ] ) chrome.push( new THREE.BoxGeometry( 0.064, 0.007, 0.74 ).translate( front - 0.03, ny - dy, 0 ) );
+	// old oyna yuvgichlari
+	for ( const s2 of [ - 1, 1 ] ) dark.push( new THREE.BoxGeometry( 0.02, 0.012, 0.52 ).rotateY( 0.12 * s2 ).translate( P.ws[ 0 ] - 0.08, belt( P.ws[ 0 ] ) + 0.035, s2 * 0.3 - 0.05 ) );
 	plate.push( new THREE.BoxGeometry( 0.02, 0.11, 0.52 ).translate( front + 0.005, yB + 0.3, 0 ) );
 	plate.push( new THREE.BoxGeometry( 0.02, 0.11, 0.52 ).translate( - 0.005, yB + 0.42, 0 ) );
 	dark.push( new THREE.BoxGeometry( 0.05, 0.09, 1.2 ).translate( 0.02, yB + 0.16, 0 ) );
@@ -355,7 +409,8 @@ export function buildCarParts( type = 'sedan' ) {
 	} ) );
 
 	return {
-		paint: M( [ orient( body ), orient( roof ), ...pillars.map( orient ), ...mirrorPaint ] ),
+		paint: M( [ orient( body ), orient( roof ), ...pillars.map( orient ), ...mirrorPaint, ...archLip ] ),
+		drl: M( drl ),
 		glass: M( [ orient( glass ) ] ),
 		tire: M( tire ), rim: M( rim ), hub: M( [ ...hub, ...arch ] ),
 		lamp: M( lamp ), red: M( red ), dark: M( dark ), plate: M( plate ), chrome: M( chrome ),

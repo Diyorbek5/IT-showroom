@@ -297,7 +297,8 @@ export function buildSurroundings( envTex ) {
 		const P = parts[ type ];
 		const m = new THREE.Matrix4().makeRotationY( rotY ).setPosition( x, 0, z );
 		const o = { uv: false, ao: false };
-		G( P.paint.clone(), paint, m.clone(), o );
+		G( P.paint.clone(), paint, m.clone(), { uv: false, ao: true } ); // pastga qarab yumshoq qorong'ilashadi
+		G( P.drl.clone(), CM.plate, m.clone(), o );
 		G( P.glass.clone(), CM.glass, m.clone(), o );
 		G( P.tire.clone(), CM.tire, m.clone(), o );
 		G( P.rim.clone(), CM.chrome, m.clone(), o );
