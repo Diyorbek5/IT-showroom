@@ -34,7 +34,7 @@ const params = {
 	sunScale: 0.5,
 	skyIntensity: 1,
 	exposure: 0.68,
-	exposure2: 1.6, // 2-qavat: qora shift, kamroq qaytgan yorug'lik — fotograflar kabi ekspozitsiya oshiriladi
+	exposure2: 1.9, // 2-qavat: qora shift, kamroq qaytgan yorug'lik — fotograflar kabi ekspozitsiya oshiriladi
 	panel: 0.9,
 	chandelier: 0.25,
 	chandelierEmissive: 7,
@@ -115,6 +115,28 @@ async function main() {
 	console.log( 'model built' );
 	const [ sky, bgTex ] = await Promise.all( [ loadSky( BASE + 'hdri/park_parking_1k.hdr' ), loadBackground( BASE + 'hdri/park_parking_bg.jpg' ) ] );
 	sky.bg = bgTex;
+	{
+
+		// GI/akslar uchun osmonning rangi biroz neytrallashtiriladi: rasmlardagi kabi oq devorlar
+		const src = sky.texture.image.data;
+		const gd = new Float32Array( src.length );
+		for ( let i = 0; i < src.length; i += 4 ) {
+
+			const l = 0.2126 * src[ i ] + 0.7152 * src[ i + 1 ] + 0.0722 * src[ i + 2 ];
+			gd[ i ] = l + ( src[ i ] - l ) * 0.3; gd[ i + 1 ] = l + ( src[ i + 1 ] - l ) * 0.3; gd[ i + 2 ] = l + ( src[ i + 2 ] - l ) * 0.3; gd[ i + 3 ] = 1;
+
+		}
+
+		const t = new THREE.DataTexture( gd, sky.texture.image.width, sky.texture.image.height, THREE.RGBAFormat, THREE.FloatType );
+		t.mapping = THREE.EquirectangularReflectionMapping;
+		t.flipY = sky.texture.flipY;
+		t.colorSpace = THREE.LinearSRGBColorSpace;
+		t.minFilter = t.magFilter = THREE.LinearFilter;
+		t.generateMipmaps = false;
+		t.needsUpdate = true;
+		sky.giTex = t;
+
+	}
 	// Barcha birliklarni osmon = 1 ga normallashtiramiz
 	{
 
@@ -144,7 +166,7 @@ async function main() {
 	function hdrBackground( on ) {
 
 		if ( scene.background && scene.background.isColor ) return;
-		scene.background = on ? sky.texture : sky.bg;
+		scene.background = on ? ( sky.giTex || sky.texture ) : sky.bg;
 		scene.backgroundIntensity = on ? params.skyIntensity : bgIntensity;
 
 	}
@@ -352,10 +374,12 @@ async function main() {
 			poly: OUTLINE2, eye: Y2 + 1.62, start: [ 12, 5.5 ],
 			blockers: [
 				...COLS2.map( ( c ) => [ c.x0, c.x1, c.z0, c.z1 ] ),
-				[ 16.0, 23.35, 11.6, 17.01 ],
+				[ 17.72, 23.35, 11.6, 17.01 ],
 				[ 3.8, 6.6, 6.3, 8.75 ],
 				[ 1.9, 3.9, 6.28, 8.75 ],
-				[ 6.5, 6.8, 1.0, 2.0 ], [ 6.5, 6.8, 2.9, 5.3 ],
+				[ 6.5, 6.8, 0, 2.0 ], [ 6.5, 6.8, 2.9, 5.3 ],
+				[ 0.75, 3.3, 3.86, 3.98 ], [ 4.3, 4.75, 3.86, 3.98 ], [ 5.65, 6.5, 3.86, 3.98 ],
+				[ 17.6, 17.72, 11.72, 12.4 ], [ 17.6, 17.72, 13.3, 17.01 ],
 				[ 3.78, 6.8, 5.18, 5.3 ], [ 3.78, 3.9, 5.3, 8.75 ],
 				[ 0, 1.4, 1.78, 3.8 ],
 			],

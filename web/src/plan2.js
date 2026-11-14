@@ -61,15 +61,19 @@ export const PARTITIONS2 = [
 	// Zina yonidagi kichik xona (eshiksiz) — rasm 15
 	{ x0: 1.9, x1: 3.9, z0: 6.28, z1: 6.4 },
 	{ x0: 1.9, x1: 2.02, z0: 6.4, z1: 8.75 },
-	// Zina atrofidagi devor (belgilangan reja, rasm 16): uzun devor → zina shimolidan g'arbga → janubga.
-	// Zina sharq tomondagi zalga ochiq.
-	{ x0: 6.5, x1: 6.8, z0: 1.0, z1: 2.0 },
-	{ x0: 6.5, x1: 6.8, z0: 2.0, z1: 2.9, doorZ: 'pvc' }, // 1-eshik (uzun devorda)
+	// Uzun devor: oynagacha (oyna bilan devor orasidagi ochiq joy yopildi — belgilangan reja 2, yulduzcha)
+	{ x0: 6.5, x1: 6.8, z0: 0.0, z1: 2.0 },
+	{ x0: 6.5, x1: 6.8, z0: 2.0, z1: 2.9, doorZ: 'pvc' }, // 1-eshik → ofis xonaga kiriladi
 	{ x0: 6.5, x1: 6.8, z0: 2.9, z1: 5.3 },
 	{ x0: 3.78, x1: 6.8, z0: 5.18, z1: 5.3 }, // zina maydonchasining shimoliy devori
 	{ x0: 3.78, x1: 3.9, z0: 5.3, z1: 8.75 }, // zina g'arbidagi devor (= kichik xona sharqiy devori)
-	// O'ng qanot: ko'ndalang devor — 2 ta eshik (o'ng ofis va o'rtadagi xona); ofislar orasidagi devor olib tashlandi
-	{ x0: 16.0, x1: 23.35, z0: 11.6, z1: 11.72, doors: [ [ 19.25, 20.05, 'white' ], [ 21.2, 22.1, 'pvc' ] ] },
+	// Ofis xona: ustunlar qatori bo'ylab devor (z ≈ 3.9), ichki o'tish joyi bilan (belgilangan reja 2)
+	{ x0: 0.75, x1: 3.3, z0: 3.86, z1: 3.98 },
+	{ x0: 4.3, x1: 6.5, z0: 3.86, z1: 3.98, doors: [ [ 4.75, 5.65, 'open' ] ] },
+	// O'ng qanot: ko'ndalang devor — g'arbiy devor bo'ylab uzun koridor uchun ochiq (x 16…17.6); bitta eshik (o'ng ofis)
+	{ x0: 17.6, x1: 23.35, z0: 11.6, z1: 11.72, doors: [ [ 21.2, 22.1, 'pvc' ] ] },
+	// Koridor devori (x 17.6), o'rtadagi xonaga eshik koridordan
+	{ x0: 17.6, x1: 17.72, z0: 11.72, z1: 17.01, doorsZ: [ [ 12.4, 13.3 ] ] },
 	{ x0: 20.53, x1: 20.65, z0: 11.72, z1: 17.01 },
 ];
 
@@ -102,6 +106,7 @@ export const PANELS2 = ( () => {
 			const x = xa + ( i + 0.5 ) * ( xb - xa ) / nx;
 			const z = za + ( k + 0.5 ) * ( zb - za ) / nz;
 			if ( x > 1.7 && x < 7.0 && z > 6.1 ) continue; // zina teshigi va kichik xona ustida emas
+			if ( Math.abs( z - 3.92 ) < 0.35 && x < 6.6 ) continue; // ofis devori ostida emas
 			out.push( [ x, z ] );
 
 		}

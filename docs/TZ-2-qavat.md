@@ -101,3 +101,8 @@
 - Yangi devor: uzun devor (x 6.5…6.8, z 1.0…5.3) → zina maydonchasi shimolida g'arbga (z 5.18…5.3, x 3.78…6.8) → zina g'arbida janubga (x 3.78…3.9, z 5.3…8.75). Zina sharqdagi zalga ochiq, teshik sharq qirrasida panjara.
 - 1-eshik: uzun devorda (z 2.0…2.9), PVC, to'q oynali.
 - 2-eshik: o'ng qanot g'arbiy devorida, burchak yonida (x 16.0, z 10.05…10.9), to'q metall.
+
+## 11. Belgilangan reja 2 bo'yicha (v6, rasm 20)
+- Uzun devor oynagacha cho'zildi (oyna bilan devor orasidagi ochiq joy yopildi). 1-eshikdan kirilganda ofis xona: g'arbiy zonaning shimoliy qismi (x 0…6.5, z 0…3.9), janubiy qismdan ustunlar qatori bo'ylab devor bilan ajratilgan (ichida eshiksiz o'tish joyi x 4.75…5.65).
+- O'ng qanot: ko'ndalang devordagi o'rtadagi eshik olib tashlandi. G'arbiy devor bo'ylab uzun koridor (x 16.0…17.6, z 11.6…17.0), zaldan ochiq; o'rtadagi xonaga eshik koridordan.
+- Ranglar: GI va akslarda osmon rangi neytrallashtirildi (devorlar yashil tus olmaydi), devorlar oqroq, 2-qavat yorug'roq.

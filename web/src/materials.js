@@ -33,7 +33,7 @@ export function createMaterials() {
 
 	m.floorPlain = m.floor.clone();
 
-	m.wall = new THREE.MeshStandardMaterial( { color: 0xf3f3f1, roughness: 0.92, metalness: 0 } );
+	m.wall = new THREE.MeshStandardMaterial( { color: 0xf7f7f6, roughness: 0.9, metalness: 0 } );
 	m.ceiling = new THREE.MeshStandardMaterial( { color: 0xf7f7f5, roughness: 0.95, metalness: 0 } );
 	m.plaster = m.wall;
 
