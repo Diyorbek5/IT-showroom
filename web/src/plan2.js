@@ -44,7 +44,7 @@ export const GLAZING2 = [
 	{ id: 'n3', a: [ 15.95, G ], b: [ 23.2, G ], mullions: [ 1.45, 2.9, 4.35, 5.8 ], sash: [ 1, 3 ] },
 	// G'arbiy fasad: faqat shimoliy burchakdagi tor oyna (rasm 12): qolgani devor, kichik xona va eshik o'rni
 	{ id: 'w1', a: [ G, 2.55 ], b: [ G, 0.53 ], mullions: [ 0.67, 1.34 ], sash: [ 1 ] },
-	{ id: 'e-w', a: [ 16.0 + G, 14.95 ], b: [ 16.0 + G, 9.93 ], mullions: [ 1.25, 2.5, 3.75 ], sash: [ 1 ] },
+	{ id: 'e-w', a: [ 16.0 + G, 14.95 ], b: [ 16.0 + G, 11.2 ], mullions: [ 1.25, 2.5 ], sash: [ 1 ] },
 	{ id: 's-a', a: [ 18.75, 17.01 - G ], b: [ 16.4, 17.01 - G ], mullions: [ 0.6, 1.75 ], sash: [ 1 ] },
 	{ id: 's-b', a: [ 22.95, 17.01 - G ], b: [ 20.65, 17.01 - G ], mullions: [ 0.55, 1.75 ], sash: [ 1 ] },
 ];
@@ -58,15 +58,18 @@ export const NOOK2 = null; // tambur olib tashlandi — eshik to'g'ridan-to'g'ri
 
 // Ichki devorlar: [x0, x1, z0, z1] (balandligi to'liq)
 export const PARTITIONS2 = [
-	// Zina yonidagi kichik xona (eshiksiz, ochiq o'tish joyi) — rasm 14
-	{ x0: 1.9, x1: 3.9, z0: 6.28, z1: 6.4 }, // kichik xona — eshiksiz (rasm 15)
+	// Zina yonidagi kichik xona (eshiksiz) — rasm 15
+	{ x0: 1.9, x1: 3.9, z0: 6.28, z1: 6.4 },
 	{ x0: 1.9, x1: 2.02, z0: 6.4, z1: 8.75 },
-	{ x0: 3.78, x1: 3.9, z0: 6.4, z1: 8.75 }, // = zina teshigining g'arbiy devori (narigi tomoni — devor)
-	// Zina shaxtasining sharqiy devori — zal bo'ylab uzun devor (rasm 14, 15: chapdagi uzun devor, radiator bilan)
-	{ x0: 6.5, x1: 6.8, z0: 1.0, z1: 8.75 },
-	{ x0: 15.375, x1: 15.55, z0: 4.56, z1: 8.75 }, // chap blok va o'ng qanot orasidagi devor
-	{ x0: 16.0, x1: 23.35, z0: 11.6, z1: 11.72, doors: [ [ 17.25, 18.15, 'pvc' ], [ 19.25, 20.05, 'white' ], [ 21.2, 22.1, 'pvc' ] ] },
-	{ x0: 18.75, x1: 18.87, z0: 11.72, z1: 17.01 },
+	// Zina atrofidagi devor (belgilangan reja, rasm 16): uzun devor → zina shimolidan g'arbga → janubga.
+	// Zina sharq tomondagi zalga ochiq.
+	{ x0: 6.5, x1: 6.8, z0: 1.0, z1: 2.0 },
+	{ x0: 6.5, x1: 6.8, z0: 2.0, z1: 2.9, doorZ: 'pvc' }, // 1-eshik (uzun devorda)
+	{ x0: 6.5, x1: 6.8, z0: 2.9, z1: 5.3 },
+	{ x0: 3.78, x1: 6.8, z0: 5.18, z1: 5.3 }, // zina maydonchasining shimoliy devori
+	{ x0: 3.78, x1: 3.9, z0: 5.3, z1: 8.75 }, // zina g'arbidagi devor (= kichik xona sharqiy devori)
+	// O'ng qanot: ko'ndalang devor — 2 ta eshik (o'ng ofis va o'rtadagi xona); ofislar orasidagi devor olib tashlandi
+	{ x0: 16.0, x1: 23.35, z0: 11.6, z1: 11.72, doors: [ [ 19.25, 20.05, 'white' ], [ 21.2, 22.1, 'pvc' ] ] },
 	{ x0: 20.53, x1: 20.65, z0: 11.72, z1: 17.01 },
 ];
 
@@ -134,8 +137,7 @@ export const SPOTS2 = ( () => {
 export const RADIATORS2 = [
 	{ x: 9.6, z: 8.75, nx: 0, nz: - 1, n: 10 },
 	{ x: 12.8, z: 8.75, nx: 0, nz: - 1, n: 10 },
-	{ x: 15.375, z: 6.6, nx: - 1, nz: 0, n: 10 },
-	{ x: 6.5, z: 3.2, nx: - 1, nz: 0, n: 10 },
+	{ x: 6.5, z: 4.1, nx: - 1, nz: 0, n: 10 },
 	{ x: 23.35, z: 6.8, nx: - 1, nz: 0, n: 10 },
 	{ x: 17.4, z: 11.72, nx: 0, nz: 1, n: 8 },
 	{ x: 21.9, z: 11.72, nx: 0, nz: 1, n: 8 },

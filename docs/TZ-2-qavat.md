@@ -95,3 +95,9 @@
 - Kichik xona (x 1.9…3.9, z 6.28…8.75) — eshiksiz blok.
 - To'q rangli metall eshik g'arbiy devorning o'zida, ustun burchagi yonida (z 2.70…3.55); tambur olib tashlandi.
 - G'arbiy fasad: shimoliy burchakda oyna (z 0.53…2.55, 3 tavaqa), qolgani devor.
+
+## 10. Belgilangan reja bo'yicha (v5, rasm 16)
+- Olib tashlandi: chap blok va o'ng qanot orasidagi o'rta devor; ofis A va WC orasidagi devor; ofis A eshigi; g'arbiy devordagi metall eshik.
+- Yangi devor: uzun devor (x 6.5…6.8, z 1.0…5.3) → zina maydonchasi shimolida g'arbga (z 5.18…5.3, x 3.78…6.8) → zina g'arbida janubga (x 3.78…3.9, z 5.3…8.75). Zina sharqdagi zalga ochiq, teshik sharq qirrasida panjara.
+- 1-eshik: uzun devorda (z 2.0…2.9), PVC, to'q oynali.
+- 2-eshik: o'ng qanot g'arbiy devorida, burchak yonida (x 16.0, z 10.05…10.9), to'q metall.

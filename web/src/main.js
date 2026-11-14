@@ -53,7 +53,7 @@ const VIEWS = [
 	{ floor: 2, id: 'qanot', name: 'Qanot', pos: [ 19.6, 3.9 + 1.6, 11.1 ], target: [ 19.4, 3.9 + 1.45, 0.5 ] },
 	{ floor: 2, id: 'ustunlar', name: 'Ustunlar', pos: [ 22.4, 3.9 + 1.65, 1.3 ], target: [ 12.0, 3.9 + 1.0, 7.5 ] },
 	{ floor: 2, id: 'ofis', name: 'Ofis xona', pos: [ 17.4, 3.9 + 1.55, 12.1 ], target: [ 17.4, 3.9 + 1.4, 17.0 ] },
-	{ floor: 2, id: 'zina2', name: 'Zina', pos: [ 6.1, 3.9 + 1.5, 0.8 ], target: [ 0.6, 3.9 + 1.15, 6.6 ] },
+	{ floor: 2, id: 'zina2', name: 'Zina', pos: [ 11.0, 3.9 + 1.6, 4.0 ], target: [ 4.8, 3.9 + 0.6, 7.6 ] },
 	{ floor: 2, id: 'tepadan2', name: 'Tepadan', pos: [ 5.5, 3.9 + 15.5, 22.5 ], target: [ 11.7, 3.9, 8.0 ] },
 ];
 
@@ -352,11 +352,11 @@ async function main() {
 			poly: OUTLINE2, eye: Y2 + 1.62, start: [ 12, 5.5 ],
 			blockers: [
 				...COLS2.map( ( c ) => [ c.x0, c.x1, c.z0, c.z1 ] ),
-				...PARTITIONS2.slice( 0, 1 ).map( ( c ) => [ c.x0, c.x1, c.z0, c.z1 ] ),
 				[ 16.0, 23.35, 11.6, 17.01 ],
-				[ 3.8, 6.8, 6.3, 8.75 ],
+				[ 3.8, 6.6, 6.3, 8.75 ],
 				[ 1.9, 3.9, 6.28, 8.75 ],
-				[ 6.5, 6.8, 1.0, 8.75 ],
+				[ 6.5, 6.8, 1.0, 2.0 ], [ 6.5, 6.8, 2.9, 5.3 ],
+				[ 3.78, 6.8, 5.18, 5.3 ], [ 3.78, 3.9, 5.3, 8.75 ],
 				[ 0, 1.4, 1.78, 3.8 ],
 			],
 		},

@@ -97,6 +97,13 @@ function buildRailings( mats ) {
 	b.add( M, box( xr - 0.03, xr + 0.03, y0, y0 + HR + 0.03, zn - 0.03, zn + 0.03 ) );
 	for ( let x = xw + 0.6; x < xr; x += 0.6 ) b.add( M, box( x - 0.01, x + 0.01, y0, y0 + BR, zn - 0.01, zn + 0.01 ) );
 	panelPattern( b, M, xw + 0.06, xr - 0.06, () => y0 + BR, () => y0 + HR, ( x, a, c ) => [ V( x, a, zn ), V( x, c, zn ) ] );
+	// sharqiy qirra (x 6.5): zina shu tomondagi zalga ochiq — teshik bo'ylab panjara
+	const xe = OPENING.x1 + 0.04;
+	b.add( M, box( xe - 0.0225, xe + 0.0225, y0 + HR - 0.0225, y0 + HR + 0.0225, zTop - 0.0225, z1 ) );
+	b.add( M, box( xe - 0.02, xe + 0.02, y0 + BR - 0.006, y0 + BR + 0.006, zTop, z1 ) );
+	b.add( M, box( xe - 0.03, xe + 0.03, y0, y0 + HR + 0.03, zTop - 0.03, zTop + 0.03 ) );
+	for ( let z = zTop + 0.6; z < z1; z += 0.6 ) b.add( M, box( xe - 0.01, xe + 0.01, y0, y0 + BR, z - 0.01, z + 0.01 ) );
+	panelPattern( b, M, zTop + 0.06, z1 - 0.04, () => y0 + BR, () => y0 + HR, ( z, a, c ) => [ V( xe, a, z ), V( xe, c, z ) ] );
 
 	return b.build( { name: 'railing' } );
 
