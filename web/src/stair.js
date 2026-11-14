@@ -86,24 +86,17 @@ function buildRailings( mats ) {
 	b.add( M, beam( V( xr, pitchB( za ) + BR, za ), V( xr, pitchB( zb ) + BR, zb ), 0.012, 0.04 ) );
 	panelPattern( b, M, zb + 0.04, za - 0.06, ( z ) => pitchB( z ) + BR, ( z ) => pitchB( z ) + HR, ( z, a, c ) => [ V( xr, a, z ), V( xr, c, z ) ] );
 
-	// ---- 2-qavat: teshik atrofidagi to'siq (chiqish tomoni — shimol — ochiq) ----
+	// ---- 2-qavat: teshik atrofidagi to'siq ----
+	// Teshik to'rtburchak (x 3.9…6.5, z 6.4…8.75): g'arbda kichik xona devori, sharqda uzun devor, janubda tashqi devor.
+	// Panjara faqat shimoliy qirrada (x 3.9…5.2); x 5.2…6.5 — zinadan chiqish joyi, ochiq.
 	const y0 = FF;
-	const xw = OPENING.x0 - 0.04; // g'arbiy uch
-	const zn = z0 - 0.04; // shimoliy qirra (x xw…xr)
-	const xe = xE + 0.04; // sharqiy qirra (2-qavatda bu yerda devor yo'q)
-	// shimoliy marshning g'arbiy qirrasi davomi (x = xr, z zTop…zn)
-	b.add( M, box( xr - 0.0225, xr + 0.0225, y0 + HR - 0.0225, y0 + HR + 0.0225, zTop - 0.0225, zn + 0.0225 ) );
-	b.add( M, box( xr - 0.02, xr + 0.02, y0 + BR - 0.006, y0 + BR + 0.006, zTop, zn ) );
-	b.add( M, box( xr - 0.03, xr + 0.03, y0, y0 + HR + 0.03, zTop - 0.03, zTop + 0.03 ) );
-	panelPattern( b, M, zTop + 0.06, zn - 0.06, () => y0 + BR, () => y0 + HR, ( z, a, c ) => [ V( xr, a, z ), V( xr, c, z ) ] );
-	// shimoliy qirra (maydonchadan g'arbga, asosiy marsh ustida)
-	b.add( M, box( xw - 0.0225, xr + 0.0225, y0 + HR - 0.0225, y0 + HR + 0.0225, zn - 0.0225, zn + 0.0225 ) );
+	const zn = zTop - 0.04;
+	const xw = OPENING.x0;
+	b.add( M, box( xw, xr + 0.0225, y0 + HR - 0.0225, y0 + HR + 0.0225, zn - 0.0225, zn + 0.0225 ) );
 	b.add( M, box( xw, xr, y0 + BR - 0.006, y0 + BR + 0.006, zn - 0.02, zn + 0.02 ) );
 	b.add( M, box( xr - 0.03, xr + 0.03, y0, y0 + HR + 0.03, zn - 0.03, zn + 0.03 ) );
-	b.add( M, box( xw - 0.03, xw + 0.03, y0, y0 + HR + 0.03, zn - 0.03, zn + 0.03 ) );
 	for ( let x = xw + 0.6; x < xr; x += 0.6 ) b.add( M, box( x - 0.01, x + 0.01, y0, y0 + BR, zn - 0.01, zn + 0.01 ) );
 	panelPattern( b, M, xw + 0.06, xr - 0.06, () => y0 + BR, () => y0 + HR, ( x, a, c ) => [ V( x, a, zn ), V( x, c, zn ) ] );
-	// g'arbiy uch — kichik xona devori, sharqiy qirra — zina shaxtasi devori (floor2.js)
 
 	return b.build( { name: 'railing' } );
 

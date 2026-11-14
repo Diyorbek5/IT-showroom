@@ -89,3 +89,9 @@
 ## 8. Zina atrofi (v3, izoh-rasm 14)
 - Zina shaxtasining sharqiy tomoni devor (x 6.50…6.80): 2-qavat zinadan chiqqach shu devordan boshlanadi, narigi tomonda ochiq joy yo'q.
 - Zina yonida (g'arbda) eshiksiz kichik xona: x 1.9…3.9, z 6.5…8.75, shimol tomonida ochiq o'tish joyi.
+
+## 9. Zina atrofi (v4, izoh-rasm 15)
+- Zina teshigi to'rtburchak: x 3.9…6.5, z 6.4…8.75. Narigi tomonlari devor: g'arbda kichik xona devori, sharqda uzun devor (x 6.5…6.8, z 1.0…8.75), janubda tashqi devor. Panjara faqat shimoliy qirrada (x 3.9…5.2); x 5.2…6.5 — zinadan chiqish joyi.
+- Kichik xona (x 1.9…3.9, z 6.28…8.75) — eshiksiz blok.
+- To'q rangli metall eshik g'arbiy devorning o'zida, ustun burchagi yonida (z 2.70…3.55); tambur olib tashlandi.
+- G'arbiy fasad: shimoliy burchakda oyna (z 0.53…2.55, 3 tavaqa), qolgani devor.

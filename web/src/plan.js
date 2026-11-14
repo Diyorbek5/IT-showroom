@@ -57,7 +57,7 @@ STAIR.going = STAIR.goingA;
 // 2-qavat polidagi zina teshigi (L shakl): shimoliy marsh ustida + maydoncha va asosiy marshning yuqori qismi
 export const OPENING = {
 	x0: 3.9, x1: 6.5, z0: STAIR.z0, z1: STAIR.z1,
-	poly: [ [ 5.2, 6.4 ], [ 6.5, 6.4 ], [ 6.5, 8.75 ], [ 3.9, 8.75 ], [ 3.9, 7.55 ], [ 5.2, 7.55 ] ],
+	poly: [ [ 3.9, 6.4 ], [ 6.5, 6.4 ], [ 6.5, 8.75 ], [ 3.9, 8.75 ] ],
 };
 
 // Zina tagidagi kladovka: zinaning eni bo'yicha (z 7.55…8.75), bino ichida. Old devori zina bo'ylab,

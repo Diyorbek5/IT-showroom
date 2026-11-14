@@ -66,21 +66,9 @@ export function buildFloor2( mats, m2 ) {
 	};
 
 	band( - 0.3, 23.65, - 0.3, 0 );
-	band( - 0.3, 0, 0, 1.9 );
-	w.add( W, box( - 0.3, 0, yb, yt, 1.9, 8.75 ) ); // g'arbiy devor (oynasiz qism)
+	band( - 0.3, 0, 0, 2.55 );
+	w.add( W, box( - 0.3, 0, yb, yt, 2.55, 8.75 ) ); // g'arbiy devor (oynasiz qism, eshik shu yerda)
 
-	// Tambur old devori: o'rtasida eshiksiz o'tish joyi
-	{
-
-		const n = NOOK2, t0 = n.x1 - 0.12;
-		w.add( W, box( t0, n.x1, Y2, TOP, n.z0, n.open[ 0 ] ) );
-		w.add( W, box( t0, n.x1, Y2 + DOOR_H + 0.15, TOP, n.open[ 0 ], n.open[ 1 ] ) );
-		w.add( W, box( t0, n.x1, Y2, TOP, n.open[ 1 ], n.z1 ) );
-		// o'tish joyi ramkasi
-		for ( const z of n.open ) w.add( m2.pvc, box( t0 - 0.01, n.x1 + 0.01, Y2, Y2 + DOOR_H + 0.15, z - 0.03, z + 0.03 ) );
-		w.add( m2.pvc, box( t0 - 0.01, n.x1 + 0.01, Y2 + DOOR_H + 0.12, Y2 + DOOR_H + 0.18, n.open[ 0 ], n.open[ 1 ] ) );
-
-	}
 
 	band( 15.7, 16.0, 9.93, 14.95 );
 	band( 16.4, 18.75, 17.01, 17.31 );
@@ -119,10 +107,10 @@ export function buildFloor2( mats, m2 ) {
 	const skz = ( z, x0, x1, side ) => w.add( S, box( x0, x1, Y2, Y2 + SK_H, z, z + side * SK_T ) );
 	skx( 23.35, 1.0, 3.57, - 1 ); skx( 23.35, 4.56, 9.0, - 1 ); skx( 23.35, 9.95, 11.6, - 1 );
 	skx( 23.35, 11.72, 14.95, - 1 ); skx( 23.35, 15.94, 16.45, - 1 );
-	skz( 8.75, 0, 1.9, - 1 ); skz( 8.75, 6.8, 15.375, - 1 ); skx( 6.8, 6.4, 8.75, 1 ); skz( 6.5, 1.9, 2.38, - 1 ); skz( 6.5, 3.42, 3.9, - 1 ); skz( 6.4, 6.5, 6.8, - 1 );
-	skz( 8.75, 2.02, 3.78, - 1 ); skx( 2.02, 6.62, 8.75, 1 ); skx( 3.78, 6.62, 8.75, - 1 );
+	skz( 8.75, 0, 1.9, - 1 ); skz( 8.75, 6.8, 15.375, - 1 ); skx( 6.8, 6.4, 8.75, 1 ); skz( 6.28, 1.9, 3.9, - 1 ); skx( 6.5, 1.0, 6.4, - 1 ); skz( 1.0, 6.5, 6.8, - 1 );
+	skz( 8.75, 2.02, 3.78, - 1 ); skx( 2.02, 6.4, 8.75, 1 ); skx( 3.78, 6.4, 8.75, - 1 );
 	skx( 0, 4.18, 5.6, 1 ); skx( 0.75, 3.8, 3.68, 1 );
-	skx( 0, 4.18, 8.75, 1 ); skx( 1.4, 1.9, 2.35, 1 ); skx( 1.4, 3.25, 3.8, 1 );
+	skx( 0, 4.18, 8.75, 1 ); skx( 0, 2.55, 2.62, 1 ); skx( 0, 3.63, 3.68, 1 ); 
 	skx( 15.375, 4.56, 8.75, - 1 ); skx( 15.55, 4.56, 8.75, 1 );
 	skx( 16.0, 8.75, 8.94, 1 );
 	let sx = 16.0;
@@ -152,8 +140,8 @@ export function buildFloor2( mats, m2 ) {
 
 	// ---------- Eshiklar ----------
 	for ( const d of doors ) addDoor( w, m2, d );
-	// tambur ichidagi to'q rangli metall eshik (rasm 02, 12, 13) — g'arbiy devorda
-	addSurfaceDoorX( w, m2, 2.35, 3.25, 0 );
+	// To'q rangli metall eshik — g'arbiy devorning o'zida, ustun burchagi yonida (rasm 15)
+	addSurfaceDoorX( w, m2, 2.7, 3.55, 0 );
 
 	// Zina teshigi atrofidagi pol qirrasi va ostona chiziqlari
 	w.add( m2.threshold, box( XJ - 0.015, XJ + 0.015, Y2, Y2 + 0.004, 1.0, 3.57 ) );
