@@ -121,3 +121,9 @@
 - Qanot yoritgichlari: yumaloq spotlar o'rniga kvadrat panellar to'ri (har qatorda 4 ta).
 - Laminat: taxtalar orasidagi ton farqi pasaytirildi, iliqroq va yaltiroqroq; qora shift neytral; eshik oynasi kulrang.
 - "Qanot zali" ko'rinishi rasm 21 nuqtasidan.
+
+## 14. 2-qavat oynasidan ko'rinish (rasm 02)
+- Qo'shni binoning devori ustidagi yashil to'r pastroq (4.7…6.4 m) — 2-qavatdan oynaning pastki qismida ko'rinadi; terrasa yuzasi beton.
+- Ortida past daraxtlar qatori (shimoliy sektor, ~115 m), daraxtlar ustidan ochiq osmon (HDRI o'rmoni o'rniga, faqat shimol tomonda).
+- Uzoqda (150…260 m) bej, g'isht va oq rangli 8…18 qavatli uylar va minorali kran.
+- Kamera uzoqlik chegarasi 600 m (osmon foni ko'rinishi uchun).

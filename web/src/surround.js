@@ -211,8 +211,9 @@ export function buildSurroundings( envTex ) {
 	G( box( - 3, 34, 0, 4.4, NZ - 14, NZ ), M.wallRib ); // 1-qavat: gofrirovka devor
 	G( box( - 3, 34, 4.4, 4.7, NZ - 14, NZ + 0.25 ), M.concrete ); // terrasa qirrasi
 	// devor ustida qurilish maydoni to'sig'i — yashil to'r (rasm 16: to'r ustidan osmon ko'rinadi)
-	G( box( - 3, 34, 4.7, 7.6, NZ - 0.9, NZ - 0.8 ), M.netting );
-	for ( let x = - 3; x <= 34; x += 2.5 ) G( box( x, x + 0.06, 4.7, 7.7, NZ - 0.96, NZ - 0.9 ), M.dark );
+	G( box( - 3, 34, 4.7, 6.4, NZ - 0.9, NZ - 0.8 ), M.netting ); // rasm 16: to'r tepasi ~6.2 m; 2-qavat rasm 02: ko'z sathidan biroz past
+	for ( let x = - 3; x <= 34; x += 2.5 ) G( box( x, x + 0.06, 4.7, 6.5, NZ - 0.96, NZ - 0.9 ), M.dark );
+	G( box( - 3, 34, 4.4, 4.72, NZ - 14, NZ - 0.3 ), M.concrete ); // terrasa (qurilish maydoni) yuzasi
 	// panjara (terrasa chetida)
 	for ( let x = - 3; x <= 34; x += 1.5 ) G( box( x, x + 0.04, 4.7, 5.75, NZ + 0.15, NZ + 0.2 ), M.steel );
 	G( box( - 3, 34, 5.72, 5.77, NZ + 0.13, NZ + 0.22 ), M.steel );
@@ -256,19 +257,60 @@ export function buildSurroundings( envTex ) {
 	}
 
 	// ---------- uzoqdagi ko'p qavatli uylar (2-qavat rasm 02) ----------
-	const facade = canvasTex( 256, 256, ( g, w, h ) => {
+	// uzoqdagi ko'p qavatli uylar (2-qavat rasm 02): bej va g'isht rangli, derazali, balkonli; turli balandlikda
+	const facadeTex = ( base, win, band, seed ) => canvasTex( 256, 256, ( g, w, h ) => {
 
-		g.fillStyle = '#b9a58c'; g.fillRect( 0, 0, w, h );
-		for ( let y = 0; y < h; y += 64 ) for ( let x = 0; x < w; x += 64 ) {
+		const R = rng( seed );
+		g.fillStyle = base; g.fillRect( 0, 0, w, h );
+		for ( let y = 0; y < h; y += 64 ) {
 
-			g.fillStyle = '#3c4148'; g.fillRect( x + 14, y + 14, 36, 34 );
-			g.fillStyle = '#a8957d'; g.fillRect( x + 8, y + 50, 48, 6 );
+			g.fillStyle = band; g.fillRect( 0, y + 54, w, 10 ); // qavatlararo lenta / balkon
+			for ( let x = 0; x < w; x += 64 ) {
+
+				const lit = R();
+				g.fillStyle = lit < 0.15 ? '#6f7880' : win;
+				g.fillRect( x + 12, y + 12, 40, 36 );
+				g.fillStyle = 'rgba(255,255,255,0.12)'; g.fillRect( x + 12, y + 12, 40, 4 );
+
+			}
 
 		}
 
-	}, [ 3.2, 3.0 ] );
-	M.facade = B( { map: facade } );
-	for ( const [ x0, x1, z0, z1, h ] of [ [ - 12, 14, - 112, - 100, 30 ], [ 18, 44, - 98, - 86, 24 ], [ - 42, - 22, - 92, - 72, 33 ] ] ) G( box( x0, x1, 0, h, z0, z1 ), M.facade, null, { ao: false } );
+	}, [ 3.4, 3.0 ] );
+	const facades = [
+		B( { map: facadeTex( '#cdbb9c', '#727a82', '#b8a688', 1 ) } ),
+		B( { map: facadeTex( '#b07a5e', '#6c7178', '#9c6a50', 2 ) } ),
+		B( { map: facadeTex( '#d9d6cf', '#7a828c', '#c3bfb6', 3 ) } ),
+		B( { map: facadeTex( '#c9a27a', '#6f767e', '#b28f6a', 4 ) } ),
+	];
+	const roofM = B( { color: 0x6c6a66 } );
+	for ( const [ x0, x1, z0, z1, h, f ] of [
+		// rasm 02: daraxtlar ortida, uzoqda (150…260 m) — ko'z sathidan 3…7° yuqori
+		[ - 70, - 40, - 190, - 172, 30, 0 ], [ - 10, 12, - 236, - 218, 52, 2 ], [ 20, 52, - 182, - 166, 26, 1 ],
+		[ 62, 88, - 214, - 196, 40, 3 ], [ - 110, - 84, - 222, - 200, 44, 1 ], [ 96, 130, - 170, - 152, 24, 0 ], [ - 30, - 12, - 262, - 246, 58, 3 ],
+	] ) {
+
+		G( box( x0, x1, 0, h, z0, z1 ), facades[ f ], null, { ao: false } );
+		G( box( x0 - 0.2, x1 + 0.2, h, h + 0.6, z0 - 0.2, z1 + 0.2 ), roofM, null, { uv: false, ao: false } );
+
+	}
+
+	// minorali kran (rasm 02 da o'ngda): panjarali ustun va strela — teshikli tekstura (alphaTest)
+	const lattice = canvasTex( 64, 64, ( g, w, h ) => {
+
+		g.clearRect( 0, 0, w, h );
+		g.strokeStyle = '#d9a21b'; g.lineWidth = 7;
+		g.strokeRect( 3, 3, w - 6, h - 6 );
+		g.beginPath(); g.moveTo( 3, 3 ); g.lineTo( w - 3, h - 3 ); g.stroke();
+
+	}, [ 1.6, 1.6 ] );
+	const craneM = B( { map: lattice, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide } );
+	const cx = 44, cz = - 128;
+	G( box( cx - 0.8, cx + 0.8, 0, 46, cz - 0.8, cz + 0.8 ), craneM, null, { ao: false } );
+	G( box( cx - 30, cx + 10, 46, 47.4, cz - 0.6, cz + 0.6 ), craneM, null, { ao: false } );
+	G( box( cx + 6, cx + 10, 43.5, 46, cz - 1.2, cz + 1.2 ), B( { color: 0x7a7c7e } ), null, { uv: false, ao: false } ); // qarshi yuk
+	G( box( cx - 1.2, cx + 1.2, 46, 49, cz - 1.2, cz + 1.2 ), B( { color: 0xd9a21b } ), null, { uv: false, ao: false } ); // kabina/cho'qqi
+	G( box( cx - 0.03, cx + 0.03, 47.4, 52, cz - 0.03, cz + 0.03 ), M.dark, null, { uv: false, ao: false } );
 
 	// ---------- mashinalar (binoga burni bilan) — carmodel.js ----------
 	const parts = { sedan: buildCarParts( 'sedan' ), hatch: buildCarParts( 'hatch' ), suv: buildCarParts( 'suv' ) };
@@ -328,6 +370,63 @@ export function buildSurroundings( envTex ) {
 	addCar( - 14.8, 11, - Math.PI / 2, 'suv', paintMats[ 0 ] );
 	addCar( - 10.4, 27, Math.PI / 2, 'hatch', paintMats[ 3 ] );
 
-	return b.build( 'surroundings' );
+	const grp = b.build( 'surroundings' );
+
+	// ---------- shimol tomonda: past daraxtlar qatori va ochiq osmon (rasm 02, 16) ----------
+	// HDRI dagi baland o'rmon o'rniga — faqat shimoliy sektorni yopadi (g'arbdagi ko'cha daraxtlari HDRI'dan qoladi)
+	const skyTex = canvasTex( 16, 256, ( g, w, h ) => {
+
+		const gr = g.createLinearGradient( 0, 0, 0, h );
+		gr.addColorStop( 0, '#6f93bb' );
+		gr.addColorStop( 0.55, '#a9c0d6' );
+		gr.addColorStop( 0.92, '#dde4e8' );
+		gr.addColorStop( 1, '#e4e7e6' );
+		g.fillStyle = gr; g.fillRect( 0, 0, w, h );
+
+	} );
+	skyTex.wrapS = skyTex.wrapT = THREE.ClampToEdgeWrapping;
+	const skyMat = new THREE.MeshBasicMaterial( { map: skyTex, side: THREE.BackSide, fog: false } );
+	skyMat.color.setScalar( 2.6 );
+	const skyGeo = new THREE.CylinderGeometry( 420, 420, 300, 48, 1, true, Math.PI - 1.15, 2.3 );
+	const skyMesh = new THREE.Mesh( skyGeo, skyMat );
+	skyMesh.position.set( 8, 150 - 8, 0 );
+	skyMesh.renderOrder = - 5;
+	grp.add( skyMesh );
+
+	const treeTex = canvasTex( 2048, 256, ( g, w, h ) => {
+
+		g.clearRect( 0, 0, w, h );
+		const R = rng( 77 );
+		// har bir daraxt toji: qorong'i asos + ko'plab mayda barg dog'lari (yorug'i tepada)
+		for ( let i = 0; i < 360; i ++ ) {
+
+			const x = R() * w, top = h * ( 0.2 + R() * 0.5 ), rad = 16 + R() * 34;
+			const hue = 80 + R() * 35, sat = 18 + R() * 14;
+			g.fillStyle = `hsl(${hue},${sat}%,${14 + R() * 6}%)`;
+			g.beginPath(); g.ellipse( x, top + rad, rad * 1.1, rad, 0, 0, Math.PI * 2 ); g.fill();
+			g.fillRect( x - rad, top + rad, rad * 2, h );
+			for ( let k = 0; k < rad * 6; k ++ ) {
+
+				const a2 = R() * Math.PI * 2, d = Math.sqrt( R() ) * rad;
+				const px = x + Math.cos( a2 ) * d * 1.1, py = top + rad + Math.sin( a2 ) * d;
+				const up = 1 - ( py - top ) / ( 2 * rad );
+				g.fillStyle = `hsla(${hue + ( R() - 0.5 ) * 12},${sat + 6}%,${18 + up * 22 + R() * 8}%,0.9)`;
+				g.fillRect( px, py, 2 + R() * 3, 2 + R() * 3 );
+
+			}
+
+		}
+
+	} );
+	treeTex.wrapT = THREE.ClampToEdgeWrapping;
+	treeTex.repeat.set( 4, 1 );
+	const treeMat = new THREE.MeshBasicMaterial( { map: treeTex, alphaTest: 0.5, side: THREE.DoubleSide, fog: false } );
+	treeMat.color.setScalar( 1.0 );
+	const treeGeo = new THREE.CylinderGeometry( 115, 115, 22, 64, 1, true, Math.PI - 1.25, 2.5 );
+	const trees = new THREE.Mesh( treeGeo, treeMat );
+	trees.position.set( 8, 11 - 0.5, 0 );
+	grp.add( trees );
+
+	return grp;
 
 }

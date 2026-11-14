@@ -93,7 +93,7 @@ async function main() {
 	RectAreaLightUniformsLib.init();
 
 	const scene = new THREE.Scene();
-	const camera = new THREE.PerspectiveCamera( 62, innerWidth / innerHeight, 0.03, 300 );
+	const camera = new THREE.PerspectiveCamera( 62, innerWidth / innerHeight, 0.03, 600 ); // uzoqdagi osmon foni (420 m) ham ko'rinsin
 
 	// ---------- Model ----------
 	setLoad( 0.1, 'Materiallar…' );
