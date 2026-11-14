@@ -13,7 +13,6 @@ import { H } from './plan.js';
 import { Y2, H2, OUTLINE2, COLS2, PARTITIONS2 } from './plan2.js';
 import { createMaterials, createMaterials2, setEnvMap } from './materials.js';
 import { buildFloor2 } from './floor2.js';
-import { buildSite } from './site.js';
 import { buildDimensions } from './dims.js';
 import { buildShell } from './building.js';
 import { buildStair } from './stair.js';
@@ -600,10 +599,6 @@ async function main() {
 	const hemi = new THREE.HemisphereLight( 0xdfe9f5, 0x6f6a5c, 1.2 );
 	hemi.visible = false;
 	scene.add( hemi );
-	// Bino atrofi: yo'lka, avtoturargoh, ko'cha, maysazor, daraxtlar (faqat tashqaridan qaraganda)
-	const mapGround = buildSite();
-	mapGround.visible = false;
-	scene.add( mapGround );
 
 	// Kadr vaqtiga qarab render o'lchamini sozlash (uzluksiz harakat paytida)
 	const perf = { last: 0, acc: 0, n: 0, cool: 0 };
@@ -679,7 +674,6 @@ async function main() {
 		floor2.userData.ceiling.visible = ! outside;
 		skyObjs.ground.visible = ! outside && cp.y < H + 0.1;
 		skyObjs.ground2.visible = ! outside && cp.y >= H + 0.1;
-		mapGround.visible = outside;
 		// Ichkarida rasmlardagi kabi yumshoq yorug'lik; tashqaridan (maket) qaraganda quyosh soyalari bilan
 		const sunI = sky.sunLum * ( outside ? params.sunScaleOut : params.sunScale );
 		if ( skyObjs.sun.intensity !== sunI ) {
@@ -690,6 +684,7 @@ async function main() {
 		}
 		hemi.visible = outside;
 		scene.background = sky.bg;
+		scene.backgroundIntensity = bgIntensity * ( outside ? 0.55 : 1 ); // tepadan qaraganda fon oqarib ketmasin
 		reflection.enabled = ! LITE && cp.y < H;
 		reflection2.enabled = ! LITE && in2;
 		if ( !! params.floor2Live !== ( in2 && ! LITE ) ) {
