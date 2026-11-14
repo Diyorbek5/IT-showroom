@@ -12,6 +12,7 @@ import { H } from './plan.js';
 import { Y2, H2, OUTLINE2, COLS2, PARTITIONS2 } from './plan2.js';
 import { createMaterials, createMaterials2, setEnvMap } from './materials.js';
 import { buildFloor2 } from './floor2.js';
+import { buildSite } from './site.js';
 import { buildShell } from './building.js';
 import { buildStair } from './stair.js';
 import { buildFixtures, applyLightLevels } from './fixtures.js';
@@ -35,6 +36,7 @@ const params = {
 	skyIntensity: 1,
 	exposure: 0.68,
 	exposure2: 1.9, // 2-qavat: qora shift, kamroq qaytgan yorug'lik — fotograflar kabi ekspozitsiya oshiriladi
+	exposureOut: 0.85, // tashqaridan (maket) ko'rinish
 	panel: 0.9,
 	chandelier: 0.25,
 	chandelierEmissive: 7,
@@ -569,13 +571,11 @@ async function main() {
 	resize();
 
 	// ---------- Tepadan (maket) ko'rinishi uchun ---------
-	const outsideBg = new THREE.Color( 0x24262a );
-	const hemi = new THREE.HemisphereLight( 0xffffff, 0x5a5c60, 1.6 );
+	const hemi = new THREE.HemisphereLight( 0xdfe9f5, 0x6f6a5c, 1.2 );
 	hemi.visible = false;
 	scene.add( hemi );
-	const mapGround = new THREE.Mesh( new THREE.CircleGeometry( 26, 72 ).rotateX( - Math.PI / 2 ), new THREE.MeshStandardMaterial( { color: 0x3a3c41, roughness: 1 } ) );
-	mapGround.position.set( 11.7, - 0.02, 8.5 );
-	mapGround.receiveShadow = true;
+	// Bino atrofi: yo'lka, avtoturargoh, ko'cha, maysazor, daraxtlar (faqat tashqaridan qaraganda)
+	const mapGround = buildSite();
 	mapGround.visible = false;
 	scene.add( mapGround );
 
@@ -648,7 +648,7 @@ async function main() {
 		skyObjs.ground2.visible = ! outside && cp.y >= H + 0.1;
 		mapGround.visible = outside;
 		hemi.visible = outside;
-		scene.background = outside ? outsideBg : sky.bg;
+		scene.background = sky.bg;
 		reflection.enabled = ! LITE && cp.y < H;
 		if ( !! params.floor2Live !== ( in2 && ! LITE ) ) {
 
@@ -656,7 +656,7 @@ async function main() {
 			applyLightLevels( lights, mats, params );
 
 		}
-		const expT = ( cp.y > Y2 - 0.2 && ! cut1 ) ? params.exposure2 : params.exposure;
+		const expT = outside ? params.exposureOut : ( cp.y > Y2 - 0.2 ) ? params.exposure2 : params.exposure;
 		const de = expT - renderer.toneMappingExposure;
 		if ( Math.abs( de ) > 0.002 ) {
 
