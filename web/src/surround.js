@@ -7,6 +7,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { box, worldUV } from './geo.js';
+import { buildCarParts, reflectiveBasic, contactShadowTexture } from './carmodel.js';
 
 const L = new THREE.Vector3( - 0.45, 0.8, 0.4 ).normalize();
 
@@ -187,7 +188,6 @@ export function buildSurroundings( envTex ) {
 		tail: B( { color: 0x8a1a1c } ),
 		plate: B( { color: 0xf2f2f0 } ),
 	};
-	const paints = [ 0xb8b9b8, 0xb8b9b8, 0x8f9296, 0x8f9296, 0x141516, 0x4d5055, 0xc4c4c2, 0x1f2b3d ].map( ( c ) => B( { color: c, envMap: envTex, reflectivity: 0.12, combine: THREE.MixOperation } ) );
 
 	const b = new Bin();
 	const G = ( g, mat, m, o ) => b.add( mat, g, m, o );
@@ -270,74 +270,63 @@ export function buildSurroundings( envTex ) {
 	M.facade = B( { map: facade } );
 	for ( const [ x0, x1, z0, z1, h ] of [ [ - 12, 14, - 112, - 100, 30 ], [ 18, 44, - 98, - 86, 24 ], [ - 42, - 22, - 92, - 72, 33 ] ] ) G( box( x0, x1, 0, h, z0, z1 ), M.facade, null, { ao: false } );
 
-	// ---------- mashinalar (binoga burni bilan) ----------
-	const carBody = makeCarGeoms();
-	const addCar = ( x, z, rotY, paint, suv ) => {
+	// ---------- mashinalar (binoga burni bilan) — carmodel.js ----------
+	const parts = { sedan: buildCarParts( 'sedan' ), hatch: buildCarParts( 'hatch' ), suv: buildCarParts( 'suv' ) };
+	const CM = {
+		glass: reflectiveBasic( 0x07080a, envTex, 0.03, 0.22 ),
+		chrome: reflectiveBasic( 0xc4c7cb, envTex, 0.3, 0.6 ),
+		lamp: reflectiveBasic( 0xbfc4c9, envTex, 0.35, 0.7 ),
+		red: reflectiveBasic( 0x7c1216, envTex, 0.1, 0.5 ),
+		dark: B( { color: 0x101113 } ),
+		tire: B( { color: 0x1c1c1d } ),
+		hub: B( { color: 0x0c0c0d, side: THREE.DoubleSide } ),
+		plate: B( { color: 0xeeeeec } ),
+		shadow: new THREE.MeshBasicMaterial( { color: 0x000000, map: contactShadowTexture(), transparent: true, opacity: 0.7, depthWrite: false } ),
+	};
+	const paintCols = [ 0xe9eaea, 0xe9eaea, 0xdcdcd7, 0xa9adb2, 0xa9adb2, 0x5e6268, 0x0d0e10, 0x0d0e10, 0x1b2536 ];
+	const paintMats = paintCols.map( ( c ) => reflectiveBasic( c, envTex, 0.03, 0.32 ) );
+	const pick = () => {
 
-		const m = new THREE.Matrix4().makeRotationY( rotY ).setPosition( x, 0, z );
-		const s = suv ? new THREE.Matrix4().makeScale( 1.04, 1.13, 1.05 ) : new THREE.Matrix4();
-		const mm = m.clone().multiply( s );
-		G( carBody.body.clone(), paint, mm.clone(), { uv: false, ao: false } );
-		G( carBody.glass.clone(), M.carGlass, mm.clone(), { uv: false, ao: false } );
-		G( carBody.lamps.clone(), M.lamp, mm.clone(), { uv: false, ao: false } );
-		G( carBody.tails.clone(), M.tail, mm.clone(), { uv: false, ao: false } );
-		G( carBody.plate.clone(), M.plate, mm.clone(), { uv: false, ao: false } );
-		G( carBody.grille.clone(), M.rubber, mm.clone(), { uv: false, ao: false } );
-		for ( const [ wx, wz ] of [ [ 0.85, - 0.78 ], [ 0.85, 0.78 ], [ 3.55, - 0.78 ], [ 3.55, 0.78 ] ] ) {
-
-			const t = new THREE.Matrix4().makeTranslation( wx, 0.32, wz );
-			G( carBody.tire.clone(), M.rubber, mm.clone().multiply( t ), { uv: false, ao: false } );
-			G( carBody.rim.clone(), M.rim, mm.clone().multiply( t ).multiply( new THREE.Matrix4().makeTranslation( 0, 0, Math.sign( wz ) * 0.1 ) ), { uv: false, ao: false } );
-
-		}
+		const t = r();
+		return t < 0.5 ? 'sedan' : t < 0.72 ? 'hatch' : 'suv';
 
 	};
 
-	// g'arbiy parkovka: old tomoni binoga (+x)
+	const addCar = ( x, z, rotY, type, paint ) => {
+
+		const P = parts[ type ];
+		const m = new THREE.Matrix4().makeRotationY( rotY ).setPosition( x, 0, z );
+		const o = { uv: false, ao: false };
+		G( P.paint.clone(), paint, m.clone(), o );
+		G( P.glass.clone(), CM.glass, m.clone(), o );
+		G( P.tire.clone(), CM.tire, m.clone(), o );
+		G( P.rim.clone(), CM.chrome, m.clone(), o );
+		G( P.hub.clone(), CM.hub, m.clone(), o );
+		G( P.lamp.clone(), CM.lamp, m.clone(), o );
+		G( P.red.clone(), CM.red, m.clone(), o );
+		G( P.dark.clone(), CM.dark, m.clone(), o );
+		G( P.plate.clone(), CM.plate, m.clone(), o );
+		G( P.chrome.clone(), CM.chrome, m.clone(), o );
+		const sh = new THREE.PlaneGeometry( P.L + 0.5, P.W + 0.45 ).rotateX( - Math.PI / 2 ).translate( P.L / 2, 0.012, 0 );
+		G( sh, CM.shadow, m.clone(), { uv: false, ao: false } );
+
+	};
+
+	// g'arbiy parkovka: old tomoni binoga (+x), bordyurdan ~0.5 m
 	for ( let z = - 11.1; z < 21; z += 2.6 ) {
 
-		if ( r() < 0.18 ) continue;
-		addCar( - 8.55 + r() * 0.2, z + ( r() - 0.5 ) * 0.15, 0, paints[ Math.floor( r() * paints.length ) ], r() < 0.35 );
+		if ( r() < 0.15 ) continue;
+		const type = pick();
+		const L = parts[ type ].L;
+		addCar( - 3.55 - L - r() * 0.25, z + ( r() - 0.5 ) * 0.2, ( r() - 0.5 ) * 0.04, type, paintMats[ Math.floor( r() * paintMats.length ) ] );
 
 	}
 
-	// ko'chada harakatdagi/turgan bir nechta mashina
-	addCar( - 10.6, - 4, Math.PI / 2, paints[ 4 ], false );
-	addCar( - 14.6, 9, - Math.PI / 2, paints[ 0 ], true );
-	addCar( - 10.6, 26, Math.PI / 2, paints[ 2 ], false );
+	// ko'chada turgan / harakatdagi bir nechta mashina
+	addCar( - 10.4, - 2, Math.PI / 2, 'sedan', paintMats[ 6 ] );
+	addCar( - 14.8, 11, - Math.PI / 2, 'suv', paintMats[ 0 ] );
+	addCar( - 10.4, 27, Math.PI / 2, 'hatch', paintMats[ 3 ] );
 
 	return b.build( 'surroundings' );
-
-}
-
-// Sedan siluetli mashina: yon profil ekstruziyasi (yumaloq qirralar), oyna "kabinasi", g'ildiraklar
-function makeCarGeoms() {
-
-	const W = 1.78;
-	const prof = [
-		[ 0.0, 0.34 ], [ 0.0, 0.88 ], [ 0.18, 1.0 ], [ 0.75, 1.03 ], [ 1.15, 1.38 ], [ 2.55, 1.42 ],
-		[ 3.15, 0.98 ], [ 3.95, 0.86 ], [ 4.5, 0.74 ], [ 4.55, 0.36 ], [ 4.4, 0.3 ],
-		// g'ildirak o'yiqlari (oldi va orqasi)
-		[ 3.95, 0.3 ], [ 3.9, 0.55 ], [ 3.55, 0.68 ], [ 3.2, 0.55 ], [ 3.15, 0.3 ],
-		[ 1.25, 0.3 ], [ 1.2, 0.55 ], [ 0.85, 0.68 ], [ 0.5, 0.55 ], [ 0.45, 0.3 ], [ 0.12, 0.3 ],
-	];
-	const sh = new THREE.Shape( prof.map( ( [ x, y ] ) => new THREE.Vector2( x, y ) ) );
-	const body = new THREE.ExtrudeGeometry( sh, { depth: W - 0.16, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.06, bevelSegments: 3, curveSegments: 4 } );
-	body.translate( 0, 0, - ( W - 0.16 ) / 2 );
-	// kabina oynalari: biroz kengroq, beltline'dan yuqori
-	// profil fasklari (bevel) 6 sm tashqariga chiqadi — oynalar undan tashqarida, tomi esa bo'yoqda qoladi
-	const gp = [ [ 0.5, 1.0 ], [ 0.62, 1.04 ], [ 1.08, 1.44 ], [ 2.675, 1.44 ], [ 3.29, 0.99 ], [ 3.1, 0.96 ] ];
-	const gs = new THREE.Shape( gp.map( ( [ x, y ] ) => new THREE.Vector2( x, y ) ) );
-	const glass = new THREE.ExtrudeGeometry( gs, { depth: W + 0.01, bevelEnabled: false } );
-	glass.translate( 0, 0.005, - ( W + 0.01 ) / 2 );
-	// faralar (old = +x), stoplar, raqam
-	const lamps = mergeGeometries( [ - 1, 1 ].map( ( s ) => new THREE.BoxGeometry( 0.05, 0.11, 0.36 ).translate( 4.6, 0.68, s * 0.6 ) ) );
-	const tails = mergeGeometries( [ - 1, 1 ].map( ( s ) => new THREE.BoxGeometry( 0.05, 0.1, 0.32 ).translate( - 0.075, 0.86, s * 0.66 ) ) );
-	// old panjara (radiator) va raqam
-	const plate = mergeGeometries( [ new THREE.BoxGeometry( 0.03, 0.11, 0.52 ).translate( 4.64, 0.44, 0 ) ] );
-	const grille = new THREE.BoxGeometry( 0.03, 0.16, 0.9 ).translate( 4.62, 0.6, 0 );
-	const tire = new THREE.CylinderGeometry( 0.33, 0.33, 0.22, 24 ).rotateX( Math.PI / 2 );
-	const rim = new THREE.CylinderGeometry( 0.2, 0.2, 0.04, 20 ).rotateX( Math.PI / 2 );
-	return { body, glass, lamps, tails, plate, grille, tire, rim };
 
 }
