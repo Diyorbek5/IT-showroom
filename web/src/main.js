@@ -171,7 +171,6 @@ async function main() {
 	const bgIntensity = scene.backgroundIntensity;
 	function hdrBackground( on ) {
 
-		if ( scene.background && scene.background.isColor ) return;
 		scene.background = on ? ( sky.giTex || sky.texture ) : sky.bg;
 		scene.backgroundIntensity = on ? params.skyIntensity : bgIntensity;
 
@@ -599,6 +598,17 @@ async function main() {
 	const hemi = new THREE.HemisphereLight( 0xdfe9f5, 0x6f6a5c, 1.2 );
 	hemi.visible = false;
 	scene.add( hemi );
+	// Tashqaridan qaraganda: oddiy kulrang tekis maydon (fon bilan bir xil rang — ufq ko'rinmaydi) + bino soyasi
+	const studioColor = new THREE.Color( 0xa4a6a9 );
+	const studio = new THREE.Group();
+	const studioGround = new THREE.Mesh( new THREE.CircleGeometry( 600, 64 ).rotateX( - Math.PI / 2 ), new THREE.MeshBasicMaterial( { color: studioColor, toneMapped: !! composer } ) ); // fon bilan bir xil ishlov — ufq chizig'i ko'rinmaydi
+	studioGround.position.set( 11.7, - 0.03, 8.5 );
+	const studioShadow = new THREE.Mesh( new THREE.PlaneGeometry( 80, 80 ).rotateX( - Math.PI / 2 ), new THREE.ShadowMaterial( { opacity: 0.28 } ) );
+	studioShadow.position.set( 11.7, - 0.02, 8.5 );
+	studioShadow.receiveShadow = true;
+	studio.add( studioGround, studioShadow );
+	studio.visible = false;
+	scene.add( studio );
 
 	// Kadr vaqtiga qarab render o'lchamini sozlash (uzluksiz harakat paytida)
 	const perf = { last: 0, acc: 0, n: 0, cool: 0 };
@@ -683,8 +693,9 @@ async function main() {
 
 		}
 		hemi.visible = outside;
-		scene.background = sky.bg;
-		scene.backgroundIntensity = bgIntensity * ( outside ? 0.55 : 1 ); // tepadan qaraganda fon oqarib ketmasin
+		studio.visible = outside && ! rebaking;
+		scene.background = studio.visible ? studioColor : sky.bg;
+		scene.backgroundIntensity = bgIntensity;
 		reflection.enabled = ! LITE && cp.y < H;
 		reflection2.enabled = ! LITE && in2;
 		if ( !! params.floor2Live !== ( in2 && ! LITE ) ) {
