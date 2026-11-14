@@ -171,7 +171,7 @@ export function applyLightLevels( lights, mats, p ) {
 	// 2-qavat panel guruhlari (6 ta katta yorug'lik) — kamera 2-qavatda bo'lganda real vaqtda ham yoqiladi
 	for ( const l of lights.floor2 || [] ) {
 
-		l.intensity = p.panel * l.userData.areaFactor * 6 * on;
+		l.intensity = p.panel * l.userData.areaFactor * 8 * on;
 		l.visible = area || !! p.floor2Live;
 
 	}

@@ -233,7 +233,7 @@ export function buildFloor2( mats, m2 ) {
 	const zones = [ [ 0.6, 3.5, 0.5, 8.4 ], [ 4.1, 7.3, 0.5, 7.0 ], [ 7.9, 15.35, 0.5, 8.4 ], [ 16.4, 22.8, 0.5, 11.2 ], [ 16.0, 18.75, 12, 17 ], [ 20.65, 23.2, 12, 17 ] ];
 	for ( const [ x0, x1, z0, z1 ] of zones ) {
 
-		const n = PANELS2.filter( ( [ x, z ] ) => x > x0 && x < x1 && z > z0 && z < z1 ).length * 0.185 + SPOTS2.filter( ( [ x, z ] ) => x > x0 && x < x1 && z > z0 && z < z1 ).length * 0.008;
+		const n = PANELS2.filter( ( [ x, z ] ) => x > x0 && x < x1 && z > z0 && z < z1 ).length * 0.185 + SPOTS2.filter( ( [ x, z ] ) => x > x0 && x < x1 && z > z0 && z < z1 ).length * 0.06;
 		const lw = ( x1 - x0 ) * 0.7, ld = ( z1 - z0 ) * 0.7;
 		const rl = new THREE.RectAreaLight( 0xf2f5ff, 1, lw, ld );
 		rl.position.set( ( x0 + x1 ) / 2, TOP - BEAM_D - 0.02, ( z0 + z1 ) / 2 );
