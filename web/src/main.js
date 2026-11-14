@@ -699,6 +699,7 @@ async function main() {
 		hemi.visible = outside;
 		studio.visible = outside && ! rebaking;
 		surround.visible = ! outside;
+		surround.userData.floor2Net.visible = cp.y > Y2 - 0.2; // 2-qavatdan: devor o'rniga yashil to'r (rasm 02)
 		scene.background = studio.visible ? studioColor : sky.bg;
 		scene.backgroundIntensity = bgIntensity;
 		reflection.enabled = ! LITE && cp.y < H;

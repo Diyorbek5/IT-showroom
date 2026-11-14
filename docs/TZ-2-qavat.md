@@ -127,3 +127,4 @@
 - Ortida past daraxtlar qatori (shimoliy sektor, ~115 m), daraxtlar ustidan ochiq osmon (HDRI o'rmoni o'rniga, faqat shimol tomonda).
 - Uzoqda (150…260 m) bej, g'isht va oq rangli 8…18 qavatli uylar va minorali kran.
 - Kamera uzoqlik chegarasi 600 m (osmon foni ko'rinishi uchun).
+- 2-qavatdan qaraganda qo'shni binoning kulrang devori ham yashil to'r bilan qoplangan (faqat kamera 2-qavatda bo'lganda; 1-qavatdan devor, zina va eshiklar ko'rinadi).

@@ -427,6 +427,17 @@ export function buildSurroundings( envTex ) {
 	trees.position.set( 8, 11 - 0.5, 0 );
 	grp.add( trees );
 
+	// 2-qavatdan qaraganda (rasm 02) devor ham yashil to'r bilan qoplangan ko'rinadi — bu qoplama faqat
+	// kamera 2-qavatda bo'lganda yoqiladi (1-qavat rasmlarida devor, zina va eshiklar ko'rinadi)
+	const netGeo = shade( worldUV( box( - 3, 34, 0.5, 4.75, NZ + 1.3, NZ + 1.38 ) ) );
+	const f2net = new THREE.Mesh( netGeo, M.netting );
+	f2net.name = 'floor2-netting';
+	f2net.visible = false;
+	grp.add( f2net );
+	const postGeo = mergeGeometries( Array.from( { length: 15 }, ( _, i ) => shade( worldUV( box( - 3 + i * 2.5, - 3 + i * 2.5 + 0.06, 0.5, 4.8, NZ + 1.38, NZ + 1.44 ) ) ) ) );
+	f2net.add( new THREE.Mesh( postGeo, M.dark ) );
+	grp.userData.floor2Net = f2net;
+
 	return grp;
 
 }
