@@ -176,24 +176,37 @@ function buildCloset( mats ) {
 	b.add( mats.skirting, box( door.x1 + 0.07, x1, 0, 0.08, z0 - t - 0.012, z0 - t ) );
 	b.add( mats.skirting, box( x0 - 0.012, x0, 0, 0.08, z0 - t, z1 ) );
 
-	// ---------- Eshik (kulrang eman, qora shisha chiziq), xonaga qaragan yuzasi z0 - t ----------
-	const dz = z0 - t;
-	const lx0 = door.x0 + 0.005, lx1 = door.x1 - 0.005;
-	b.add( mats.oak, box( lx0, lx1, 0.01, door.h - 0.005, dz + 0.01, dz + 0.05 ) );
+	// ---------- Eshik — rasm 17 dagi kabi: kulrang yasen laminat, chetki vertikal ramalar,
+	// gorizontal panellar orasida ingichka qora chiziqlar, bitta qora shisha chiziq, qora furnitura ----------
+	const dz = z0 - t; // xonaga qaragan yuza
+	const lx0 = door.x0 + 0.005, lx1 = door.x1 - 0.005, ly1 = door.h - 0.005;
+	const SW = 0.085; // chetki rama (stoyka) kengligi
+	const f0 = dz + 0.01; // tavaqa old yuzasi
+	b.add( mats.ashH, box( lx0 + SW, lx1 - SW, 0.01, ly1, f0, dz + 0.05 ) ); // gorizontal tolali maydon
+	b.add( mats.ashV, box( lx0, lx0 + SW, 0.01, ly1, f0 - 0.001, dz + 0.05 ) );
+	b.add( mats.ashV, box( lx1 - SW, lx1, 0.01, ly1, f0 - 0.001, dz + 0.05 ) );
+	// stoyka va maydon orasidagi ingichka tirqish
+	for ( const x of [ lx0 + SW, lx1 - SW ] ) b.add( mats.doorSeam, box( x - 0.0015, x + 0.0015, 0.01, ly1, f0 - 0.0012, f0 + 0.002 ) );
+	// gorizontal chiziqlar (rasmdagi balandliklar, m)
+	for ( const y of [ 1.89, 1.71, 1.62, 1.01, 0.68, 0.36 ] ) b.add( mats.doorSeam, box( lx0 + SW, lx1 - SW, y, y + 0.003, f0 - 0.0012, f0 + 0.002 ) );
+	// qora shisha chiziq
+	b.add( mats.blackGlass, box( lx0 + SW, lx1 - SW, 1.34, 1.40, f0 - 0.0015, f0 + 0.002 ) );
+	// nalichnik (yon — vertikal tola, tepa — gorizontal)
 	const aw = 0.07, at = 0.012;
-	b.add( mats.oak, box( door.x0 - aw, door.x0, 0, door.h + aw, dz - at, dz ) );
-	b.add( mats.oak, box( door.x1, door.x1 + aw, 0, door.h + aw, dz - at, dz ) );
-	b.add( mats.oak, box( door.x0 - aw, door.x1 + aw, door.h, door.h + aw, dz - at, dz ) );
-	b.add( mats.oak, box( door.x0, door.x0 + 0.005, 0, door.h, dz, z0 ) );
-	b.add( mats.oak, box( door.x1 - 0.005, door.x1, 0, door.h, dz, z0 ) );
-	for ( const y of [ 0.38, 0.72, 1.06, 1.74 ] ) b.add( mats.groove, box( lx0 + 0.09, lx1 - 0.09, y, y + 0.004, dz + 0.0085, dz + 0.0105 ) );
-	b.add( mats.blackGlass, box( lx0 + 0.09, lx1 - 0.09, 1.4, 1.46, dz + 0.007, dz + 0.0105 ) );
-	// tutqich — burchakdan uzoq tomonda (g'arb)
-	const hx = lx0 + 0.075;
-	b.add( mats.blackMetal, new THREE.CylinderGeometry( 0.026, 0.026, 0.012, 24 ).rotateX( Math.PI / 2 ).translate( hx, 1.0, dz + 0.004 ) );
-	b.add( mats.blackMetal, beam( V( hx, 1.0, dz + 0.004 ), V( hx, 1.0, dz - 0.055 ), 0.009, 0.009, true ) );
-	b.add( mats.blackMetal, box( hx, hx + 0.13, 0.99, 1.012, dz - 0.068, dz - 0.05 ) );
-	b.add( mats.blackMetal, new THREE.CylinderGeometry( 0.02, 0.02, 0.01, 20 ).rotateX( Math.PI / 2 ).translate( hx, 0.86, dz + 0.004 ) );
+	b.add( mats.ashV, box( door.x0 - aw, door.x0, 0, door.h + aw, dz - at, dz ) );
+	b.add( mats.ashV, box( door.x1, door.x1 + aw, 0, door.h + aw, dz - at, dz ) );
+	b.add( mats.ashH, box( door.x0 - aw, door.x1 + aw, door.h, door.h + aw, dz - at, dz ) );
+	b.add( mats.ashV, box( door.x0, door.x0 + 0.005, 0, door.h, dz, z0 ) );
+	b.add( mats.ashV, box( door.x1 - 0.005, door.x1, 0, door.h, dz, z0 ) );
+	// qora sharnirlar — g'arbiy (burchakdan uzoq) tomonda
+	for ( const y of [ 1.78, 1.52, 0.38 ] ) b.add( mats.blackMetal, box( lx0 - 0.006, lx0 + 0.004, y - 0.05, y + 0.05, dz - 0.004, f0 ) );
+	// tutqich — sharqiy (burchak) tomonda: kvadrat rozetka, qora dasta, pastda kalit rozetkasi
+	const hx = lx1 - 0.055;
+	b.add( mats.blackMetal, box( hx - 0.024, hx + 0.024, 0.976, 1.024, f0 - 0.008, f0 ) );
+	b.add( mats.blackMetal, beam( V( hx, 1.0, f0 - 0.008 ), V( hx, 1.0, f0 - 0.058 ), 0.008, 0.008, true ) );
+	b.add( mats.blackMetal, box( hx - 0.135, hx + 0.005, 0.99, 1.01, f0 - 0.07, f0 - 0.052 ) );
+	b.add( mats.blackMetal, box( hx - 0.022, hx + 0.022, 0.86, 0.904, f0 - 0.007, f0 ) );
+	b.add( mats.chrome, box( hx - 0.003, hx + 0.003, 0.872, 0.892, f0 - 0.0075, f0 - 0.006 ) );
 
 	return b.build( { name: 'closet' } );
 

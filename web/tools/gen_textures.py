@@ -185,3 +185,28 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         laminate_textures(sys.argv[1])
     print('ok')
+
+
+def aniso_noise(size, cx, cy, seed):
+    """Tileable value noise stretched along X (cx columns, cy rows of cells)."""
+    r = np.random.default_rng(seed)
+    g = r.random((cy, cx)).astype(np.float32)
+    g = np.tile(g, (3, 3))
+    im = Image.fromarray((g * 65535).astype(np.int32), mode='I').resize((size * 3, size * 3), Image.BICUBIC)
+    return np.asarray(im, dtype=np.float32)[size:2 * size, size:2 * size] / 65535.0
+
+
+def ash_texture(px=1024):
+    """Kulrang yasen/eman laminat (eshik, rasm 17): gorizontal tola, 1 m ni qoplaydi."""
+    a = aniso_noise(px, 3, 140, 501)      # asosiy tola chiziqlari
+    b = aniso_noise(px, 6, 420, 502)      # ingichka tolalar
+    c = aniso_noise(px, 2, 18, 503)       # keng ton farqi
+    d = aniso_noise(px, 12, 60, 504)      # tola uzilishi
+    streak = smoothstep(0.55, 0.85, a) * (0.6 + 0.4 * d)
+    fine = (b - 0.5) * 0.07
+    tone = (c - 0.5) * 0.08
+    base = np.array([0.83, 0.835, 0.83], np.float32)
+    dark = np.array([0.64, 0.645, 0.64], np.float32)
+    col = base[None, None, :] * (1 + tone + fine)[..., None]
+    col = col * (1 - streak[..., None] * 0.5) + dark * (streak[..., None] * 0.5)
+    Image.fromarray((np.clip(col, 0, 1) * 255).astype(np.uint8)).save(os.path.join(OUT, 'ash_grey.jpg'), quality=90)

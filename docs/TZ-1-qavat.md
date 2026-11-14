@@ -101,3 +101,4 @@ Diagnostika uchun URL parametrlari: `?q=low` (kuchsiz GPU), `?view=zina`, `?exp=
 - Pol: och kulrang marmar keramogranit, yumshoq bulutsimon kulrang dog'lar va xira tomirlar (rasmdagi kabi).
 - Poldagi chiziqli panjara: 1-eshik chetidan ichkariga, x 0.35…2.4, z ≈ 1.2.
 - Yorug'lik: rasmlar yumshoq kunduzgi yorug'likda — ichkarida quyosh soyalari deyarli yo'q, oq balans neytral-sovuq, ekspozitsiya rasm yorqinligiga moslangan (ustun yuzasi ~204/255). Tashqaridan (maket) ko'rinishda quyosh avvalgidek.
+- Zina ostidagi eshik (rasm 17): kulrang yasen laminat (`tex/ash_grey.jpg`) — chetki stoykalarda vertikal, panellarda gorizontal tola; ingichka chiziqlar 1.89 / 1.71 / 1.62 / 1.01 / 0.68 / 0.36 m da; qora shisha chiziq 1.34…1.40 m; qora kvadrat rozetkali dasta va kalit rozetkasi sharqiy (burchak) tomonda; 3 ta qora sharnir g'arbiy tomonda.

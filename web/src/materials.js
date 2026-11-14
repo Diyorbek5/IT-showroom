@@ -85,6 +85,14 @@ export function createMaterials() {
 			diffuseColor.rgb = mix( vec3( g ) * vec3( 0.97, 0.985, 1.0 ), diffuseColor.rgb, 0.18 ) * 1.12;` );
 
 	};
+	// Zina ostidagi eshik: kulrang yasen laminat (rasm 17) — panellarda gorizontal, chetki ramalarda vertikal tola
+	const ashMap = tex( 'tex/ash_grey.jpg', { srgb: true, repeat: 1 } );
+	m.ashH = new THREE.MeshStandardMaterial( { map: ashMap, roughness: 0.55, metalness: 0 } );
+	const ashMapV = ashMap.clone();
+	ashMapV.center.set( 0.5, 0.5 );
+	ashMapV.rotation = Math.PI / 2;
+	m.ashV = new THREE.MeshStandardMaterial( { map: ashMapV, roughness: 0.55, metalness: 0 } );
+	m.doorSeam = new THREE.MeshStandardMaterial( { color: 0x5c5d5e, roughness: 0.7 } );
 	m.blackGlass = new THREE.MeshPhysicalMaterial( { color: 0x070708, roughness: 0.05, metalness: 0, clearcoat: 1 } );
 	m.blackMetal = new THREE.MeshStandardMaterial( { color: 0x151517, roughness: 0.35, metalness: 0.8 } );
 	m.groove = new THREE.MeshStandardMaterial( { color: 0x6f6f6c, roughness: 0.8 } );
