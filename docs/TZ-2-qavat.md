@@ -128,3 +128,10 @@
 - Uzoqda (150…260 m) bej, g'isht va oq rangli 8…18 qavatli uylar va minorali kran.
 - Kamera uzoqlik chegarasi 600 m (osmon foni ko'rinishi uchun).
 - 2-qavatdan qaraganda qo'shni binoning kulrang devori ham yashil to'r bilan qoplangan (faqat kamera 2-qavatda bo'lganda; 1-qavatdan devor, zina va eshiklar ko'rinadi).
+
+## 15. Rasm 22…25 bo'yicha 1:1 (ichki ko'rinish)
+- Laminat: kulrang-bej eman, 1.38 × 0.197 m taxtalar, yoysimon naqsh, ingichka tolalar, tugunlar va V-faska (`tex/laminate_*`, `oak_laminate()`), iliq tus.
+- Shiftdagi panellar 60 × 60 sm.
+- 1-eshik (uzun devorda, z 2.0…2.9) — to'q (deyarli qora), tik panelli (rasm 23).
+- Ofisda g'arbiy oyna yonida radiator (rasm 25).
+- G'arb tomonida ko'chaning narigi tarafida daraxtlar qatori va 5 qavatli uy (rasm 25 oynasidan).

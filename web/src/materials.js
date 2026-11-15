@@ -120,20 +120,20 @@ export function createMaterials() {
 export function createMaterials2( m ) {
 
 	const m2 = {};
-	const lr = 1 / 2.4;
+	const lr = 1 / 2.76; // tekstura 2.76 m ni qoplaydi (1.38 × 0.197 m taxtalar)
 	m2.laminate = new THREE.MeshPhysicalMaterial( {
 		map: tex( 'tex/laminate_albedo.jpg', { srgb: true, repeat: lr, aniso: 16 } ),
 		roughnessMap: tex( 'tex/laminate_rough.jpg', { repeat: lr, aniso: 16 } ),
 		normalMap: tex( 'tex/laminate_normal.jpg', { repeat: lr, aniso: 16 } ),
 		roughness: 1, metalness: 0, ior: 1.5, specularIntensity: 0.9,
-		clearcoat: 0.6, clearcoatRoughness: 0.14, color: 0xfff8ef,
+		clearcoat: 0.6, clearcoatRoughness: 0.14, color: 0xfff1e4, // rasm 23: iliq kulrang-bej
 	} );
-	m2.laminate.normalScale.set( 0.35, 0.35 );
+	m2.laminate.normalScale.set( 0.6, 0.6 );
 	// Rasm 21: taxtalar orasidagi ton farqi juda kam — kontrastni pasaytiramiz
 	m2.laminate.onBeforeCompile = ( sh ) => {
 
 		sh.fragmentShader = sh.fragmentShader.replace( '#include <map_fragment>', `#include <map_fragment>
-			diffuseColor.rgb = mix( vec3( 0.59, 0.53, 0.45 ), diffuseColor.rgb, 0.65 );` );
+			diffuseColor.rgb = mix( vec3( 0.5, 0.45, 0.4 ), diffuseColor.rgb, 0.92 );` );
 
 	};
 	m2.wall = m.wall.clone();

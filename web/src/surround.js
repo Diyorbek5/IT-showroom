@@ -370,6 +370,40 @@ export function buildSurroundings( envTex ) {
 	addCar( - 14.8, 11, - Math.PI / 2, 'suv', paintMats[ 0 ] );
 	addCar( - 10.4, 27, Math.PI / 2, 'hatch', paintMats[ 3 ] );
 
+	// ---------- g'arb: ko'chaning narigi tomonida daraxtlar qatori va 5 qavatli uy (2-qavat rasm 25) ----------
+	const crownTex = canvasTex( 256, 256, ( g, w, h ) => {
+
+		g.clearRect( 0, 0, w, h );
+		const R = rng( 31 );
+		for ( let i = 0; i < 2600; i ++ ) {
+
+			const a2 = R() * Math.PI * 2, d = Math.sqrt( R() ) * 0.46;
+			const px = w * ( 0.5 + Math.cos( a2 ) * d * ( 0.9 + 0.2 * Math.sin( a2 * 3 ) ) ), py = h * ( 0.48 + Math.sin( a2 ) * d * 0.9 );
+			const up = 1 - py / h;
+			g.fillStyle = `hsla(${85 + R() * 30},${26 + R() * 14}%,${14 + up * 26 + R() * 10}%,0.95)`;
+			g.beginPath(); g.arc( px, py, 3 + R() * 6, 0, Math.PI * 2 ); g.fill();
+
+		}
+
+	} );
+	const crownM = B( { map: crownTex, alphaTest: 0.5, side: THREE.DoubleSide } );
+	const trunkM = B( { color: 0x4a3e33 } );
+	for ( let z = - 28; z < 40; z += 6.5 ) {
+
+		const tx = - 19.2 + ( r() - 0.5 ) * 0.6, tz = z + ( r() - 0.5 ) * 1.5, s2 = 0.85 + r() * 0.4;
+		G( new THREE.CylinderGeometry( 0.14, 0.2, 4.2 * s2, 8 ).translate( tx, 2.1 * s2, tz ), trunkM, null, { uv: false } );
+		for ( const rot of [ 0, Math.PI / 2, Math.PI / 4 ] ) {
+
+			const pg = new THREE.PlaneGeometry( 7.5 * s2, 7.5 * s2 ).rotateY( rot ).translate( tx, 6.6 * s2, tz );
+			G( pg, crownM, null, { uv: false, ao: false } );
+
+		}
+
+	}
+
+	G( box( - 44, - 28, 0, 15.5, - 30, 42 ), B( { map: facadeTex( '#bfa889', '#5e666f', '#a99274', 7 ) } ), null, { ao: false } );
+	G( box( - 44.2, - 27.8, 15.5, 16.1, - 30.2, 42.2 ), roofM, null, { uv: false, ao: false } );
+
 	const grp = b.build( 'surroundings' );
 
 	// ---------- shimol tomonda: past daraxtlar qatori va ochiq osmon (rasm 02, 16) ----------

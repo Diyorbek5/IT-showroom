@@ -205,8 +205,8 @@ export function buildFloor2( mats, m2 ) {
 	const pe = new Batch();
 	for ( const [ x, z ] of PANELS2 ) {
 
-		cb.add( m2.panelFrame, new RoundedBoxGeometry( 0.47, 0.035, 0.47, 2, 0.006 ).translate( x, TOP - 0.0175, z ) );
-		pe.add( m2.ledCool, new THREE.PlaneGeometry( 0.43, 0.43 ).rotateX( Math.PI / 2 ).translate( x, TOP - 0.0356, z ) );
+		cb.add( m2.panelFrame, new RoundedBoxGeometry( 0.6, 0.035, 0.6, 2, 0.006 ).translate( x, TOP - 0.0175, z ) ); // rasm 22…25: 60×60 sm panellar
+		pe.add( m2.ledCool, new THREE.PlaneGeometry( 0.56, 0.56 ).rotateX( Math.PI / 2 ).translate( x, TOP - 0.0356, z ) );
 
 	}
 
@@ -304,20 +304,27 @@ function addDoorZ( b, m2, p ) {
 	const xc = ( p.x0 + p.x1 ) / 2;
 	const z0 = p.z0, z1 = p.z1;
 	const lz0 = z0 + 0.005, lz1 = z1 - 0.005;
-	b.add( m2.pvc, box( xc - 0.025, xc + 0.025, Y2 + 0.01, Y2 + DOOR_H - 0.005, lz0, lz1 ) );
-	b.add( m2.darkGlass, box( xc - 0.027, xc + 0.027, Y2 + 0.95, Y2 + 1.95, lz0 + 0.11, lz1 - 0.11 ) );
+	// 'dark' — rasm 23 dagi kabi to'q (deyarli qora) eshik, tik panelli; aks holda oq PVC + to'q oyna
+	const dark = p.doorZ === 'dark';
+	const LM = dark ? m2.metalDoor : m2.pvc;
+	b.add( LM, box( xc - 0.025, xc + 0.025, Y2 + 0.01, Y2 + DOOR_H - 0.005, lz0, lz1 ) );
+	if ( dark ) {
+
+		for ( const zz of [ lz0 + 0.2, lz1 - 0.2 ] ) b.add( m2.blackMetal, box( xc - 0.027, xc + 0.027, Y2 + 0.15, Y2 + DOOR_H - 0.15, zz - 0.004, zz + 0.004 ) );
+
+	} else b.add( m2.darkGlass, box( xc - 0.027, xc + 0.027, Y2 + 0.95, Y2 + 1.95, lz0 + 0.11, lz1 - 0.11 ) );
 	for ( const side of [ - 1, 1 ] ) {
 
 		const xf = side < 0 ? p.x0 : p.x1, t = side * 0.012;
-		b.add( m2.pvc, box( xf, xf + t, Y2, Y2 + DOOR_H + 0.06, z0 - 0.06, z0 ) );
-		b.add( m2.pvc, box( xf, xf + t, Y2, Y2 + DOOR_H + 0.06, z1, z1 + 0.06 ) );
-		b.add( m2.pvc, box( xf, xf + t, Y2 + DOOR_H, Y2 + DOOR_H + 0.06, z0 - 0.06, z1 + 0.06 ) );
+		b.add( LM, box( xf, xf + t, Y2, Y2 + DOOR_H + 0.06, z0 - 0.06, z0 ) );
+		b.add( LM, box( xf, xf + t, Y2, Y2 + DOOR_H + 0.06, z1, z1 + 0.06 ) );
+		b.add( LM, box( xf, xf + t, Y2 + DOOR_H, Y2 + DOOR_H + 0.06, z0 - 0.06, z1 + 0.06 ) );
 		b.add( m2.chrome, box( xc + side * 0.06, xc + side * 0.075, Y2 + 1.0, Y2 + 1.02, lz1 - 0.19, lz1 - 0.06 ) );
 
 	}
 
-	b.add( m2.pvc, box( p.x0, p.x1, Y2, Y2 + DOOR_H, z0, z0 + 0.01 ) );
-	b.add( m2.pvc, box( p.x0, p.x1, Y2, Y2 + DOOR_H, z1 - 0.01, z1 ) );
+	b.add( LM, box( p.x0, p.x1, Y2, Y2 + DOOR_H, z0, z0 + 0.01 ) );
+	b.add( LM, box( p.x0, p.x1, Y2, Y2 + DOOR_H, z1 - 0.01, z1 ) );
 
 }
 

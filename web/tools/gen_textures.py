@@ -210,3 +210,64 @@ def ash_texture(px=1024):
     col = base[None, None, :] * (1 + tone + fine)[..., None]
     col = col * (1 - streak[..., None] * 0.5) + dark * (streak[..., None] * 0.5)
     Image.fromarray((np.clip(col, 0, 1) * 255).astype(np.uint8)).save(os.path.join(OUT, 'ash_grey.jpg'), quality=90)
+
+
+def oak_laminate(px=2048, meters=2.76):
+    """Kulrang-bej eman laminat (2-qavat rasm 22…25): 1.38 × 0.197 m taxtalar, yoysimon (cathedral) naqsh,
+    ingichka tolalar, kamdan-kam kichik tugunlar, taxta chetida V-faska."""
+    rows, plen = 14, px // 2
+    rowH = px // rows
+    rng2 = np.random.default_rng(1234)
+    y, x = np.mgrid[0:px, 0:px]
+    r = np.minimum(y // rowH, rows - 1)
+    v = (y - r * rowH) / rowH
+    off = rng2.integers(0, plen, rows)
+    xs = (x + off[r]) % px
+    k = xs // plen
+    u = (xs % plen) / plen
+    pid = r * 2 + k
+    n = rows * 2
+    tone = rng2.uniform(-0.03, 0.03, n)[pid]
+    warm = rng2.uniform(-0.006, 0.01, n)[pid]
+    A = rng2.uniform(5, 14, n)[pid]
+    B = rng2.uniform(0.5, 1.4, n)[pid]
+    c0 = rng2.uniform(0.25, 0.75, n)[pid]
+    ph = rng2.uniform(0, 6.28, n)[pid]
+    # ingichka tolalar: uzunlik bo'ylab cho'zilgan shovqin (har bir taxta uchun boshqa joyidan)
+    N1 = aniso_noise(px, 4, 300, 901)
+    N2 = aniso_noise(px, 10, 160, 902)
+    yy = (y + pid * 97) % px
+    fine = N1[yy, x] - 0.5
+    mid = N2[yy, x] - 0.5
+    # yoysimon halqalar
+    c = c0 + 0.12 * np.sin(u * np.pi * 1.7 + ph)
+    f = ((v - c) ** 2) * A + u * B + mid * 0.35
+    ring = np.abs(np.sin(f * np.pi * 1.6))
+    rings = (1 - smoothstep(0.0, 0.3, ring)) * (0.55 + 0.45 * smoothstep(0.0, 0.25, np.abs(v - c)))
+    base = np.array([0.765, 0.725, 0.68], np.float32)
+    lum = 1 + tone + fine * 0.11 + mid * 0.08 - rings * 0.15
+    col = np.empty((px, px, 3), np.float32)
+    col[..., 0] = base[0] * lum + warm
+    col[..., 1] = base[1] * lum
+    col[..., 2] = base[2] * lum - warm
+    # kichik tugunlar
+    kn = rng2.random(n) < 0.18
+    ku, kv = rng2.uniform(0.15, 0.85, n), rng2.uniform(0.25, 0.75, n)
+    d = np.sqrt(((u - ku[pid]) * plen / rowH) ** 2 * 0.25 + (v - kv[pid]) ** 2) * 14
+    knot = (1 - smoothstep(0.0, 0.5, d)) * kn[pid]
+    col *= (1 - knot * 0.35)[..., None]
+    # V-faska: taxta chetlarida ingichka qorong'i chiziq
+    ev = np.minimum(v, 1 - v) * rowH
+    eu = np.minimum(u, 1 - u) * plen
+    e = np.minimum(ev, eu)
+    groove = 1 - smoothstep(0.5, 2.5, e)
+    col *= (1 - groove * 0.22)[..., None]
+    rough = 0.42 + fine * 0.25 + rings * 0.1 + groove * 0.4
+    height = -groove * 0.8 - rings * 0.04 + fine * 0.03
+    gx = (np.roll(height, -1, 1) - np.roll(height, 1, 1)) * 0.5
+    gy = (np.roll(height, -1, 0) - np.roll(height, 1, 0)) * 0.5
+    nn = np.stack([-gx * 2.0, gy * 2.0, np.ones_like(gx)], -1)
+    nn /= np.linalg.norm(nn, axis=-1, keepdims=True)
+    Image.fromarray((np.clip(col, 0, 1) * 255).astype(np.uint8)).resize((1024, 1024), Image.LANCZOS).save(os.path.join(OUT, 'laminate_albedo.jpg'), quality=90)
+    Image.fromarray((np.clip(rough, 0, 1) * 255).astype(np.uint8)).resize((1024, 1024), Image.LANCZOS).save(os.path.join(OUT, 'laminate_rough.jpg'), quality=88)
+    Image.fromarray(((nn * 0.5 + 0.5) * 255).astype(np.uint8)).resize((1024, 1024), Image.LANCZOS).save(os.path.join(OUT, 'laminate_normal.jpg'), quality=92)

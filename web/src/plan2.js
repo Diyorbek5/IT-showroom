@@ -64,7 +64,7 @@ export const PARTITIONS2 = [
 	{ x0: 1.9, x1: 2.02, z0: 6.4, z1: 8.75 },
 	// Uzun devor: oynagacha (oyna bilan devor orasidagi ochiq joy yopildi — belgilangan reja 2, yulduzcha)
 	{ x0: 6.5, x1: 6.8, z0: 0.0, z1: 2.0 },
-	{ x0: 6.5, x1: 6.8, z0: 2.0, z1: 2.9, doorZ: 'pvc' }, // 1-eshik → ofis xonaga kiriladi
+	{ x0: 6.5, x1: 6.8, z0: 2.0, z1: 2.9, doorZ: 'dark' }, // 1-eshik → ofis xonaga kiriladi
 	{ x0: 6.5, x1: 6.8, z0: 2.9, z1: 5.3 },
 	{ x0: 3.78, x1: 6.8, z0: 5.18, z1: 5.3 }, // zina maydonchasining shimoliy devori
 	{ x0: 3.78, x1: 3.9, z0: 5.3, z1: 8.75 }, // zina g'arbidagi devor (= kichik xona sharqiy devori)
@@ -129,6 +129,7 @@ export const RADIATORS2 = [
 	{ x: 9.6, z: 8.75, nx: 0, nz: - 1, n: 10 },
 	{ x: 12.8, z: 8.75, nx: 0, nz: - 1, n: 10 },
 	{ x: 6.5, z: 4.1, nx: - 1, nz: 0, n: 10 },
+	{ x: 1.15, z: 3.86, nx: 0, nz: - 1, n: 8 }, // ofis: g'arbiy oyna yonida (rasm 25)
 	{ x: 23.35, z: 6.8, nx: - 1, nz: 0, n: 10 },
 	{ x: 16.0, z: 12.6, nx: 1, nz: 0, n: 10 }, // yon devorda, oq eshik yonida (rasm 21)
 ];
