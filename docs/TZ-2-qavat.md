@@ -135,3 +135,10 @@
 - 1-eshik (uzun devorda, z 2.0…2.9) — to'q (deyarli qora), tik panelli (rasm 23).
 - Ofisda g'arbiy oyna yonida radiator (rasm 25).
 - G'arb tomonida ko'chaning narigi tarafida daraxtlar qatori va 5 qavatli uy (rasm 25 oynasidan).
+
+## 16. Jihozlar (premium) — `web/src/furniture.js`
+- 1-qavat: sharqiy devorda yong'oq reykali panel va yorug' "ISTEK · IT SHOWROOM" logotipi; oldida 3 o'rinli operatorlar stoykasi (oq peshtaxta, yong'oq reykalar, latun chiziq, monitorlar, kreslolar); vitrina yonida mehmonlar burchagi — marmar dumaloq stol, 2 ta konyak charm kreslo, gilam, patnisda shirinliklar, suv shishalari va stakanlar; o'simliklar.
+- 2-qavat qanot: majlislar zali — 6 m yong'oq stol (markazida marmar), 13 ta charm stul, ustida chiziqli osma chiroq, janubiy devorda TV va tumba.
+- 2-qavat chap blok (zina chiqishi yonida): dasturchilar uchun 2 qator × 4 o'rin, har birida 2 monitor, akustik to'siq.
+- Ofis — direktor xonasi: yong'oq stol, baland charm kreslo, 2 mehmon kreslosi, TV, gilam, "KUTUBXONA" yozuvli kitob javonlari.
+- Shift: kabellar ikki qator bo'ylab erkin osilgan, ba'zi panellar yonida pastga tushgan halqalar (rasm 24, 25).

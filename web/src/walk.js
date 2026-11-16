@@ -23,6 +23,8 @@ export class WalkControls {
 				...COLUMNS.map( ( c ) => [ c.x0, c.x1, c.z0, c.z1 ] ),
 				[ STAIR.x0 - 0.05, STAIR.xE, STAIR.z0 - 0.15, 8.75 ],
 				[ WC.x0, WC.x1, WC.z0, WC.z1 ],
+				// jihozlar: operatorlar stoykasi, mehmonlar burchagi
+				[ 5.2, 7.3, 1.4, 4.8 ], [ 2.6, 4.6, 0.7, 2.1 ],
 			],
 		};
 		const down = ( e ) => {

@@ -15,6 +15,7 @@ import { createMaterials, createMaterials2, setEnvMap } from './materials.js';
 import { buildFloor2 } from './floor2.js';
 import { buildDimensions } from './dims.js';
 import { buildSurroundings } from './surround.js';
+import { createFurnitureMaterials, buildFurniture1, buildFurniture2 } from './furniture.js';
 import { buildShell } from './building.js';
 import { buildStair } from './stair.js';
 import { buildFixtures, applyLightLevels } from './fixtures.js';
@@ -106,7 +107,20 @@ async function main() {
 	const floor2 = buildFloor2( mats, m2 );
 	lights.floor2 = floor2.userData.lights;
 	applyLightLevels( lights, mats, params );
-	scene.add( shell, stair, fixtures, floor2, floor2.userData.mass );
+	// Jihozlar (premium): 1-qavat — logotip, operatorlar, mehmonlar; 2-qavat — majlislar zali, dasturchilar, direktor
+	const furn1 = buildFurniture1( createFurnitureMaterials() );
+	const F2 = createFurnitureMaterials();
+	const furn2 = buildFurniture2( F2, Y2 );
+	for ( const [ k, v ] of Object.entries( F2 ) ) {
+
+		if ( Array.isArray( v ) ) v.forEach( ( mm, i ) => ( m2[ 'furn_' + k + i ] = mm ) );
+		else m2[ 'furn_' + k ] = v; // 2-qavat cubemap aksini olishi uchun
+
+	}
+
+	furn2.userData.mats.forEach( ( mm, i ) => ( m2[ 'furn_x' + i ] = mm ) );
+	floor2.add( furn2 );
+	scene.add( shell, stair, fixtures, floor2, floor2.userData.mass, furn1 );
 	const ceilingGroup = shell.userData.ceiling;
 	const floor = shell.userData.floor;
 
@@ -397,6 +411,8 @@ async function main() {
 				[ 0.75, 3.3, 3.86, 3.98 ], [ 4.3, 4.75, 3.86, 3.98 ], [ 5.65, 6.5, 3.86, 3.98 ],
 				[ 3.78, 6.8, 5.18, 5.3 ], [ 3.78, 3.9, 5.3, 8.75 ],
 				[ 0, 1.4, 1.78, 3.8 ],
+				// jihozlar
+				[ 18.0, 21.4, 8.0, 15.2 ], [ 7.9, 13.7, 5.5, 8.4 ], [ 1.9, 3.7, 0.7, 3.0 ], [ 1.7, 3.3, 3.45, 3.86 ], [ 18.3, 21.1, 16.5, 17.01 ],
 			],
 		},
 	};

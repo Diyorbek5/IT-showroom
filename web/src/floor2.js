@@ -385,11 +385,13 @@ function addCables( b, m2 ) {
 	}
 
 	const rand = mulberry( 11 );
-	for ( const pts of rows.values() ) {
+	// rasm 24, 25: har qator bo'ylab bir-ikki kabel, panellar orasida erkin osilib turadi (sezilarli egilish)
+	for ( const [ dz, sagMin, sagRnd, skip ] of [ [ 0.3, 0.12, 0.26, 0 ], [ - 0.36, 0.2, 0.34, 0.45 ] ] ) for ( const pts of rows.values() ) {
 
 		if ( pts.length < 2 ) continue;
+		if ( rand() < skip ) continue;
 		pts.sort( ( a, c ) => a[ 0 ] - c[ 0 ] );
-		const z = pts[ 0 ][ 1 ] + 0.3;
+		const z = pts[ 0 ][ 1 ] + dz;
 		const path = [];
 		for ( let i = 0; i < pts.length; i ++ ) {
 
@@ -412,7 +414,7 @@ function addCables( b, m2 ) {
 
 			} else {
 
-				const sag = 0.08 + rand() * 0.12;
+				const sag = sagMin + rand() * sagRnd;
 				path.push( V( ( x + xn ) / 2, TOP - 0.04 - sag, z + ( rand() - 0.5 ) * 0.1 ) );
 
 			}
@@ -420,7 +422,18 @@ function addCables( b, m2 ) {
 		}
 
 		const curve = new THREE.CatmullRomCurve3( path, false, 'centripetal' );
-		b.add( m2.cable, new THREE.TubeGeometry( curve, path.length * 10, 0.0055, 5, false ) );
+		b.add( m2.cable, new THREE.TubeGeometry( curve, path.length * 10, 0.0065, 5, false ) );
+
+	}
+
+	// ortiqcha kabel halqalari: ba'zi panellar yonida pastga osilib qaytadi (rasm 24)
+	for ( const [ x, z ] of PANELS2 ) {
+
+		if ( rand() > 0.28 ) continue;
+		const s2 = rand() < 0.5 ? - 1 : 1, drop = 0.35 + rand() * 0.45;
+		const pts = [ V( x + s2 * 0.32, TOP - 0.04, z + 0.25 ), V( x + s2 * 0.45, TOP - drop * 0.7, z + 0.3 ), V( x + s2 * 0.62, TOP - drop, z + 0.38 ),
+			V( x + s2 * 0.82, TOP - drop * 0.6, z + 0.42 ), V( x + s2 * 0.95, TOP - 0.04, z + 0.4 ) ];
+		b.add( m2.cable, new THREE.TubeGeometry( new THREE.CatmullRomCurve3( pts, false, 'centripetal' ), 40, 0.0065, 5, false ) );
 
 	}
 
